@@ -1,0 +1,118 @@
+using ContractorEntity = P360.People.Domain.Entities.Contractor;
+
+namespace P360.People.Api.Contracts;
+
+public sealed record CreateContractorRequest(
+    string? ReferenceId,
+    string? ContractorName,
+    string? ContractorId,
+    string? CompanyName,
+    string? ProjectName,
+    string? Address,
+    DateTime ContractStart,
+    DateTime ContractEnd,
+    string? PhoneNo,
+    string? Nationality,
+    string? VehicleName,
+    string? VehicleId,
+    string? ContractorImage,
+    string? CreatedBy,
+    string? ClientId)
+{
+    public ContractorEntity ToEntity()
+    {
+        return new ContractorEntity
+        {
+            ReferenceId = ReferenceId,
+            ContractorName = ContractorName,
+            ContractorId = ContractorId,
+            CompanyName = CompanyName,
+            ProjectName = ProjectName,
+            Address = Address,
+            ContractStart = ContractStart,
+            ContractEnd = ContractEnd,
+            PhoneNo = PhoneNo,
+            Nationality = Nationality,
+            VehicleName = VehicleName,
+            VehicleId = VehicleId,
+            ContractorImage = ContractorImage,
+            CreatedBy = CreatedBy,
+            ClientId = ClientId,
+            CreatedAt = DateTime.UtcNow
+        };
+    }
+}
+
+public sealed record UpdateContractorRequest(
+    string? ContractorName,
+    string? ContractorId,
+    string? CompanyName,
+    string? ProjectName,
+    string? Address,
+    DateTime ContractStart,
+    DateTime ContractEnd,
+    string? PhoneNo,
+    string? Nationality,
+    string? VehicleName,
+    string? VehicleId,
+    string? ContractorImage)
+{
+    public void ApplyTo(ContractorEntity contractor)
+    {
+        contractor.ContractorName = ContractorName;
+        contractor.ContractorId = ContractorId;
+        contractor.CompanyName = CompanyName;
+        contractor.ProjectName = ProjectName;
+        contractor.Address = Address;
+        contractor.ContractStart = ContractStart;
+        contractor.ContractEnd = ContractEnd;
+        contractor.PhoneNo = PhoneNo;
+        contractor.Nationality = Nationality;
+        contractor.VehicleName = VehicleName;
+        contractor.VehicleId = VehicleId;
+        contractor.ContractorImage = ContractorImage;
+    }
+}
+
+public sealed record ContractorResponse(
+    string Id,
+    string ReferenceId,
+    string ContractorName,
+    string ContractorId,
+    string CompanyName,
+    string ProjectName,
+    string Address,
+    DateTime ContractStart,
+    DateTime ContractEnd,
+    string PhoneNo,
+    string Nationality,
+    string VehicleName,
+    string VehicleId,
+    string ContractorImage,
+    string CreatedBy,
+    DateTime CreatedAt,
+    string ClientId)
+{
+    public static ContractorResponse FromEntity(
+        ContractorEntity contractor)
+    {
+        return new ContractorResponse(
+            contractor.Id ?? string.Empty,
+            contractor.ReferenceId ?? string.Empty,
+            contractor.ContractorName ?? string.Empty,
+            contractor.ContractorId ?? string.Empty,
+            contractor.CompanyName ?? string.Empty,
+            contractor.ProjectName ?? string.Empty,
+            contractor.Address ?? string.Empty,
+            contractor.ContractStart,
+            contractor.ContractEnd,
+            contractor.PhoneNo ?? string.Empty,
+            contractor.Nationality ?? string.Empty,
+            contractor.VehicleName ?? string.Empty,
+            contractor.VehicleId ?? string.Empty,
+            contractor.ContractorImage ?? string.Empty,
+            contractor.CreatedBy ?? string.Empty,
+            contractor.CreatedAt,
+            contractor.ClientId ?? string.Empty);
+    }
+}

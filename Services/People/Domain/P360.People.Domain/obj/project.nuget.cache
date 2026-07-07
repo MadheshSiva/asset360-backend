@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "uKD4+1XSHI9SGz2e2w3uJ35e9zC9AyQDwTxM3u/E94ZR9wIqAjSo3FGwYAEs4PLmeNp9xv65HeYM4+DDBn14EQ==",
+  "success": true,
+  "projectFilePath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/People/Domain/P360.People.Domain/P360.People.Domain.csproj",
+  "expectedPackageFiles": [
+    "/home/piq2/.nuget/packages/mongodb.bson/3.8.0/mongodb.bson.3.8.0.nupkg.sha512",
+    "/home/piq2/.nuget/packages/system.memory/4.5.5/system.memory.4.5.5.nupkg.sha512",
+    "/home/piq2/.nuget/packages/system.runtime.compilerservices.unsafe/5.0.0/system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

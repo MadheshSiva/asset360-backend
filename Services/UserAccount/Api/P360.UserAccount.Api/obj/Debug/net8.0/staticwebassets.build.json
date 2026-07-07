@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "MrvoiRWiJLBoSKsP/BIIXV8pn4UZRWBzJubAWC12wj4=",
+  "Source": "P360.UserAccount.Api",
+  "BasePath": "_content/P360.UserAccount.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

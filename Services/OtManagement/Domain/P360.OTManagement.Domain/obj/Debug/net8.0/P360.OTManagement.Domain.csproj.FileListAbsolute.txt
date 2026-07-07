@@ -1,0 +1,16 @@
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/bin/Debug/net8.0/P360.OTManagement.Domain.deps.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/bin/Debug/net8.0/P360.OTManagement.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/bin/Debug/net8.0/P360.OTManagement.Domain.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/bin/Debug/net8.0/P360.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/bin/Debug/net8.0/P360.Domain.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/P360.OTManagement.Domain.csproj.AssemblyReference.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/P360.OTManagement.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/P360.OTManagement.Domain.AssemblyInfoInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/P360.OTManagement.Domain.AssemblyInfo.cs
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/P360.OTManagement.Domain.csproj.CoreCompileInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/P360.OTManagement.Domain.sourcelink.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/P360.OTManagement.Domain.csproj.CopyComplete
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/P360.OTManagement.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/refint/P360.OTManagement.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/P360.OTManagement.Domain.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/OtManagement/Domain/P360.OTManagement.Domain/obj/Debug/net8.0/ref/P360.OTManagement.Domain.dll

@@ -1,0 +1,13 @@
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/bin/Debug/net8.0/P360.Media.Client.deps.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/bin/Debug/net8.0/P360.Media.Client.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/bin/Debug/net8.0/P360.Media.Client.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/P360.Media.Client.csproj.AssemblyReference.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/P360.Media.Client.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/P360.Media.Client.AssemblyInfoInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/P360.Media.Client.AssemblyInfo.cs
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/P360.Media.Client.csproj.CoreCompileInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/P360.Media.Client.sourcelink.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/P360.Media.Client.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/refint/P360.Media.Client.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/P360.Media.Client.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Media/P360.Media.Client/obj/Debug/net8.0/ref/P360.Media.Client.dll

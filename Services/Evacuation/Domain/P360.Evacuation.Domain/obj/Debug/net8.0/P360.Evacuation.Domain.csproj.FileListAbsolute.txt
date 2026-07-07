@@ -1,0 +1,16 @@
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/bin/Debug/net8.0/P360.Evacuation.Domain.deps.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/bin/Debug/net8.0/P360.Evacuation.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/bin/Debug/net8.0/P360.Evacuation.Domain.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/bin/Debug/net8.0/P360.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/bin/Debug/net8.0/P360.Domain.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/P360.Evacuation.Domain.csproj.AssemblyReference.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/P360.Evacuation.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/P360.Evacuation.Domain.AssemblyInfoInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/P360.Evacuation.Domain.AssemblyInfo.cs
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/P360.Evacuation.Domain.csproj.CoreCompileInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/P360.Evacuation.Domain.sourcelink.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/P360.Evacuation.Domain.csproj.CopyComplete
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/P360.Evacuation.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/refint/P360.Evacuation.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/P360.Evacuation.Domain.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/Evacuation/Domain/P360.Evacuation.Domain/obj/Debug/net8.0/ref/P360.Evacuation.Domain.dll

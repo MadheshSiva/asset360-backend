@@ -1,0 +1,16 @@
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/bin/Debug/net8.0/P360.VisitorManagement.Domain.deps.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/bin/Debug/net8.0/P360.VisitorManagement.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/bin/Debug/net8.0/P360.VisitorManagement.Domain.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/bin/Debug/net8.0/P360.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/bin/Debug/net8.0/P360.Domain.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/P360.VisitorManagement.Domain.csproj.AssemblyReference.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/P360.VisitorManagement.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/P360.VisitorManagement.Domain.AssemblyInfoInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/P360.VisitorManagement.Domain.AssemblyInfo.cs
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/P360.VisitorManagement.Domain.csproj.CoreCompileInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/P360.VisitorManagement.Domain.sourcelink.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/P360.VisitorManagement.Domain.csproj.CopyComplete
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/P360.VisitorManagement.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/refint/P360.VisitorManagement.Domain.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/P360.VisitorManagement.Domain.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/Debug/net8.0/ref/P360.VisitorManagement.Domain.dll

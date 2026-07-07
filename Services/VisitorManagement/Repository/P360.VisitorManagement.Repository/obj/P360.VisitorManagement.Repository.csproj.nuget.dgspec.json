@@ -1,0 +1,263 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Repository/P360.VisitorManagement.Repository/P360.VisitorManagement.Repository.csproj": {}
+  },
+  "projects": {
+    "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Domain/P360.Domain/P360.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Domain/P360.Domain/P360.Domain.csproj",
+        "projectName": "P360.Domain",
+        "projectPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Domain/P360.Domain/P360.Domain.csproj",
+        "packagesPath": "/home/piq2/.nuget/packages/",
+        "outputPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Domain/P360.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq2/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MongoDB.Bson": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.128/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Repository/P360.Repository/P360.Repository.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Repository/P360.Repository/P360.Repository.csproj",
+        "projectName": "P360.Repository",
+        "projectPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Repository/P360.Repository/P360.Repository.csproj",
+        "packagesPath": "/home/piq2/.nuget/packages/",
+        "outputPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Repository/P360.Repository/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq2/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Domain/P360.Domain/P360.Domain.csproj": {
+                "projectPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Domain/P360.Domain/P360.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Hosting.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.128/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/P360.VisitorManagement.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/P360.VisitorManagement.Domain.csproj",
+        "projectName": "P360.VisitorManagement.Domain",
+        "projectPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/P360.VisitorManagement.Domain.csproj",
+        "packagesPath": "/home/piq2/.nuget/packages/",
+        "outputPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq2/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Domain/P360.Domain/P360.Domain.csproj": {
+                "projectPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Domain/P360.Domain/P360.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MongoDB.Bson": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.128/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Repository/P360.VisitorManagement.Repository/P360.VisitorManagement.Repository.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Repository/P360.VisitorManagement.Repository/P360.VisitorManagement.Repository.csproj",
+        "projectName": "P360.VisitorManagement.Repository",
+        "projectPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Repository/P360.VisitorManagement.Repository/P360.VisitorManagement.Repository.csproj",
+        "packagesPath": "/home/piq2/.nuget/packages/",
+        "outputPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Repository/P360.VisitorManagement.Repository/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq2/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Repository/P360.Repository/P360.Repository.csproj": {
+                "projectPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Repository/P360.Repository/P360.Repository.csproj"
+              },
+              "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/P360.VisitorManagement.Domain.csproj": {
+                "projectPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Services/VisitorManagement/Domain/P360.VisitorManagement.Domain/P360.VisitorManagement.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.128/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

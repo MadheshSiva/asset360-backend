@@ -1,0 +1,75 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/P360.Email.csproj": {}
+  },
+  "projects": {
+    "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/P360.Email.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/P360.Email.csproj",
+        "projectName": "P360.Email",
+        "projectPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/P360.Email.csproj",
+        "packagesPath": "/home/piq2/.nuget/packages/",
+        "outputPath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq2/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MailKit": {
+              "target": "Package",
+              "version": "[4.17.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.128/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

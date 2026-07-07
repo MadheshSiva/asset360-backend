@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "h3CafSso8txhl0gESjI9FY0MgGTgKIBo1kRLatREwZZQPekb+tRsb91ty5Piw+ZbgljctQiUmVHKUWt1lHLt5Q==",
+  "success": true,
+  "projectFilePath": "/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/P360.Email.csproj",
+  "expectedPackageFiles": [
+    "/home/piq2/.nuget/packages/bouncycastle.cryptography/2.6.2/bouncycastle.cryptography.2.6.2.nupkg.sha512",
+    "/home/piq2/.nuget/packages/mailkit/4.17.0/mailkit.4.17.0.nupkg.sha512",
+    "/home/piq2/.nuget/packages/microsoft.extensions.configuration.abstractions/8.0.0/microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",
+    "/home/piq2/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.2/microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
+    "/home/piq2/.nuget/packages/microsoft.extensions.primitives/8.0.0/microsoft.extensions.primitives.8.0.0.nupkg.sha512",
+    "/home/piq2/.nuget/packages/mimekit/4.17.0/mimekit.4.17.0.nupkg.sha512",
+    "/home/piq2/.nuget/packages/system.formats.asn1/8.0.1/system.formats.asn1.8.0.1.nupkg.sha512",
+    "/home/piq2/.nuget/packages/system.security.cryptography.pkcs/8.0.1/system.security.cryptography.pkcs.8.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

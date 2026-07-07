@@ -1,0 +1,13 @@
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/bin/Debug/net8.0/P360.Email.deps.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/bin/Debug/net8.0/P360.Email.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/bin/Debug/net8.0/P360.Email.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/P360.Email.csproj.AssemblyReference.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/P360.Email.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/P360.Email.AssemblyInfoInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/P360.Email.AssemblyInfo.cs
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/P360.Email.csproj.CoreCompileInputs.cache
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/P360.Email.sourcelink.json
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/P360.Email.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/refint/P360.Email.dll
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/P360.Email.pdb
+/home/piq2/Downloads/people360git/People360-Main-BE/People360/src/Email/P360.Email/obj/Debug/net8.0/ref/P360.Email.dll

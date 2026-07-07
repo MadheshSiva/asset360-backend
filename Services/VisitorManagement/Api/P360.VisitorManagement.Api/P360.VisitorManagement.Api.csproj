@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.26" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Domain\P360.VisitorManagement.Domain\P360.VisitorManagement.Domain.csproj" />
+    <ProjectReference Include="..\..\Repository\P360.VisitorManagement.Repository\P360.VisitorManagement.Repository.csproj" />
+    <ProjectReference Include="..\..\..\..\Repository\P360.Repository\P360.Repository.csproj" />
+    <ProjectReference Include="..\..\..\..\Media\P360.Media.Client\P360.Media.Client.csproj" />
+    <ProjectReference Include="..\..\..\..\Email\P360.Email\P360.Email.csproj" />
+  </ItemGroup>
+
+</Project>
