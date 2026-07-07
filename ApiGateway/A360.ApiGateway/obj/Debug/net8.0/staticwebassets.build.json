@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "oRA511wqiEzGUF6yi0fBL7XTkq74x+QVc1ItwXPN/5M=",
+  "Source": "A360.ApiGateway",
+  "BasePath": "_content/A360.ApiGateway",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -1,0 +1,12 @@
+/home/piq1/People3601/People360/src/Email/A360.Email/bin/Debug/net8.0/A360.Email.deps.json
+/home/piq1/People3601/People360/src/Email/A360.Email/bin/Debug/net8.0/A360.Email.dll
+/home/piq1/People3601/People360/src/Email/A360.Email/bin/Debug/net8.0/A360.Email.pdb
+/home/piq1/People3601/People360/src/Email/A360.Email/obj/Debug/net8.0/A360.Email.csproj.AssemblyReference.cache
+/home/piq1/People3601/People360/src/Email/A360.Email/obj/Debug/net8.0/A360.Email.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq1/People3601/People360/src/Email/A360.Email/obj/Debug/net8.0/A360.Email.AssemblyInfoInputs.cache
+/home/piq1/People3601/People360/src/Email/A360.Email/obj/Debug/net8.0/A360.Email.AssemblyInfo.cs
+/home/piq1/People3601/People360/src/Email/A360.Email/obj/Debug/net8.0/A360.Email.csproj.CoreCompileInputs.cache
+/home/piq1/People3601/People360/src/Email/A360.Email/obj/Debug/net8.0/A360.Email.dll
+/home/piq1/People3601/People360/src/Email/A360.Email/obj/Debug/net8.0/refint/A360.Email.dll
+/home/piq1/People3601/People360/src/Email/A360.Email/obj/Debug/net8.0/A360.Email.pdb
+/home/piq1/People3601/People360/src/Email/A360.Email/obj/Debug/net8.0/ref/A360.Email.dll

@@ -1,0 +1,12 @@
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/bin/Debug/net8.0/A360.Media.Client.deps.json
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/bin/Debug/net8.0/A360.Media.Client.dll
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/bin/Debug/net8.0/A360.Media.Client.pdb
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/obj/Debug/net8.0/A360.Media.Client.csproj.AssemblyReference.cache
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/obj/Debug/net8.0/A360.Media.Client.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/obj/Debug/net8.0/A360.Media.Client.AssemblyInfoInputs.cache
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/obj/Debug/net8.0/A360.Media.Client.AssemblyInfo.cs
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/obj/Debug/net8.0/A360.Media.Client.csproj.CoreCompileInputs.cache
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/obj/Debug/net8.0/A360.Media.Client.dll
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/obj/Debug/net8.0/refint/A360.Media.Client.dll
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/obj/Debug/net8.0/A360.Media.Client.pdb
+/home/piq1/People3601/People360/src/Media/A360.Media.Client/obj/Debug/net8.0/ref/A360.Media.Client.dll

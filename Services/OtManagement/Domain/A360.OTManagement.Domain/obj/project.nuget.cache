@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "osJVlccxswsX3/4IzN4QZeeuJgdKlfJUl4F+dQT8NDb3MgOZdm+wmJA6p3HWGSl5d/zeEDD5R3xPXKhC4IdCmg==",
+  "success": true,
+  "projectFilePath": "/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/A360.OTManagement.Domain.csproj",
+  "expectedPackageFiles": [
+    "/home/piq1/.nuget/packages/mongodb.bson/3.8.0/mongodb.bson.3.8.0.nupkg.sha512",
+    "/home/piq1/.nuget/packages/system.memory/4.5.5/system.memory.4.5.5.nupkg.sha512",
+    "/home/piq1/.nuget/packages/system.runtime.compilerservices.unsafe/5.0.0/system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

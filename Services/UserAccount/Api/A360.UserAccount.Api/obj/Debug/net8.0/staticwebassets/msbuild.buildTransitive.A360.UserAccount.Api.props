@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../buildMultiTargeting/A360.UserAccount.Api.props" />
+</Project>

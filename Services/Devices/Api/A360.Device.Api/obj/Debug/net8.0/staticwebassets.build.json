@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "OP1+8kKIf/BEIG17k6R7p4gJ704/bQCCvWM28YRYYvo=",
+  "Source": "A360.Device.Api",
+  "BasePath": "_content/A360.Device.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

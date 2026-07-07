@@ -1,0 +1,15 @@
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/bin/Debug/net8.0/A360.OTManagement.Domain.deps.json
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/bin/Debug/net8.0/A360.OTManagement.Domain.dll
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/bin/Debug/net8.0/A360.OTManagement.Domain.pdb
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/bin/Debug/net8.0/A360.Domain.dll
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/bin/Debug/net8.0/A360.Domain.pdb
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/A360.OTManagement.Domain.csproj.AssemblyReference.cache
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/A360.OTManagement.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/A360.OTManagement.Domain.AssemblyInfoInputs.cache
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/A360.OTManagement.Domain.AssemblyInfo.cs
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/A360.OTManagement.Domain.csproj.CoreCompileInputs.cache
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/A360.OTManagement.Domain.csproj.CopyComplete
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/A360.OTManagement.Domain.dll
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/refint/A360.OTManagement.Domain.dll
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/A360.OTManagement.Domain.pdb
+/home/piq1/People3601/People360/src/Services/OtManagement/Domain/A360.OTManagement.Domain/obj/Debug/net8.0/ref/A360.OTManagement.Domain.dll

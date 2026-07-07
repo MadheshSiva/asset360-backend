@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "tFDWFUoIWeyVqTyeyJOu9oVMtgFg8DOwwBtnqXMC/EA=",
+  "Source": "A360.UserAccount.Api",
+  "BasePath": "_content/A360.UserAccount.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

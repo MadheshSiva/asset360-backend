@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/A360.Media.Api.props" />
+</Project>
