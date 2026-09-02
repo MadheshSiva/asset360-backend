@@ -19,10 +19,4 @@ public class VisitorClientPermit : BaseEntity
 
     [BsonElement("fire_contact_no")]
     public string? FireContactNo { get; set; }
-
-    [BsonElement("created_by")]
-    public string? CreatedBy { get; set; }
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
 }

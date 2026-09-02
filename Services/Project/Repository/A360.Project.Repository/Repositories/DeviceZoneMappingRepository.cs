@@ -22,9 +22,10 @@ public sealed class DeviceZoneMappingRepository : MongoRepository<DeviceZoneMapp
                     .Ascending(deviceZoneMapping => deviceZoneMapping.ProjectId)
                     .Ascending(deviceZoneMapping => deviceZoneMapping.CountryId)
                     .Ascending(deviceZoneMapping => deviceZoneMapping.AreaId)
+                    .Ascending(deviceZoneMapping => deviceZoneMapping.OuterZoneId)
                     .Ascending(deviceZoneMapping => deviceZoneMapping.BuildingId)
                     .Ascending(deviceZoneMapping => deviceZoneMapping.FloorId),
-                new CreateIndexOptions { Name = "ix_devicezonemapping_project_country_area_building_floor" }),
+                new CreateIndexOptions { Name = "ix_devicezonemapping_project_country_area_outerzone_building_floor" }),
             new CreateIndexModel<DeviceZoneMappingEntity>(
                 Builders<DeviceZoneMappingEntity>.IndexKeys.Ascending(deviceZoneMapping => deviceZoneMapping.ZoneId),
                 new CreateIndexOptions { Name = "ix_devicezonemapping_zone_id" }),

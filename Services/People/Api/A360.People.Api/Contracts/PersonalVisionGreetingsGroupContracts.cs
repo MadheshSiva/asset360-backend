@@ -41,7 +41,9 @@ string? GreetingsType,
 string? GreetingsDescription,
 bool Status,
 List<CreateGreetingsTimeScheduleRequest>? GreetingsTimeSchedules,
-string? CreatedBy)
+string? CreatedBy,
+string? ClientId,
+string? TenantId)
 {
 public GroupsEntity ToEntity()
 {
@@ -70,7 +72,10 @@ MemberName = x.MemberName ?? string.Empty
             }).ToList(),
 
         CreatedBy = CreatedBy,
-        CreatedAt = DateTime.UtcNow
+        CreatedAt = DateTime.UtcNow,
+        ClientId = ClientId,
+        TenantId = TenantId,
+        IsDeleted = false
     };
 }
 
@@ -84,7 +89,8 @@ string? GroupName,
 string? GreetingsType,
 string? GreetingsDescription,
 bool Status,
-List<UpdateGreetingsTimeScheduleRequest>? GreetingsTimeSchedules)
+List<UpdateGreetingsTimeScheduleRequest>? GreetingsTimeSchedules,
+string? UpdatedBy)
 {
 public void ApplyTo(GroupsEntity entity)
 {
@@ -109,7 +115,8 @@ MemberName = x.MemberName ?? string.Empty
             ToTime = x.ToTime ?? string.Empty
         }).ToList();
 
-    entity.ModifiedAt = DateTime.UtcNow;
+    entity.UpdatedBy = UpdatedBy;
+    entity.UpdatedAt = DateTime.UtcNow;
 }
 
 
@@ -125,7 +132,12 @@ string GreetingsDescription,
 bool Status,
 List<GreetingsTimeScheduleResponse> GreetingsTimeSchedules,
 string CreatedBy,
-DateTime CreatedAt)
+DateTime? CreatedAt,
+string? UpdatedBy,
+DateTime? UpdatedAt,
+string? ClientId,
+string? TenantId,
+bool IsDeleted)
 {
 public static PersonalVisionGreetingsGroupsResponse FromEntity(
 GroupsEntity entity)
@@ -157,7 +169,12 @@ entity.Id ?? string.Empty,
             ?? [],
 
         entity.CreatedBy ?? string.Empty,
-        entity.CreatedAt);
+        entity.CreatedAt,
+        entity.UpdatedBy,
+        entity.UpdatedAt,
+        entity.ClientId,
+        entity.TenantId,
+        entity.IsDeleted);
 }
 
 

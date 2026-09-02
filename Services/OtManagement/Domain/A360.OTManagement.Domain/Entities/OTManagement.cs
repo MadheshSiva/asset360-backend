@@ -24,7 +24,7 @@ public class OTManagement : BaseEntity
     public string Type { get; set; } = null!;
 
     [BsonElement("status")]
-    public bool Status { get; set; }
+    public new bool Status { get; set; }
 
     [BsonElement("sterilization")]
     public string Sterilization { get; set; } = null!;
@@ -52,10 +52,4 @@ public class OTManagement : BaseEntity
 
     [BsonElement("zone")]
     public string Zone { get; set; } = null!;
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
 }

@@ -7,6 +7,7 @@ public sealed record CreateDeviceZoneMappingRequest(
     string? ProjectId,
     string? CountryId,
     string? AreaId,
+    string? OuterZoneId,
     string? BuildingId,
     string? FloorId,
     string? ZoneId,
@@ -21,6 +22,7 @@ public sealed record CreateDeviceZoneMappingRequest(
     bool Status,
     string? CreatedBy,
     string? ClientId,
+    string? TenantId,
     List<JsonElement>? DeviceGeoJsonData);
 
 public sealed record UpdateDeviceZoneMappingRequest(
@@ -31,13 +33,15 @@ public sealed record UpdateDeviceZoneMappingRequest(
     string? AssemblyPoint,
     string? Exit,
     bool Status,
-    List<JsonElement>? DeviceGeoJsonData);
+    List<JsonElement>? DeviceGeoJsonData,
+    string? UpdatedBy);
 
 public sealed record DeviceZoneMappingResponse(
     string Id,
     string ProjectId,
     string CountryId,
     string AreaId,
+    string OuterZoneId,
     string BuildingId,
     string FloorId,
     string ZoneId,
@@ -50,9 +54,13 @@ public sealed record DeviceZoneMappingResponse(
     string? AssemblyPoint,
     string? Exit,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted,
     List<JsonElement> DeviceGeoJsonData)
 {
     public static DeviceZoneMappingResponse FromEntity(DeviceZoneMappingEntity deviceZoneMapping)
@@ -62,6 +70,7 @@ public sealed record DeviceZoneMappingResponse(
             deviceZoneMapping.ProjectId,
             deviceZoneMapping.CountryId,
             deviceZoneMapping.AreaId,
+            deviceZoneMapping.OuterZoneId,
             deviceZoneMapping.BuildingId,
             deviceZoneMapping.FloorId,
             deviceZoneMapping.ZoneId,
@@ -76,7 +85,11 @@ public sealed record DeviceZoneMappingResponse(
             deviceZoneMapping.Status,
             deviceZoneMapping.CreatedBy,
             deviceZoneMapping.CreatedAt,
+            deviceZoneMapping.UpdatedBy,
+            deviceZoneMapping.UpdatedAt,
             deviceZoneMapping.ClientId,
+            deviceZoneMapping.TenantId,
+            deviceZoneMapping.IsDeleted,
             GeoJsonConversion.ToJsonElements(deviceZoneMapping.DeviceGeoJsonData));
     }
 }

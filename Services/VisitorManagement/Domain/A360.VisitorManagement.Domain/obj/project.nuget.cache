@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "vIZnkDygXM6biFAuFGsa2tYJnZFY2/zAefWaeLEg89k0KNufNFX0udRuODw/DLm2QRcY03vsMFpEMq25g667iw==",
+  "dgSpecHash": "74GaX39e1HQ7htuT1xpCA7Nnj6l29Q/sxhaLHI7zx2mO6eMyN6E7sTeWtSK9aet05rNbqYBUACvAENO2NX6OAQ==",
   "success": true,
   "projectFilePath": "/home/piq1/People3601/People360/src/Services/VisitorManagement/Domain/A360.VisitorManagement.Domain/A360.VisitorManagement.Domain.csproj",
   "expectedPackageFiles": [

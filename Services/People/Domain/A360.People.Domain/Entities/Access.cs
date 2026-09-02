@@ -18,20 +18,11 @@ public class Access : BaseEntity
     public List<string> Readers { get; set; } = [];
 
     [BsonElement("status")]
-    public bool Status { get; set; }
+    public new bool Status { get; set; }
 
     [BsonElement("from_datetime")]
     public DateTime FromDateTime { get; set; }
 
     [BsonElement("to_datetime")]
     public DateTime ToDateTime { get; set; }
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("client_id")]
-    public string ClientId { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
 }

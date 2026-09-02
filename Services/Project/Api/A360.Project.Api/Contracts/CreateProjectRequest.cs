@@ -7,4 +7,5 @@ public sealed record CreateProjectRequest(
     string CreatedBy,
     string ClientId,
     DateTime WeekStart,
-    DateTime WeekEnd);
+    DateTime WeekEnd,
+    string? TenantId);

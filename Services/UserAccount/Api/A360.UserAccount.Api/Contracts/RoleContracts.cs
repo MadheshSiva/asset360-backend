@@ -10,14 +10,17 @@ public sealed record CreateRoleRequest(
     //IReadOnlyCollection<AssignedProjectRequest>? AssignedProjects,
     IReadOnlyCollection<AssignedPermissionRequest>? AssignedPermissions,
     string? CreatedBy,
-    string? ClientId);
+    string? ClientId,
+    string? TenantId);
 
 public sealed record UpdateRoleRequest(
     string? RoleName,
     string? Description,
    // [property: JsonPropertyName("assignedProject")]
    // IReadOnlyCollection<AssignedProjectRequest>? AssignedProjects,
-    IReadOnlyCollection<AssignedPermissionRequest>? AssignedPermissions);
+    IReadOnlyCollection<AssignedPermissionRequest>? AssignedPermissions,
+    string? UpdatedBy,
+    string? Status);
 
 // public sealed record AssignedProjectRequest(
 //     string? ProjectId,
@@ -50,9 +53,14 @@ public sealed record RoleResponse(
     string Description,
     //IReadOnlyCollection<AssignedProjectResponse> AssignedProjects,
     IReadOnlyCollection<AssignedPermissionResponse> AssignedPermissions,
-    string CreatedBy,
-    DateTime CreatedDate,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted,
     string Action)
 {
     public static RoleResponse FromEntity(RoleEntity role)
@@ -65,8 +73,13 @@ public sealed record RoleResponse(
             //role.AssignedProjects.Select(AssignedProjectResponse.FromEntity).ToArray(),
             role.AssignedPermissions.Select(AssignedPermissionResponse.FromEntity).ToArray(),
             role.CreatedBy,
-            role.CreatedDate,
+            role.CreatedAt,
+            role.UpdatedBy,
+            role.UpdatedAt,
             role.ClientId,
+            role.TenantId,
+            role.Status,
+            role.IsDeleted,
             role.Action);
     }
 }

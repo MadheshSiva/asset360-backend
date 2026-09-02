@@ -12,7 +12,8 @@ public sealed record CreateCountryRequest(
     string? Longitude,
     bool Status,
     string? CreatedBy,
-    string? ClientId);
+    string? ClientId,
+    string? TenantId);
 
 public sealed record UpdateCountryRequest(
     string? CountryName,
@@ -22,7 +23,8 @@ public sealed record UpdateCountryRequest(
     string? Latitude,
     string? Longitude,
     bool Status,
-    string? ClientId);
+    string? ClientId,
+    string? UpdatedBy);
 
 public sealed record CountryResponse(
     string Id,
@@ -34,9 +36,13 @@ public sealed record CountryResponse(
     string Latitude,
     string Longitude,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId)
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static CountryResponse FromEntity(CountryEntity country)
     {
@@ -52,6 +58,10 @@ public sealed record CountryResponse(
             country.Status,
             country.CreatedBy,
             country.CreatedAt,
-            country.ClientId);
+            country.UpdatedBy,
+            country.UpdatedAt,
+            country.ClientId,
+            country.TenantId,
+            country.IsDeleted);
     }
 }

@@ -18,19 +18,10 @@ public string GreetingsType { get; set; } = null!;
 public string GreetingsDescription { get; set; } = null!;
 
 [BsonElement("status")]
-public bool Status { get; set; }
+public new bool Status { get; set; }
 
 [BsonElement("greetings_time_schedules")]
 public List<GreetingsTimeSchedule> GreetingsTimeSchedules { get; set; } = new();
-
-[BsonElement("created_by")]
-public string CreatedBy { get; set; } = null!;
-
-[BsonElement("created_at")]
-public DateTime CreatedAt { get; set; }
-
-[BsonElement("modified_at")]
-public DateTime? ModifiedAt { get; set; }
 
 
 }

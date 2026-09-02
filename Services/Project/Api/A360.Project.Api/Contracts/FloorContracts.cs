@@ -6,32 +6,40 @@ public sealed record CreateFloorRequest(
     string? ProjectId,
     string? CountryId,
     string? AreaId,
+    string? OuterZoneId,
     string? BuildingId,
     string? FloorName,
     string? Description,
     bool Status,
     string? CreatedBy,
     string? ClientId,
+    string? TenantId,
     string? MapPath);
 
 public sealed record UpdateFloorRequest(
     string? FloorName,
     string? Description,
     bool Status,
-    string? MapPath);
+    string? MapPath,
+    string? UpdatedBy);
 
 public sealed record FloorResponse(
     string Id,
     string ProjectId,
     string CountryId,
     string AreaId,
+    string OuterZoneId,
     string BuildingId,
     string FloorName,
     string Description,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted,
     string MapPath)
 {
     public static FloorResponse FromEntity(FloorEntity floor)
@@ -41,13 +49,18 @@ public sealed record FloorResponse(
             floor.ProjectId,
             floor.CountryId,
             floor.AreaId,
+            floor.OuterZoneId,
             floor.BuildingId,
             floor.FloorName,
             floor.Description,
             floor.Status,
             floor.CreatedBy,
             floor.CreatedAt,
+            floor.UpdatedBy,
+            floor.UpdatedAt,
             floor.ClientId,
+            floor.TenantId,
+            floor.IsDeleted,
             floor.MapPath);
     }
 }

@@ -13,10 +13,4 @@ public class VisitorEntryExit : BaseEntity
 
     [BsonElement("description")]
     public string? Description { get; set; }
-
-    [BsonElement("created_by")]
-    public string? CreatedBy { get; set; }
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
 }

@@ -6,7 +6,9 @@ public sealed record CreateVisitorEntryExitRequest(
     string? Name,
     string? Type,
     string? Description,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public EntryExitEntity ToEntity()
     {
@@ -16,7 +18,10 @@ public sealed record CreateVisitorEntryExitRequest(
             Type = Type,
             Description = Description,
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -24,13 +29,21 @@ public sealed record CreateVisitorEntryExitRequest(
 public sealed record UpdateVisitorEntryExitRequest(
     string? Name,
     string? Type,
-    string? Description)
+    string? Description,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(EntryExitEntity entryExit)
     {
         entryExit.Name = Name;
         entryExit.Type = Type;
         entryExit.Description = Description;
+        entryExit.UpdatedBy = UpdatedBy;
+        entryExit.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            entryExit.Status = Status;
+        }
     }
 }
 
@@ -40,7 +53,12 @@ public sealed record VisitorEntryExitResponse(
     string Type,
     string Description,
     string CreatedBy,
-    DateTime CreatedAt)
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    bool IsDeleted,
+    string? Status)
 {
     public static VisitorEntryExitResponse FromEntity(
         EntryExitEntity entryExit)
@@ -51,6 +69,11 @@ public sealed record VisitorEntryExitResponse(
             entryExit.Type ?? string.Empty,
             entryExit.Description ?? string.Empty,
             entryExit.CreatedBy ?? string.Empty,
-            entryExit.CreatedAt);
+            entryExit.CreatedAt,
+            entryExit.UpdatedBy,
+            entryExit.UpdatedAt,
+            entryExit.TenantId,
+            entryExit.IsDeleted,
+            entryExit.Status);
     }
 }

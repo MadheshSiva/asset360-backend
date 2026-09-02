@@ -14,6 +14,8 @@ internal static class ProjectMappings
             CreatedBy = request.CreatedBy.Trim(),
             CreatedAt = DateTime.UtcNow,
             ClientId = request.ClientId.Trim(),
+            TenantId = request.TenantId,
+            IsDeleted = false,
             WeekStart = ToUtc(request.WeekStart),
             WeekEnd = ToUtc(request.WeekEnd)
         };
@@ -27,6 +29,8 @@ internal static class ProjectMappings
         project.ClientId = request.ClientId.Trim();
         project.WeekStart = ToUtc(request.WeekStart);
         project.WeekEnd = ToUtc(request.WeekEnd);
+        project.UpdatedBy = request.UpdatedBy;
+        project.UpdatedAt = DateTime.UtcNow;
     }
 
     private static DateTime ToUtc(DateTime value)

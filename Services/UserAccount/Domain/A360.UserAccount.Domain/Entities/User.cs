@@ -36,15 +36,6 @@ public sealed class User : BaseEntity
     [BsonElement("user_role_id")]
     public string UserRoleId { get; set; } = string.Empty;
 
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = string.Empty;
-
-    [BsonElement("created_date")]
-    public DateTime CreatedDate { get; set; }
-
-    [BsonElement("client_Id")]
-    public string ClientId { get; set; } = string.Empty;
-
     [BsonElement("two_factor_code")]
     public string TwoFactorCode { get; set; } = string.Empty;
 

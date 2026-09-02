@@ -53,15 +53,6 @@ public class VisitorGatePass : BaseEntity
     [BsonElement("HostPersonEmail")]
     public string? HostPersonEmail { get; set; }
 
-    [BsonElement("created_by")]
-    public string? CreatedBy { get; set; }
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("status")]
-    public string? Status { get; set; }
-
     [BsonElement("VisitorDocuments")]
     public List<VisitorGatePassDocument> VisitorDocuments { get; set; } = [];
 
@@ -154,9 +145,6 @@ public class VisitorGatePass : BaseEntity
 
     [BsonElement("MaxApprovalLevel")]
     public int? MaxApprovalLevel { get; set; }
-
-    [BsonElement("client_id")]
-    public string? ClientId { get; set; }
 
     [BsonElement("IsLevelProcessed")]
     public bool IsLevelProcessed { get; set; }

@@ -11,7 +11,9 @@ public sealed record CreatePersonalVisionAccessRequest(
     bool Status,
     List<AccessTimeSchedule>? AccessTimeSchedule,
     string? CreatedBy,
-    string? Action)
+    string? Action,
+    string? ClientId,
+    string? TenantId)
 {
     public AccessEntity ToEntity()
     {
@@ -25,7 +27,10 @@ public sealed record CreatePersonalVisionAccessRequest(
             AccessTimeSchedule = AccessTimeSchedule ?? [],
             CreatedBy = CreatedBy,
             CreatedAt = DateTime.UtcNow,
-            Action = Action
+            Action = Action,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -37,7 +42,7 @@ public sealed record UpdatePersonalVisionAccessRequest(
     List<Reader>? Reader,
     bool Status,
     List<AccessTimeSchedule>? AccessTimeSchedule,
-    string? ModifiedBy,
+    string? UpdatedBy,
     string? Action)
 {
     public void ApplyTo(AccessEntity access)
@@ -48,8 +53,8 @@ public sealed record UpdatePersonalVisionAccessRequest(
         access.Reader = Reader ?? [];
         access.Status = Status;
         access.AccessTimeSchedule = AccessTimeSchedule ?? [];
-        access.ModifiedBy = ModifiedBy;
-        access.ModifiedAt = DateTime.UtcNow;
+        access.UpdatedBy = UpdatedBy;
+        access.UpdatedAt = DateTime.UtcNow;
         access.Action = Action;
     }
 }
@@ -63,10 +68,13 @@ public sealed record PersonalVisionAccessResponse(
     bool Status,
     List<AccessTimeSchedule> AccessTimeSchedule,
     string CreatedBy,
-    DateTime CreatedAt,
-    string? ModifiedBy,
-    DateTime ModifiedAt,
-    string? Action)
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? Action,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static PersonalVisionAccessResponse FromEntity(
         AccessEntity access)
@@ -81,9 +89,12 @@ public sealed record PersonalVisionAccessResponse(
             access.AccessTimeSchedule ?? [],
             access.CreatedBy ?? string.Empty,
             access.CreatedAt,
-            access.ModifiedBy,
-            access.ModifiedAt,
-            access.Action
+            access.UpdatedBy,
+            access.UpdatedAt,
+            access.Action,
+            access.ClientId,
+            access.TenantId,
+            access.IsDeleted
         );
     }
 }

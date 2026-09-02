@@ -6,6 +6,7 @@ public sealed record CreateZoneRequest(
     string? ProjectId,
     string? CountryId,
     string? AreaId,
+    string? OuterZoneId,
     string? BuildingId,
     string? FloorId,
     string? ZoneName,
@@ -17,6 +18,7 @@ public sealed record CreateZoneRequest(
     bool Status,
     string? CreatedBy,
     string? ClientId,
+    string? TenantId,
     int? TimeTakenAssemblePoint,
     string? MapPath);
 
@@ -29,13 +31,15 @@ public sealed record UpdateZoneRequest(
     bool ExitPoint,
     bool Status,
     int? TimeTakenAssemblePoint,
-    string? MapPath);
+    string? MapPath,
+    string? UpdatedBy);
 
 public sealed record ZoneResponse(
     string Id,
     string ProjectId,
     string CountryId,
     string AreaId,
+    string OuterZoneId,
     string BuildingId,
     string FloorId,
     string ZoneName,
@@ -45,9 +49,13 @@ public sealed record ZoneResponse(
     bool MusterPoint,
     bool ExitPoint,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted,
     int? TimeTakenAssemblePoint,
     string MapPath)
 {
@@ -58,6 +66,7 @@ public sealed record ZoneResponse(
             zone.ProjectId,
             zone.CountryId,
             zone.AreaId,
+            zone.OuterZoneId,
             zone.BuildingId,
             zone.FloorId,
             zone.ZoneName,
@@ -69,7 +78,11 @@ public sealed record ZoneResponse(
             zone.Status,
             zone.CreatedBy,
             zone.CreatedAt,
+            zone.UpdatedBy,
+            zone.UpdatedAt,
             zone.ClientId,
+            zone.TenantId,
+            zone.IsDeleted,
             zone.TimeTakenAssemblePoint,
             zone.MapPath);
     }

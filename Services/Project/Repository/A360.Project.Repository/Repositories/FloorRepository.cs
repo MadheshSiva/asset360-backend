@@ -22,8 +22,9 @@ public sealed class FloorRepository : MongoRepository<FloorEntity>, IFloorReposi
                     .Ascending(floor => floor.ProjectId)
                     .Ascending(floor => floor.CountryId)
                     .Ascending(floor => floor.AreaId)
+                    .Ascending(floor => floor.OuterZoneId)
                     .Ascending(floor => floor.BuildingId),
-                new CreateIndexOptions { Name = "ix_floor_project_country_area_building" }),
+                new CreateIndexOptions { Name = "ix_floor_project_country_area_outerzone_building" }),
             new CreateIndexModel<FloorEntity>(
                 Builders<FloorEntity>.IndexKeys
                     .Ascending(floor => floor.BuildingId)

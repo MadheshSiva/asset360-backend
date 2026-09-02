@@ -11,7 +11,9 @@ public sealed record CreatePatientMasterRequest(
     string? Priority,
     string? SurgeryType,
     bool Status,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public PatientMasterEntity ToEntity()
     {
@@ -26,7 +28,10 @@ public sealed record CreatePatientMasterRequest(
             SurgeryType = SurgeryType,
             Status = Status,
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -38,7 +43,8 @@ public sealed record UpdatePatientMasterRequest(
     string? Department,
     string? Priority,
     string? SurgeryType,
-    bool Status)
+    bool Status,
+    string? UpdatedBy)
 {
     public void ApplyTo(
         PatientMasterEntity patientMaster)
@@ -50,6 +56,8 @@ public sealed record UpdatePatientMasterRequest(
         patientMaster.Priority = Priority;
         patientMaster.SurgeryType = SurgeryType;
         patientMaster.Status = Status;
+        patientMaster.UpdatedBy = UpdatedBy;
+        patientMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
 
@@ -63,8 +71,13 @@ public sealed record PatientMasterResponse(
     string Priority,
     string SurgeryType,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt)
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static PatientMasterResponse FromEntity(
         PatientMasterEntity patientMaster)
@@ -79,7 +92,12 @@ public sealed record PatientMasterResponse(
             patientMaster.Priority ?? string.Empty,
             patientMaster.SurgeryType ?? string.Empty,
             patientMaster.Status,
-            patientMaster.CreatedBy ?? string.Empty,
-            patientMaster.CreatedAt);
+            patientMaster.CreatedBy,
+            patientMaster.CreatedAt,
+            patientMaster.UpdatedBy,
+            patientMaster.UpdatedAt,
+            patientMaster.ClientId,
+            patientMaster.TenantId,
+            patientMaster.IsDeleted);
     }
 }

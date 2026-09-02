@@ -1,0 +1,339 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/piq1/People3601/People360/src/Services/Asset/Api/A360.Asset.Api/A360.Asset.Api.csproj": {}
+  },
+  "projects": {
+    "/home/piq1/People3601/People360/src/Domain/A360.Domain/A360.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq1/People3601/People360/src/Domain/A360.Domain/A360.Domain.csproj",
+        "projectName": "A360.Domain",
+        "projectPath": "/home/piq1/People3601/People360/src/Domain/A360.Domain/A360.Domain.csproj",
+        "packagesPath": "/home/piq1/.nuget/packages/",
+        "outputPath": "/home/piq1/People3601/People360/src/Domain/A360.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq1/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MongoDB.Bson": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.130/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/piq1/People3601/People360/src/Repository/A360.Repository/A360.Repository.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq1/People3601/People360/src/Repository/A360.Repository/A360.Repository.csproj",
+        "projectName": "A360.Repository",
+        "projectPath": "/home/piq1/People3601/People360/src/Repository/A360.Repository/A360.Repository.csproj",
+        "packagesPath": "/home/piq1/.nuget/packages/",
+        "outputPath": "/home/piq1/People3601/People360/src/Repository/A360.Repository/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq1/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/piq1/People3601/People360/src/Domain/A360.Domain/A360.Domain.csproj": {
+                "projectPath": "/home/piq1/People3601/People360/src/Domain/A360.Domain/A360.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Hosting.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.130/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/piq1/People3601/People360/src/Services/Asset/Api/A360.Asset.Api/A360.Asset.Api.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq1/People3601/People360/src/Services/Asset/Api/A360.Asset.Api/A360.Asset.Api.csproj",
+        "projectName": "A360.Asset.Api",
+        "projectPath": "/home/piq1/People3601/People360/src/Services/Asset/Api/A360.Asset.Api/A360.Asset.Api.csproj",
+        "packagesPath": "/home/piq1/.nuget/packages/",
+        "outputPath": "/home/piq1/People3601/People360/src/Services/Asset/Api/A360.Asset.Api/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq1/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/piq1/People3601/People360/src/Repository/A360.Repository/A360.Repository.csproj": {
+                "projectPath": "/home/piq1/People3601/People360/src/Repository/A360.Repository/A360.Repository.csproj"
+              },
+              "/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/A360.Asset.Domain.csproj": {
+                "projectPath": "/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/A360.Asset.Domain.csproj"
+              },
+              "/home/piq1/People3601/People360/src/Services/Asset/Repository/A360.Asset.Repository/A360.Asset.Repository.csproj": {
+                "projectPath": "/home/piq1/People3601/People360/src/Services/Asset/Repository/A360.Asset.Repository/A360.Asset.Repository.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.26, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.6.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.130/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/A360.Asset.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/A360.Asset.Domain.csproj",
+        "projectName": "A360.Asset.Domain",
+        "projectPath": "/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/A360.Asset.Domain.csproj",
+        "packagesPath": "/home/piq1/.nuget/packages/",
+        "outputPath": "/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq1/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/piq1/People3601/People360/src/Domain/A360.Domain/A360.Domain.csproj": {
+                "projectPath": "/home/piq1/People3601/People360/src/Domain/A360.Domain/A360.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MongoDB.Bson": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.130/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/piq1/People3601/People360/src/Services/Asset/Repository/A360.Asset.Repository/A360.Asset.Repository.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/piq1/People3601/People360/src/Services/Asset/Repository/A360.Asset.Repository/A360.Asset.Repository.csproj",
+        "projectName": "A360.Asset.Repository",
+        "projectPath": "/home/piq1/People3601/People360/src/Services/Asset/Repository/A360.Asset.Repository/A360.Asset.Repository.csproj",
+        "packagesPath": "/home/piq1/.nuget/packages/",
+        "outputPath": "/home/piq1/People3601/People360/src/Services/Asset/Repository/A360.Asset.Repository/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/piq1/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/piq1/People3601/People360/src/Repository/A360.Repository/A360.Repository.csproj": {
+                "projectPath": "/home/piq1/People3601/People360/src/Repository/A360.Repository/A360.Repository.csproj"
+              },
+              "/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/A360.Asset.Domain.csproj": {
+                "projectPath": "/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/A360.Asset.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.130/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

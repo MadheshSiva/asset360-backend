@@ -22,10 +22,11 @@ public sealed class SubZoneRepository : MongoRepository<SubZoneEntity>, ISubZone
                     .Ascending(subZone => subZone.ProjectId)
                     .Ascending(subZone => subZone.CountryId)
                     .Ascending(subZone => subZone.AreaId)
+                    .Ascending(subZone => subZone.OuterZoneId)
                     .Ascending(subZone => subZone.BuildingId)
                     .Ascending(subZone => subZone.FloorId)
                     .Ascending(subZone => subZone.ZoneId),
-                new CreateIndexOptions { Name = "ix_subzone_project_country_area_building_floor_zone" }),
+                new CreateIndexOptions { Name = "ix_subzone_project_country_area_outerzone_building_floor_zone" }),
             new CreateIndexModel<SubZoneEntity>(
                 Builders<SubZoneEntity>.IndexKeys
                     .Ascending(subZone => subZone.ZoneId)

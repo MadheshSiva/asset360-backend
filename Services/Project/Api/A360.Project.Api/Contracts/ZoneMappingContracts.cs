@@ -7,6 +7,7 @@ public sealed record CreateZoneMappingRequest(
     string? ProjectId,
     string? CountryId,
     string? AreaId,
+    string? OuterZoneId,
     string? BuildingId,
     string? FloorId,
     string? ZoneId,
@@ -19,6 +20,7 @@ public sealed record CreateZoneMappingRequest(
     bool Status,
     string? CreatedBy,
     string? ClientId,
+    string? TenantId,
     string? ZoneColour,
     List<JsonElement>? GeoJsonData);
 
@@ -31,13 +33,15 @@ public sealed record UpdateZoneMappingRequest(
     string? Exit,
     bool Status,
     string? ZoneColour,
-    List<JsonElement>? GeoJsonData);
+    List<JsonElement>? GeoJsonData,
+    string? UpdatedBy);
 
 public sealed record ZoneMappingResponse(
     string Id,
     string ProjectId,
     string CountryId,
     string AreaId,
+    string OuterZoneId,
     string BuildingId,
     string FloorId,
     string ZoneId,
@@ -48,9 +52,13 @@ public sealed record ZoneMappingResponse(
     bool? AssemblyPoint,
     string? Exit,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted,
     string? ZoneColour,
     List<JsonElement> GeoJsonData)
 {
@@ -61,6 +69,7 @@ public sealed record ZoneMappingResponse(
             zoneMapping.ProjectId,
             zoneMapping.CountryId,
             zoneMapping.AreaId,
+            zoneMapping.OuterZoneId,
             zoneMapping.BuildingId,
             zoneMapping.FloorId,
             zoneMapping.ZoneId,
@@ -73,7 +82,11 @@ public sealed record ZoneMappingResponse(
             zoneMapping.Status,
             zoneMapping.CreatedBy,
             zoneMapping.CreatedAt,
+            zoneMapping.UpdatedBy,
+            zoneMapping.UpdatedAt,
             zoneMapping.ClientId,
+            zoneMapping.TenantId,
+            zoneMapping.IsDeleted,
             zoneMapping.ZoneColour,
             GeoJsonConversion.ToJsonElements(zoneMapping.GeoJsonData));
     }

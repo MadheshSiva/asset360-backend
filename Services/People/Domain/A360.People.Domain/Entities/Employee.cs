@@ -26,15 +26,6 @@ public class Employee : BaseEntity
     [BsonElement("employee_image")]
     public string EmployeeImage { get; set; } = null!;
 
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("client_id")]
-    public string ClientId { get; set; } = null!;
-
     [BsonElement("Action")]
     public string? Action { get; set; }
 

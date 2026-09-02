@@ -23,16 +23,10 @@ public class PersonalWorkSchedule : BaseEntity
     public string GroupId { get; set; } = null!;
 
     [BsonElement("status")]
-    public bool Status { get; set; }
+    public new bool Status { get; set; }
 
     [BsonElement("WorkSchedules")]
     public List<WorkScheduleItem> WorkSchedules { get; set; } = [];
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
 
     [BsonElement("scheduleType")]
     public string ScheduleType { get; set; } = null!;

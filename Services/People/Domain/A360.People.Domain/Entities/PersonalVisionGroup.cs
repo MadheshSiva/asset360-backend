@@ -5,9 +5,6 @@ namespace A360.People.Domain.Entities;
 
 public class PersonalVisionGroup : BaseEntity
 {
-    [BsonElement("clientid")]
-    public string ClientId { get; set; } = null!;
-
     [BsonElement("userid")]
     public string UserId { get; set; } = null!;
 
@@ -19,18 +16,6 @@ public class PersonalVisionGroup : BaseEntity
 
     [BsonElement("Members")]
     public List<GroupMember> Members { get; set; } = [];
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("modified_by")]
-    public string ModifiedBy { get; set; } = null!;
-
-    [BsonElement("modified_at")]
-    public DateTime ModifiedAt { get; set; }
 
     [BsonElement("isactive")]
     public bool IsActive { get; set; }

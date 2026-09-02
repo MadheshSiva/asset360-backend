@@ -19,6 +19,10 @@ public sealed class ZoneMapping : BaseEntity
     [BsonRepresentation(BsonType.ObjectId)]
     public string AreaId { get; set; } = string.Empty;
 
+    [BsonElement("outer_zone_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string OuterZoneId { get; set; } = string.Empty;
+
     [BsonElement("building_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string BuildingId { get; set; } = string.Empty;
@@ -50,16 +54,7 @@ public sealed class ZoneMapping : BaseEntity
     public string? Exit { get; set; }
 
     [BsonElement("status")]
-    public bool Status { get; set; }
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = string.Empty;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("client_id")]
-    public string ClientId { get; set; } = string.Empty;
+    public new bool Status { get; set; }
 
     [BsonElement("zone_colour")]
     public string? ZoneColour { get; set; }

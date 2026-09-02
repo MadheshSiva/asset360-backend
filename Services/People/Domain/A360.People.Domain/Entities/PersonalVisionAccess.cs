@@ -19,22 +19,10 @@ public class PersonalVisionAccess : BaseEntity
     public List<Reader> Reader { get; set; } = [];
 
     [BsonElement("status")]
-    public bool Status { get; set; }
+    public new bool Status { get; set; }
 
     [BsonElement("AccessTimeSchedule")]
     public List<AccessTimeSchedule> AccessTimeSchedule { get; set; } = [];
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("modified_by")]
-    public string? ModifiedBy { get; set; }
-
-    [BsonElement("modified_at")]
-    public DateTime ModifiedAt { get; set; }
 
     [BsonElement("Action")]
     public string? Action { get; set; }

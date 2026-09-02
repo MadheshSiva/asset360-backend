@@ -57,7 +57,9 @@ public sealed record CreateVisitorRegistrationRequest(
     string? TradeLicenseExpDate,
     List<VisitorRegistrationDocumentDto>? Documents,
     string? CreatedBy,
-    string? Status)
+    string? Status,
+    string? ClientId,
+    string? TenantId)
 {
     public RegistrationEntity ToEntity()
     {
@@ -89,7 +91,10 @@ public sealed record CreateVisitorRegistrationRequest(
             Documents = Documents?.Select(d => d.ToEntity()).ToList() ?? [],
             CreatedBy = CreatedBy,
             CreatedAt = DateTime.UtcNow,
-            Status = string.IsNullOrWhiteSpace(Status) ? "Pending" : Status
+            Status = string.IsNullOrWhiteSpace(Status) ? "Pending" : Status,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -119,7 +124,7 @@ public sealed record UpdateVisitorRegistrationRequest(
     string? TradeLicenseNo,
     string? TradeLicenseExpDate,
     List<VisitorRegistrationDocumentDto>? Documents,
-    string? ModifiedBy,
+    string? UpdatedBy,
     string? Status)
 {
     public void ApplyTo(RegistrationEntity registration)
@@ -148,8 +153,8 @@ public sealed record UpdateVisitorRegistrationRequest(
         registration.TradeLicenseNo = TradeLicenseNo;
         registration.TradeLicenseExpDate = TradeLicenseExpDate;
         registration.Documents = Documents?.Select(d => d.ToEntity()).ToList() ?? [];
-        registration.ModifiedBy = ModifiedBy;
-        registration.ModifiedAt = DateTime.UtcNow;
+        registration.UpdatedBy = UpdatedBy;
+        registration.UpdatedAt = DateTime.UtcNow;
         registration.Status = Status;
     }
 }
@@ -181,11 +186,13 @@ public sealed record VisitorRegistrationResponse(
     string? TradeLicenseExpDate,
     List<VisitorRegistrationDocumentDto> Documents,
     string CreatedBy,
-    DateTime CreatedAt,
-    string? ModifiedBy,
-    DateTime ModifiedAt,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
     string Password,
-    string Status)
+    string Status,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static VisitorRegistrationResponse FromEntity(
         RegistrationEntity registration)
@@ -218,9 +225,11 @@ public sealed record VisitorRegistrationResponse(
             registration.Documents.Select(VisitorRegistrationDocumentDto.FromEntity).ToList(),
             registration.CreatedBy ?? string.Empty,
             registration.CreatedAt,
-            registration.ModifiedBy,
-            registration.ModifiedAt,
+            registration.UpdatedBy,
+            registration.UpdatedAt,
             registration.Password ?? string.Empty,
-            registration.Status ?? string.Empty);
+            registration.Status ?? string.Empty,
+            registration.TenantId,
+            registration.IsDeleted);
     }
 }

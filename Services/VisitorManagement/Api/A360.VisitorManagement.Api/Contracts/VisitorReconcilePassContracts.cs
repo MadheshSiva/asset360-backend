@@ -7,7 +7,9 @@ public sealed record CreateVisitorReconcilePassRequest(
     string? NumberOfPeopleExited,
     string? VisitorPhysicallyPresent,
     string? VerifiedSecurityEmpNo,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public ReconcilePassEntity ToEntity()
     {
@@ -18,7 +20,10 @@ public sealed record CreateVisitorReconcilePassRequest(
             VisitorPhysicallyPresent = VisitorPhysicallyPresent,
             VerifiedSecurityEmpNo = VerifiedSecurityEmpNo,
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -27,7 +32,9 @@ public sealed record UpdateVisitorReconcilePassRequest(
     string? NumberOfVisitors,
     string? NumberOfPeopleExited,
     string? VisitorPhysicallyPresent,
-    string? VerifiedSecurityEmpNo)
+    string? VerifiedSecurityEmpNo,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ReconcilePassEntity reconcilePass)
     {
@@ -35,6 +42,12 @@ public sealed record UpdateVisitorReconcilePassRequest(
         reconcilePass.NumberOfPeopleExited = NumberOfPeopleExited;
         reconcilePass.VisitorPhysicallyPresent = VisitorPhysicallyPresent;
         reconcilePass.VerifiedSecurityEmpNo = VerifiedSecurityEmpNo;
+        reconcilePass.UpdatedBy = UpdatedBy;
+        reconcilePass.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            reconcilePass.Status = Status;
+        }
     }
 }
 
@@ -45,7 +58,12 @@ public sealed record VisitorReconcilePassResponse(
     string VisitorPhysicallyPresent,
     string VerifiedSecurityEmpNo,
     string CreatedBy,
-    DateTime CreatedAt)
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    bool IsDeleted,
+    string? Status)
 {
     public static VisitorReconcilePassResponse FromEntity(
         ReconcilePassEntity reconcilePass)
@@ -57,6 +75,11 @@ public sealed record VisitorReconcilePassResponse(
             reconcilePass.VisitorPhysicallyPresent ?? string.Empty,
             reconcilePass.VerifiedSecurityEmpNo ?? string.Empty,
             reconcilePass.CreatedBy ?? string.Empty,
-            reconcilePass.CreatedAt);
+            reconcilePass.CreatedAt,
+            reconcilePass.UpdatedBy,
+            reconcilePass.UpdatedAt,
+            reconcilePass.TenantId,
+            reconcilePass.IsDeleted,
+            reconcilePass.Status);
     }
 }

@@ -77,18 +77,6 @@ public class VisitorRegistration : BaseEntity
     [BsonElement("Documents")]
     public List<VisitorRegistrationDocument> Documents { get; set; } = [];
 
-    [BsonElement("created_by")]
-    public string? CreatedBy { get; set; }
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("modified_by")]
-    public string? ModifiedBy { get; set; }
-
-    [BsonElement("modified_at")]
-    public DateTime ModifiedAt { get; set; }
-
     [BsonElement("password")]
     public string? Password { get; set; }
 
@@ -103,7 +91,4 @@ public class VisitorRegistration : BaseEntity
 
     [BsonElement("forget_password_otp_code_expiration")]
     public DateTime? ForgetPasswordOtpCodeExpiration { get; set; }
-
-    [BsonElement("status")]
-    public string? Status { get; set; }
 }

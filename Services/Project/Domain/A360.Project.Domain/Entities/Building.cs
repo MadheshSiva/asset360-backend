@@ -19,6 +19,10 @@ public sealed class Building : BaseEntity
     [BsonRepresentation(BsonType.ObjectId)]
     public string AreaId { get; set; } = string.Empty;
 
+    [BsonElement("outer_zone_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string OuterZoneId { get; set; } = string.Empty;
+
     [BsonElement("building_name")]
     public string BuildingName { get; set; } = string.Empty;
 
@@ -32,14 +36,5 @@ public sealed class Building : BaseEntity
     public string Longitude { get; set; } = string.Empty;
 
     [BsonElement("status")]
-    public bool Status { get; set; }
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = string.Empty;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("client_id")]
-    public string ClientId { get; set; } = string.Empty;
+    public new bool Status { get; set; }
 }

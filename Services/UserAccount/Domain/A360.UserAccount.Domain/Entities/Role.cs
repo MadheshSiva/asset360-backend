@@ -22,15 +22,6 @@ public sealed class Role : BaseEntity
     [BsonElement("AssignedPermissions")]
     public List<AssignedPermission> AssignedPermissions { get; set; } = [];
 
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = string.Empty;
-
-    [BsonElement("created_date")]
-    public DateTime CreatedDate { get; set; }
-
-    [BsonElement("client_Id")]
-    public string ClientId { get; set; } = string.Empty;
-
     [BsonElement("Action")]
     public string Action { get; set; } = string.Empty;
 }

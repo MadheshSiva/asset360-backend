@@ -48,6 +48,7 @@ public static class BuildingEndpoints
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
+        IOuterZoneRepository outerZoneRepository,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -60,6 +61,7 @@ public static class BuildingEndpoints
             projectRepository,
             countryRepository,
             areaRepository,
+            outerZoneRepository,
             cancellationToken);
         if (relationshipErrors.Count > 0)
         {

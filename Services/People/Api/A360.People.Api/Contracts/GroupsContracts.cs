@@ -6,7 +6,9 @@ public sealed record CreateGroupRequest(
     string? GroupType,
     string? GroupName,
     List<string>? Members,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public GroupEntity ToEntity()
     {
@@ -16,7 +18,10 @@ public sealed record CreateGroupRequest(
             GroupName = GroupName,
             Members = Members ?? [],
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            ClientId = ClientId,
+            TenantId = TenantId,
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
         };
     }
 }
@@ -24,13 +29,21 @@ public sealed record CreateGroupRequest(
 public sealed record UpdateGroupRequest(
     string? GroupType,
     string? GroupName,
-    List<string>? Members)
+    List<string>? Members,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(GroupEntity group)
     {
         group.GroupType = GroupType;
         group.GroupName = GroupName;
         group.Members = Members ?? [];
+        group.UpdatedBy = UpdatedBy;
+        group.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            group.Status = Status;
+        }
     }
 }
 
@@ -40,7 +53,13 @@ public sealed record GroupResponse(
     string GroupName,
     List<string> Members,
     string CreatedBy,
-    DateTime CreatedAt)
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted)
 {
     public static GroupResponse FromEntity(
         GroupEntity group)
@@ -51,6 +70,12 @@ public sealed record GroupResponse(
             group.GroupName ?? string.Empty,
             group.Members ?? [],
             group.CreatedBy ?? string.Empty,
-            group.CreatedAt);
+            group.CreatedAt,
+            group.UpdatedBy,
+            group.UpdatedAt,
+            group.ClientId,
+            group.TenantId,
+            group.Status,
+            group.IsDeleted);
     }
 }

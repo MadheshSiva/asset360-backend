@@ -41,6 +41,10 @@ public static class ProjectServiceCollectionExtensions
         services.AddScoped<IAreaRepository>(serviceProvider => serviceProvider.GetRequiredService<AreaRepository>());
         services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<AreaRepository>());
 
+        services.AddScoped<OuterZoneRepository>();
+        services.AddScoped<IOuterZoneRepository>(serviceProvider => serviceProvider.GetRequiredService<OuterZoneRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<OuterZoneRepository>());
+
         services.AddScoped<BuildingRepository>();
         services.AddScoped<IBuildingRepository>(serviceProvider => serviceProvider.GetRequiredService<BuildingRepository>());
         services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<BuildingRepository>());

@@ -63,15 +63,6 @@ public class Device : BaseEntity
     [BsonElement("mydevice_image")]
     public string? MydeviceImage { get; set; }
 
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("client_id")]
-    public string ClientId { get; set; } = null!;
-
     [BsonElement("flexi1")]
     public string? Flexi1 { get; set; }
 

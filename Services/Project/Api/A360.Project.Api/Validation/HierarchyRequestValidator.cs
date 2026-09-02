@@ -48,6 +48,29 @@ internal static class HierarchyRequestValidator
         return errors.ToDictionary();
     }
 
+    public static IDictionary<string, string[]> Validate(this CreateOuterZoneRequest request)
+    {
+        var errors = new ValidationErrorBuilder();
+
+        errors.ObjectId(nameof(request.ProjectId), request.ProjectId, "Project id");
+        errors.ObjectId(nameof(request.CountryId), request.CountryId, "Country id");
+        errors.ObjectId(nameof(request.AreaId), request.AreaId, "Area id");
+        errors.Required(nameof(request.OuterZoneName), request.OuterZoneName, "Outer zone name");
+        errors.Required(nameof(request.CreatedBy), request.CreatedBy, "Created by");
+        errors.Required(nameof(request.ClientId), request.ClientId, "Client id");
+
+        return errors.ToDictionary();
+    }
+
+    public static IDictionary<string, string[]> Validate(this UpdateOuterZoneRequest request)
+    {
+        var errors = new ValidationErrorBuilder();
+
+        errors.Required(nameof(request.OuterZoneName), request.OuterZoneName, "Outer zone name");
+
+        return errors.ToDictionary();
+    }
+
     public static IDictionary<string, string[]> Validate(this CreateBuildingRequest request)
     {
         var errors = new ValidationErrorBuilder();
@@ -55,6 +78,7 @@ internal static class HierarchyRequestValidator
         errors.ObjectId(nameof(request.ProjectId), request.ProjectId, "Project id");
         errors.ObjectId(nameof(request.CountryId), request.CountryId, "Country id");
         errors.ObjectId(nameof(request.AreaId), request.AreaId, "Area id");
+        errors.ObjectId(nameof(request.OuterZoneId), request.OuterZoneId, "Outer zone id");
         errors.Required(nameof(request.BuildingName), request.BuildingName, "Building name");
         errors.Required(nameof(request.CreatedBy), request.CreatedBy, "Created by");
         errors.Required(nameof(request.ClientId), request.ClientId, "Client id");
@@ -78,6 +102,7 @@ internal static class HierarchyRequestValidator
         errors.ObjectId(nameof(request.ProjectId), request.ProjectId, "Project id");
         errors.ObjectId(nameof(request.CountryId), request.CountryId, "Country id");
         errors.ObjectId(nameof(request.AreaId), request.AreaId, "Area id");
+        errors.ObjectId(nameof(request.OuterZoneId), request.OuterZoneId, "Outer zone id");
         errors.ObjectId(nameof(request.BuildingId), request.BuildingId, "Building id");
         errors.Required(nameof(request.FloorName), request.FloorName, "Floor name");
         errors.Required(nameof(request.CreatedBy), request.CreatedBy, "Created by");
@@ -102,6 +127,7 @@ internal static class HierarchyRequestValidator
         errors.ObjectId(nameof(request.ProjectId), request.ProjectId, "Project id");
         errors.ObjectId(nameof(request.CountryId), request.CountryId, "Country id");
         errors.ObjectId(nameof(request.AreaId), request.AreaId, "Area id");
+        errors.ObjectId(nameof(request.OuterZoneId), request.OuterZoneId, "Outer zone id");
         errors.ObjectId(nameof(request.BuildingId), request.BuildingId, "Building id");
         errors.ObjectId(nameof(request.FloorId), request.FloorId, "Floor id");
         errors.Required(nameof(request.ZoneName), request.ZoneName, "Zone name");
@@ -129,6 +155,7 @@ internal static class HierarchyRequestValidator
         errors.ObjectId(nameof(request.ProjectId), request.ProjectId, "Project id");
         errors.ObjectId(nameof(request.CountryId), request.CountryId, "Country id");
         errors.ObjectId(nameof(request.AreaId), request.AreaId, "Area id");
+        errors.ObjectId(nameof(request.OuterZoneId), request.OuterZoneId, "Outer zone id");
         errors.ObjectId(nameof(request.BuildingId), request.BuildingId, "Building id");
         errors.ObjectId(nameof(request.FloorId), request.FloorId, "Floor id");
         errors.ObjectId(nameof(request.ZoneId), request.ZoneId, "Zone id");
@@ -159,6 +186,7 @@ internal static class HierarchyRequestValidator
         errors.ObjectId(nameof(request.ProjectId), request.ProjectId, "Project id");
         errors.ObjectId(nameof(request.CountryId), request.CountryId, "Country id");
         errors.ObjectId(nameof(request.AreaId), request.AreaId, "Area id");
+        errors.ObjectId(nameof(request.OuterZoneId), request.OuterZoneId, "Outer zone id");
         errors.ObjectId(nameof(request.BuildingId), request.BuildingId, "Building id");
         errors.ObjectId(nameof(request.FloorId), request.FloorId, "Floor id");
         errors.ObjectId(nameof(request.ZoneId), request.ZoneId, "Zone id");
@@ -185,6 +213,7 @@ internal static class HierarchyRequestValidator
         errors.ObjectId(nameof(request.ProjectId), request.ProjectId, "Project id");
         errors.ObjectId(nameof(request.CountryId), request.CountryId, "Country id");
         errors.ObjectId(nameof(request.AreaId), request.AreaId, "Area id");
+        errors.ObjectId(nameof(request.OuterZoneId), request.OuterZoneId, "Outer zone id");
         errors.ObjectId(nameof(request.BuildingId), request.BuildingId, "Building id");
         errors.ObjectId(nameof(request.FloorId), request.FloorId, "Floor id");
         errors.ObjectId(nameof(request.ZoneId), request.ZoneId, "Zone id");

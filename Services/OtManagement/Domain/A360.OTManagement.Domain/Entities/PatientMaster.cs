@@ -27,11 +27,5 @@ public class PatientMaster : BaseEntity
     public string SurgeryType { get; set; } = null!;
 
     [BsonElement("status")]
-    public bool Status { get; set; }
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
+    public new bool Status { get; set; }
 }

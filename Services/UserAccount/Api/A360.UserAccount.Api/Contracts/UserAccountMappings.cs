@@ -26,8 +26,11 @@ internal static class UserAccountMappings
             ActiveDirectoryUserName = Clean(request.ActiveDirectoryUserName),
             UserRoleId = Clean(request.UserRoleId),
             CreatedBy = Clean(request.CreatedBy),
-            CreatedDate = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow,
             ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            Status = "Active",
+            IsDeleted = false,
             LoginStatus = "Active"
         };
     }
@@ -41,6 +44,12 @@ internal static class UserAccountMappings
         user.LoginPassword = passwordHashingService.Hash(Clean(request.LoginPassword));
         user.ActiveDirectoryUserName = Clean(request.ActiveDirectoryUserName);
         user.UserRoleId = Clean(request.UserRoleId);
+        user.UpdatedBy = request.UpdatedBy;
+        user.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(request.Status))
+        {
+            user.Status = request.Status;
+        }
     }
 
     public static RoleEntity ToEntity(this CreateRoleRequest request)
@@ -53,8 +62,11 @@ internal static class UserAccountMappings
             //AssignedProjects = ToAssignedProjects(request.AssignedProjects),
             AssignedPermissions = ToAssignedPermissions(request.AssignedPermissions),
             CreatedBy = Clean(request.CreatedBy),
-            CreatedDate = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow,
             ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            Status = "Active",
+            IsDeleted = false,
             Action = "Created"
         };
     }
@@ -65,6 +77,12 @@ internal static class UserAccountMappings
         role.Description = Clean(request.Description);
         //role.AssignedProjects = ToAssignedProjects(request.AssignedProjects);
         role.AssignedPermissions = ToAssignedPermissions(request.AssignedPermissions);
+        role.UpdatedBy = request.UpdatedBy;
+        role.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(request.Status))
+        {
+            role.Status = request.Status;
+        }
         role.Action = "Updated";
     }
 

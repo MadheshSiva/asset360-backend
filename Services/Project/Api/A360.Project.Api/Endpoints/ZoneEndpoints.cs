@@ -53,6 +53,7 @@ public static class ZoneEndpoints
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
+        IOuterZoneRepository outerZoneRepository,
         IBuildingRepository buildingRepository,
         IFloorRepository floorRepository,
         CancellationToken cancellationToken)
@@ -67,6 +68,7 @@ public static class ZoneEndpoints
             projectRepository,
             countryRepository,
             areaRepository,
+            outerZoneRepository,
             buildingRepository,
             floorRepository,
             cancellationToken);

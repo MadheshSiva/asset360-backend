@@ -6,4 +6,5 @@ public sealed record UpdateProjectRequest(
     bool Status,
     string ClientId,
     DateTime WeekStart,
-    DateTime WeekEnd);
+    DateTime WeekEnd,
+    string? UpdatedBy);

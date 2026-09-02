@@ -12,7 +12,9 @@ public sealed record CreateOTSchedulingRequest(
     string? SurgeryType,
     string? Priority,
     bool Status,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public OTSchedulingEntity ToEntity()
     {
@@ -27,7 +29,10 @@ public sealed record CreateOTSchedulingRequest(
             Priority = Priority,
             Status = Status,
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -39,7 +44,8 @@ public sealed record UpdateOTSchedulingRequest(
     DateTime EndTime,
     string? SurgeryType,
     string? Priority,
-    bool Status)
+    bool Status,
+    string? UpdatedBy)
 {
     public void ApplyTo(
         OTSchedulingEntity otScheduling)
@@ -51,6 +57,8 @@ public sealed record UpdateOTSchedulingRequest(
         otScheduling.SurgeryType = SurgeryType;
         otScheduling.Priority = Priority;
         otScheduling.Status = Status;
+        otScheduling.UpdatedBy = UpdatedBy;
+        otScheduling.UpdatedAt = DateTime.UtcNow;
     }
 }
 
@@ -64,8 +72,13 @@ public sealed record OTSchedulingResponse(
     string SurgeryType,
     string Priority,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt)
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static OTSchedulingResponse FromEntity(
         OTSchedulingEntity otScheduling)
@@ -80,7 +93,12 @@ public sealed record OTSchedulingResponse(
             otScheduling.SurgeryType ?? string.Empty,
             otScheduling.Priority ?? string.Empty,
             otScheduling.Status,
-            otScheduling.CreatedBy ?? string.Empty,
-            otScheduling.CreatedAt);
+            otScheduling.CreatedBy,
+            otScheduling.CreatedAt,
+            otScheduling.UpdatedBy,
+            otScheduling.UpdatedAt,
+            otScheduling.ClientId,
+            otScheduling.TenantId,
+            otScheduling.IsDeleted);
     }
 }

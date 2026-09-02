@@ -19,7 +19,9 @@ public sealed record CreateOTManagementRequest(
     string? Area,
     string? Building,
     string? Zone,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public OTManagementEntity ToEntity()
     {
@@ -42,7 +44,10 @@ public sealed record CreateOTManagementRequest(
             Building = Building,
             Zone = Zone,
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -62,7 +67,8 @@ public sealed record UpdateOTManagementRequest(
     string? Country,
     string? Area,
     string? Building,
-    string? Zone)
+    string? Zone,
+    string? UpdatedBy)
 {
     public void ApplyTo(
         OTManagementEntity otManagement)
@@ -82,6 +88,8 @@ public sealed record UpdateOTManagementRequest(
         otManagement.Area = Area;
         otManagement.Building = Building;
         otManagement.Zone = Zone;
+        otManagement.UpdatedBy = UpdatedBy;
+        otManagement.UpdatedAt = DateTime.UtcNow;
     }
 }
 
@@ -103,8 +111,13 @@ public sealed record OTManagementResponse(
     string Area,
     string Building,
     string Zone,
-    string CreatedBy,
-    DateTime CreatedAt)
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static OTManagementResponse FromEntity(
         OTManagementEntity otManagement)
@@ -127,7 +140,12 @@ public sealed record OTManagementResponse(
             otManagement.Area ?? string.Empty,
             otManagement.Building ?? string.Empty,
             otManagement.Zone ?? string.Empty,
-            otManagement.CreatedBy ?? string.Empty,
-            otManagement.CreatedAt);
+            otManagement.CreatedBy,
+            otManagement.CreatedAt,
+            otManagement.UpdatedBy,
+            otManagement.UpdatedAt,
+            otManagement.ClientId,
+            otManagement.TenantId,
+            otManagement.IsDeleted);
     }
 }

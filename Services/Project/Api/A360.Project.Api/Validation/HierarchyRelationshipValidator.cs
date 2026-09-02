@@ -34,7 +34,7 @@ internal static class HierarchyRelationshipValidator
     }
 
     public static async Task<IDictionary<string, string[]>> ValidateRelationshipsAsync(
-        this CreateBuildingRequest request,
+        this CreateOuterZoneRequest request,
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
@@ -50,10 +50,29 @@ internal static class HierarchyRelationshipValidator
     }
 
     public static async Task<IDictionary<string, string[]>> ValidateRelationshipsAsync(
+        this CreateBuildingRequest request,
+        IProjectRepository projectRepository,
+        ICountryRepository countryRepository,
+        IAreaRepository areaRepository,
+        IOuterZoneRepository outerZoneRepository,
+        CancellationToken cancellationToken)
+    {
+        var errors = new ValidationErrorBuilder();
+
+        await RequireExistsAsync(errors, nameof(request.ProjectId), request.ProjectId, "Project", projectRepository, cancellationToken);
+        await RequireExistsAsync(errors, nameof(request.CountryId), request.CountryId, "Country", countryRepository, cancellationToken);
+        await RequireExistsAsync(errors, nameof(request.AreaId), request.AreaId, "Area", areaRepository, cancellationToken);
+        await RequireExistsAsync(errors, nameof(request.OuterZoneId), request.OuterZoneId, "OuterZone", outerZoneRepository, cancellationToken);
+
+        return errors.ToDictionary();
+    }
+
+    public static async Task<IDictionary<string, string[]>> ValidateRelationshipsAsync(
         this CreateFloorRequest request,
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
+        IOuterZoneRepository outerZoneRepository,
         IBuildingRepository buildingRepository,
         CancellationToken cancellationToken)
     {
@@ -62,6 +81,7 @@ internal static class HierarchyRelationshipValidator
         await RequireExistsAsync(errors, nameof(request.ProjectId), request.ProjectId, "Project", projectRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.CountryId), request.CountryId, "Country", countryRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.AreaId), request.AreaId, "Area", areaRepository, cancellationToken);
+        await RequireExistsAsync(errors, nameof(request.OuterZoneId), request.OuterZoneId, "OuterZone", outerZoneRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.BuildingId), request.BuildingId, "Building", buildingRepository, cancellationToken);
 
         return errors.ToDictionary();
@@ -72,6 +92,7 @@ internal static class HierarchyRelationshipValidator
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
+        IOuterZoneRepository outerZoneRepository,
         IBuildingRepository buildingRepository,
         IFloorRepository floorRepository,
         CancellationToken cancellationToken)
@@ -81,6 +102,7 @@ internal static class HierarchyRelationshipValidator
         await RequireExistsAsync(errors, nameof(request.ProjectId), request.ProjectId, "Project", projectRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.CountryId), request.CountryId, "Country", countryRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.AreaId), request.AreaId, "Area", areaRepository, cancellationToken);
+        await RequireExistsAsync(errors, nameof(request.OuterZoneId), request.OuterZoneId, "OuterZone", outerZoneRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.BuildingId), request.BuildingId, "Building", buildingRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.FloorId), request.FloorId, "Floor", floorRepository, cancellationToken);
 
@@ -92,6 +114,7 @@ internal static class HierarchyRelationshipValidator
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
+        IOuterZoneRepository outerZoneRepository,
         IBuildingRepository buildingRepository,
         IFloorRepository floorRepository,
         IZoneRepository zoneRepository,
@@ -102,6 +125,7 @@ internal static class HierarchyRelationshipValidator
         await RequireExistsAsync(errors, nameof(request.ProjectId), request.ProjectId, "Project", projectRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.CountryId), request.CountryId, "Country", countryRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.AreaId), request.AreaId, "Area", areaRepository, cancellationToken);
+        await RequireExistsAsync(errors, nameof(request.OuterZoneId), request.OuterZoneId, "OuterZone", outerZoneRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.BuildingId), request.BuildingId, "Building", buildingRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.FloorId), request.FloorId, "Floor", floorRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.ZoneId), request.ZoneId, "Zone", zoneRepository, cancellationToken);
@@ -114,6 +138,7 @@ internal static class HierarchyRelationshipValidator
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
+        IOuterZoneRepository outerZoneRepository,
         IBuildingRepository buildingRepository,
         IFloorRepository floorRepository,
         IZoneRepository zoneRepository,
@@ -124,6 +149,7 @@ internal static class HierarchyRelationshipValidator
         await RequireExistsAsync(errors, nameof(request.ProjectId), request.ProjectId, "Project", projectRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.CountryId), request.CountryId, "Country", countryRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.AreaId), request.AreaId, "Area", areaRepository, cancellationToken);
+        await RequireExistsAsync(errors, nameof(request.OuterZoneId), request.OuterZoneId, "OuterZone", outerZoneRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.BuildingId), request.BuildingId, "Building", buildingRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.FloorId), request.FloorId, "Floor", floorRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.ZoneId), request.ZoneId, "Zone", zoneRepository, cancellationToken);
@@ -136,6 +162,7 @@ internal static class HierarchyRelationshipValidator
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
+        IOuterZoneRepository outerZoneRepository,
         IBuildingRepository buildingRepository,
         IFloorRepository floorRepository,
         IZoneRepository zoneRepository,
@@ -146,6 +173,7 @@ internal static class HierarchyRelationshipValidator
         await RequireExistsAsync(errors, nameof(request.ProjectId), request.ProjectId, "Project", projectRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.CountryId), request.CountryId, "Country", countryRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.AreaId), request.AreaId, "Area", areaRepository, cancellationToken);
+        await RequireExistsAsync(errors, nameof(request.OuterZoneId), request.OuterZoneId, "OuterZone", outerZoneRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.BuildingId), request.BuildingId, "Building", buildingRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.FloorId), request.FloorId, "Floor", floorRepository, cancellationToken);
         await RequireExistsAsync(errors, nameof(request.ZoneId), request.ZoneId, "Zone", zoneRepository, cancellationToken);

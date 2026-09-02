@@ -41,7 +41,9 @@ public sealed record CreatePersonalVisionGreetingsIndividualRequest(
     string? GreetingsDescription,
     bool Status,
     List<CreateGreetingsTimeScheduleRequest>? GreetingsTimeSchedules,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public GreetingsEntity ToEntity()
     {
@@ -66,7 +68,10 @@ public sealed record CreatePersonalVisionGreetingsIndividualRequest(
                     ToTime = x.ToTime
                 }).ToList(),
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -77,7 +82,8 @@ public sealed record UpdatePersonalVisionGreetingsIndividualRequest(
     string? GreetingsType,
     string? GreetingsDescription,
     bool Status,
-    List<UpdateGreetingsTimeScheduleRequest>? GreetingsTimeSchedules)
+    List<UpdateGreetingsTimeScheduleRequest>? GreetingsTimeSchedules,
+    string? UpdatedBy)
 {
     public void ApplyTo(
         GreetingsEntity entity)
@@ -102,7 +108,8 @@ public sealed record UpdatePersonalVisionGreetingsIndividualRequest(
                 ToTime = x.ToTime
             }).ToList();
 
-        entity.ModifiedAt = DateTime.UtcNow;
+        entity.UpdatedBy = UpdatedBy;
+        entity.UpdatedAt = DateTime.UtcNow;
     }
 }
 
@@ -115,7 +122,12 @@ public sealed record PersonalVisionGreetingsIndividualResponse(
     bool Status,
     List<GreetingsTimeScheduleResponse> GreetingsTimeSchedules,
     string CreatedBy,
-    DateTime CreatedAt)
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static PersonalVisionGreetingsIndividualResponse FromEntity(
         GreetingsEntity entity)
@@ -141,6 +153,11 @@ public sealed record PersonalVisionGreetingsIndividualResponse(
                 .ToList()
                 ?? [],
             entity.CreatedBy ?? string.Empty,
-            entity.CreatedAt);
+            entity.CreatedAt,
+            entity.UpdatedBy,
+            entity.UpdatedAt,
+            entity.ClientId,
+            entity.TenantId,
+            entity.IsDeleted);
     }
 }

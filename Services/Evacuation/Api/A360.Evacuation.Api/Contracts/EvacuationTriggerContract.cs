@@ -9,7 +9,8 @@ public sealed record CreateEvacuationTriggerRequest(
     string? IpAddress,
     string? ApplicationName,
     string? CreatedBy,
-    string? ClientId)
+    string? ClientId,
+    string? TenantId)
 {
     public EvacuationTriggerEntity ToEntity()
     {
@@ -22,8 +23,10 @@ public sealed record CreateEvacuationTriggerRequest(
 
             CreatedBy = CreatedBy,
             ClientId = ClientId,
+            TenantId = TenantId,
 
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
         };
     }
 }
@@ -31,13 +34,22 @@ public sealed record CreateEvacuationTriggerRequest(
 public sealed record UpdateEvacuationTriggerRequest(
     string? TriggerField,
     string? IpAddress,
-    string? ApplicationName)
+    string? ApplicationName,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(EvacuationTriggerEntity evacuationTrigger)
     {
         evacuationTrigger.TriggerField = TriggerField;
         evacuationTrigger.IpAddress = IpAddress;
         evacuationTrigger.ApplicationName = ApplicationName;
+
+        evacuationTrigger.UpdatedBy = UpdatedBy;
+        evacuationTrigger.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            evacuationTrigger.Status = Status;
+        }
     }
 }
 
@@ -47,9 +59,14 @@ public sealed record EvacuationTriggerResponse(
     string TriggerField,
     string? IpAddress,
     string? ApplicationName,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId)
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? ClientId,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted)
 {
     public static EvacuationTriggerResponse FromEntity(
         EvacuationTriggerEntity evacuationTrigger)
@@ -62,10 +79,16 @@ public sealed record EvacuationTriggerResponse(
             evacuationTrigger.IpAddress,
             evacuationTrigger.ApplicationName,
 
-            evacuationTrigger.CreatedBy ?? string.Empty,
+            evacuationTrigger.CreatedBy,
             evacuationTrigger.CreatedAt,
 
-            evacuationTrigger.ClientId ?? string.Empty
+            evacuationTrigger.ClientId,
+
+            evacuationTrigger.UpdatedBy,
+            evacuationTrigger.UpdatedAt,
+            evacuationTrigger.TenantId,
+            evacuationTrigger.Status,
+            evacuationTrigger.IsDeleted
         );
     }
 }

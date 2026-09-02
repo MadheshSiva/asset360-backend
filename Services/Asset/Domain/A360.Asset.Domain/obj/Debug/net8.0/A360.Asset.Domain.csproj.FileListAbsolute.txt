@@ -1,0 +1,15 @@
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/bin/Debug/net8.0/A360.Asset.Domain.deps.json
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/bin/Debug/net8.0/A360.Asset.Domain.dll
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/bin/Debug/net8.0/A360.Asset.Domain.pdb
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/bin/Debug/net8.0/A360.Domain.dll
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/bin/Debug/net8.0/A360.Domain.pdb
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.csproj.AssemblyReference.cache
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.AssemblyInfoInputs.cache
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.AssemblyInfo.cs
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.csproj.CoreCompileInputs.cache
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.csproj.CopyComplete
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.dll
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/refint/A360.Asset.Domain.dll
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.pdb
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/ref/A360.Asset.Domain.dll

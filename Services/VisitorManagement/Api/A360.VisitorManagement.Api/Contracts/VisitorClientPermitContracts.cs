@@ -8,7 +8,9 @@ public sealed record CreateVisitorClientPermitRequest(
     string? SupportContactNo,
     string? SecurityContactNo,
     string? FireContactNo,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public ClientPermitEntity ToEntity()
     {
@@ -20,7 +22,10 @@ public sealed record CreateVisitorClientPermitRequest(
             SecurityContactNo = SecurityContactNo,
             FireContactNo = FireContactNo,
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -30,7 +35,9 @@ public sealed record UpdateVisitorClientPermitRequest(
     string? ClientEmail,
     string? SupportContactNo,
     string? SecurityContactNo,
-    string? FireContactNo)
+    string? FireContactNo,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ClientPermitEntity clientPermit)
     {
@@ -39,6 +46,12 @@ public sealed record UpdateVisitorClientPermitRequest(
         clientPermit.SupportContactNo = SupportContactNo;
         clientPermit.SecurityContactNo = SecurityContactNo;
         clientPermit.FireContactNo = FireContactNo;
+        clientPermit.UpdatedBy = UpdatedBy;
+        clientPermit.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            clientPermit.Status = Status;
+        }
     }
 }
 
@@ -50,7 +63,12 @@ public sealed record VisitorClientPermitResponse(
     string SecurityContactNo,
     string FireContactNo,
     string CreatedBy,
-    DateTime CreatedAt)
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    bool IsDeleted,
+    string? Status)
 {
     public static VisitorClientPermitResponse FromEntity(
         ClientPermitEntity clientPermit)
@@ -63,6 +81,11 @@ public sealed record VisitorClientPermitResponse(
             clientPermit.SecurityContactNo ?? string.Empty,
             clientPermit.FireContactNo ?? string.Empty,
             clientPermit.CreatedBy ?? string.Empty,
-            clientPermit.CreatedAt);
+            clientPermit.CreatedAt,
+            clientPermit.UpdatedBy,
+            clientPermit.UpdatedAt,
+            clientPermit.TenantId,
+            clientPermit.IsDeleted,
+            clientPermit.Status);
     }
 }

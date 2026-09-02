@@ -21,8 +21,9 @@ public sealed class BuildingRepository : MongoRepository<BuildingEntity>, IBuild
                 Builders<BuildingEntity>.IndexKeys
                     .Ascending(building => building.ProjectId)
                     .Ascending(building => building.CountryId)
-                    .Ascending(building => building.AreaId),
-                new CreateIndexOptions { Name = "ix_building_project_country_area" }),
+                    .Ascending(building => building.AreaId)
+                    .Ascending(building => building.OuterZoneId),
+                new CreateIndexOptions { Name = "ix_building_project_country_area_outerzone" }),
             new CreateIndexModel<BuildingEntity>(
                 Builders<BuildingEntity>.IndexKeys
                     .Ascending(building => building.AreaId)

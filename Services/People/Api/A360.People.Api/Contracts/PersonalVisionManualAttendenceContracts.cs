@@ -8,7 +8,9 @@ public sealed record CreatePersonalVisionManualAttendanceRequest(
     string? Reason,
     DateTime FromDate,
     string? FromTime,
-    string? AttendanceStatus)
+    string? AttendanceStatus,
+    string? ClientId,
+    string? TenantId)
 {
     public ManualAttendanceEntity ToEntity()
     {
@@ -21,7 +23,10 @@ public sealed record CreatePersonalVisionManualAttendanceRequest(
             FromTime = FromTime,
             AttendanceStatus = AttendanceStatus,
             ApproveStatus = "Pending",
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -36,7 +41,9 @@ public sealed record UpdatePersonalVisionManualAttendanceRequest(
     string? ApproveStatus,
     string? ApprovedBy,
     string? ApprovedRemarks,
-    string? Action)
+    string? Action,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ManualAttendanceEntity attendance)
     {
@@ -56,7 +63,12 @@ public sealed record UpdatePersonalVisionManualAttendanceRequest(
             attendance.ApprovedOn = DateTime.UtcNow;
         }
 
-        attendance.ModifiedAt = DateTime.UtcNow;
+        attendance.UpdatedBy = UpdatedBy;
+        attendance.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            attendance.Status = Status;
+        }
     }
 }
 
@@ -70,13 +82,17 @@ public sealed record PersonalVisionManualAttendanceResponse(
     string? AttendanceStatus,
     string? ApproveStatus,
     string? CreatedBy,
-    DateTime CreatedAt,
-    string? ModifiedBy,
-    DateTime? ModifiedAt,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
     string? ApprovedBy,
     DateTime? ApprovedOn,
     string? ApprovedRemarks,
-    string? Action)
+    string? Action,
+    string? ClientId,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted)
 {
     public static PersonalVisionManualAttendanceResponse FromEntity(
         ManualAttendanceEntity attendance)
@@ -92,11 +108,15 @@ public sealed record PersonalVisionManualAttendanceResponse(
             attendance.ApproveStatus,
             attendance.CreatedBy,
             attendance.CreatedAt,
-            attendance.ModifiedBy,
-            attendance.ModifiedAt,
+            attendance.UpdatedBy,
+            attendance.UpdatedAt,
             attendance.ApprovedBy,
             attendance.ApprovedOn,
             attendance.ApprovedRemarks,
-            attendance.Action);
+            attendance.Action,
+            attendance.ClientId,
+            attendance.TenantId,
+            attendance.Status,
+            attendance.IsDeleted);
     }
 }

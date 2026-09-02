@@ -13,6 +13,7 @@ public sealed record CreateAreaRequest(
     bool Status,
     string? CreatedBy,
     string? ClientId,
+    string? TenantId,
     string? MapPath);
 
 public sealed record UpdateAreaRequest(
@@ -22,7 +23,8 @@ public sealed record UpdateAreaRequest(
     string? Latitude,
     string? Longitude,
     bool Status,
-    string? MapPath);
+    string? MapPath,
+    string? UpdatedBy);
 
 public sealed record AreaResponse(
     string Id,
@@ -34,9 +36,13 @@ public sealed record AreaResponse(
     string Latitude,
     string Longitude,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted,
     string MapPath)
 {
     public static AreaResponse FromEntity(AreaEntity area)
@@ -53,7 +59,11 @@ public sealed record AreaResponse(
             area.Status,
             area.CreatedBy,
             area.CreatedAt,
+            area.UpdatedBy,
+            area.UpdatedAt,
             area.ClientId,
+            area.TenantId,
+            area.IsDeleted,
             area.MapPath);
     }
 }

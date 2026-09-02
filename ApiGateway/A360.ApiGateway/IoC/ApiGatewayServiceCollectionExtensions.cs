@@ -14,6 +14,8 @@ public static class ApiGatewayServiceCollectionExtensions
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+        services.AddHttpClient("SwaggerAggregator");
+        services.AddMemoryCache();
 
         return services;
     }

@@ -16,10 +16,4 @@ public class VisitorReconcilePass : BaseEntity
 
     [BsonElement("Verified_security_emp_no")]
     public string? VerifiedSecurityEmpNo { get; set; }
-
-    [BsonElement("created_by")]
-    public string? CreatedBy { get; set; }
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
 }

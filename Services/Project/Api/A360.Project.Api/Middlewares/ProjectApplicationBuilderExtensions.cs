@@ -19,6 +19,7 @@ public static class ProjectApplicationBuilderExtensions
         app.MapProjectEndpoints();
         app.MapCountryEndpoints();
         app.MapAreaEndpoints();
+        app.MapOuterZoneEndpoints();
         app.MapBuildingEndpoints();
         app.MapFloorEndpoints();
         app.MapZoneEndpoints();

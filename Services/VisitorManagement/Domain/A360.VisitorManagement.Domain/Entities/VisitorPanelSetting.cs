@@ -14,15 +14,6 @@ public class VisitorPanelSetting : BaseEntity
     [BsonElement("CompanyName")]
     public string? CompanyName { get; set; }
 
-    [BsonElement("client_id")]
-    public string ClientId { get; set; } = null!;
-
-    [BsonElement("created_by")]
-    public string? CreatedBy { get; set; }
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
     [BsonElement("isauthcode")]
     public bool IsAuthCode { get; set; }
 

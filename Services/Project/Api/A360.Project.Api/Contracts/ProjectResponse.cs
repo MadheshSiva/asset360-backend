@@ -7,9 +7,13 @@ public sealed record ProjectResponse(
     string ProjectName,
     string Description,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted,
     DateTime WeekStart,
     DateTime WeekEnd)
 {
@@ -22,7 +26,11 @@ public sealed record ProjectResponse(
             project.Status,
             project.CreatedBy,
             project.CreatedAt,
+            project.UpdatedBy,
+            project.UpdatedAt,
             project.ClientId,
+            project.TenantId,
+            project.IsDeleted,
             project.WeekStart,
             project.WeekEnd);
     }

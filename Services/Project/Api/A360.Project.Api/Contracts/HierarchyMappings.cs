@@ -3,6 +3,7 @@ using BuildingEntity = A360.Project.Domain.Entities.Building;
 using CountryEntity = A360.Project.Domain.Entities.Country;
 using DeviceZoneMappingEntity = A360.Project.Domain.Entities.DeviceZoneMapping;
 using FloorEntity = A360.Project.Domain.Entities.Floor;
+using OuterZoneEntity = A360.Project.Domain.Entities.OuterZone;
 using SubZoneEntity = A360.Project.Domain.Entities.SubZone;
 using ZoneEntity = A360.Project.Domain.Entities.Zone;
 using ZoneMappingEntity = A360.Project.Domain.Entities.ZoneMapping;
@@ -25,7 +26,9 @@ internal static class HierarchyMappings
             Status = request.Status,
             CreatedBy = Clean(request.CreatedBy),
             CreatedAt = DateTime.UtcNow,
-            ClientId = Clean(request.ClientId)
+            ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            IsDeleted = false
         };
     }
 
@@ -39,6 +42,8 @@ internal static class HierarchyMappings
         country.Longitude = Clean(request.Longitude);
         country.Status = request.Status;
         country.ClientId = Clean(request.ClientId);
+        country.UpdatedBy = request.UpdatedBy;
+        country.UpdatedAt = DateTime.UtcNow;
     }
 
     public static AreaEntity ToEntity(this CreateAreaRequest request)
@@ -56,6 +61,8 @@ internal static class HierarchyMappings
             CreatedBy = Clean(request.CreatedBy),
             CreatedAt = DateTime.UtcNow,
             ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            IsDeleted = false,
             MapPath = Clean(request.MapPath)
         };
     }
@@ -69,6 +76,43 @@ internal static class HierarchyMappings
         area.Longitude = Clean(request.Longitude);
         area.Status = request.Status;
         area.MapPath = Clean(request.MapPath);
+        area.UpdatedBy = request.UpdatedBy;
+        area.UpdatedAt = DateTime.UtcNow;
+    }
+
+    public static OuterZoneEntity ToEntity(this CreateOuterZoneRequest request)
+    {
+        return new OuterZoneEntity
+        {
+            ProjectId = Clean(request.ProjectId),
+            CountryId = Clean(request.CountryId),
+            AreaId = Clean(request.AreaId),
+            OuterZoneName = Clean(request.OuterZoneName),
+            Description = Clean(request.Description),
+            OutlineMap = Clean(request.OutlineMap),
+            Latitude = Clean(request.Latitude),
+            Longitude = Clean(request.Longitude),
+            Status = request.Status,
+            CreatedBy = Clean(request.CreatedBy),
+            CreatedAt = DateTime.UtcNow,
+            ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            IsDeleted = false,
+            MapPath = Clean(request.MapPath)
+        };
+    }
+
+    public static void ApplyTo(this UpdateOuterZoneRequest request, OuterZoneEntity outerZone)
+    {
+        outerZone.OuterZoneName = Clean(request.OuterZoneName);
+        outerZone.Description = Clean(request.Description);
+        outerZone.OutlineMap = Clean(request.OutlineMap);
+        outerZone.Latitude = Clean(request.Latitude);
+        outerZone.Longitude = Clean(request.Longitude);
+        outerZone.Status = request.Status;
+        outerZone.MapPath = Clean(request.MapPath);
+        outerZone.UpdatedBy = request.UpdatedBy;
+        outerZone.UpdatedAt = DateTime.UtcNow;
     }
 
     public static BuildingEntity ToEntity(this CreateBuildingRequest request)
@@ -78,6 +122,7 @@ internal static class HierarchyMappings
             ProjectId = Clean(request.ProjectId),
             CountryId = Clean(request.CountryId),
             AreaId = Clean(request.AreaId),
+            OuterZoneId = Clean(request.OuterZoneId),
             BuildingName = Clean(request.BuildingName),
             Description = Clean(request.Description),
             Latitude = Clean(request.Latitude),
@@ -85,7 +130,9 @@ internal static class HierarchyMappings
             Status = request.Status,
             CreatedBy = Clean(request.CreatedBy),
             CreatedAt = DateTime.UtcNow,
-            ClientId = Clean(request.ClientId)
+            ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            IsDeleted = false
         };
     }
 
@@ -96,6 +143,8 @@ internal static class HierarchyMappings
         building.Latitude = Clean(request.Latitude);
         building.Longitude = Clean(request.Longitude);
         building.Status = request.Status;
+        building.UpdatedBy = request.UpdatedBy;
+        building.UpdatedAt = DateTime.UtcNow;
     }
 
     public static FloorEntity ToEntity(this CreateFloorRequest request)
@@ -105,6 +154,7 @@ internal static class HierarchyMappings
             ProjectId = Clean(request.ProjectId),
             CountryId = Clean(request.CountryId),
             AreaId = Clean(request.AreaId),
+            OuterZoneId = Clean(request.OuterZoneId),
             BuildingId = Clean(request.BuildingId),
             FloorName = Clean(request.FloorName),
             Description = Clean(request.Description),
@@ -112,6 +162,8 @@ internal static class HierarchyMappings
             CreatedBy = Clean(request.CreatedBy),
             CreatedAt = DateTime.UtcNow,
             ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            IsDeleted = false,
             MapPath = Clean(request.MapPath)
         };
     }
@@ -122,6 +174,8 @@ internal static class HierarchyMappings
         floor.Description = Clean(request.Description);
         floor.Status = request.Status;
         floor.MapPath = Clean(request.MapPath);
+        floor.UpdatedBy = request.UpdatedBy;
+        floor.UpdatedAt = DateTime.UtcNow;
     }
 
     public static ZoneEntity ToEntity(this CreateZoneRequest request)
@@ -131,6 +185,7 @@ internal static class HierarchyMappings
             ProjectId = Clean(request.ProjectId),
             CountryId = Clean(request.CountryId),
             AreaId = Clean(request.AreaId),
+            OuterZoneId = Clean(request.OuterZoneId),
             BuildingId = Clean(request.BuildingId),
             FloorId = Clean(request.FloorId),
             ZoneName = Clean(request.ZoneName),
@@ -143,6 +198,8 @@ internal static class HierarchyMappings
             CreatedBy = Clean(request.CreatedBy),
             CreatedAt = DateTime.UtcNow,
             ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            IsDeleted = false,
             TimeTakenAssemblePoint = request.TimeTakenAssemblePoint,
             MapPath = Clean(request.MapPath)
         };
@@ -159,6 +216,8 @@ internal static class HierarchyMappings
         zone.Status = request.Status;
         zone.TimeTakenAssemblePoint = request.TimeTakenAssemblePoint;
         zone.MapPath = Clean(request.MapPath);
+        zone.UpdatedBy = request.UpdatedBy;
+        zone.UpdatedAt = DateTime.UtcNow;
     }
 
     public static SubZoneEntity ToEntity(this CreateSubZoneRequest request)
@@ -168,6 +227,7 @@ internal static class HierarchyMappings
             ProjectId = Clean(request.ProjectId),
             CountryId = Clean(request.CountryId),
             AreaId = Clean(request.AreaId),
+            OuterZoneId = Clean(request.OuterZoneId),
             BuildingId = Clean(request.BuildingId),
             FloorId = Clean(request.FloorId),
             ZoneId = Clean(request.ZoneId),
@@ -181,6 +241,8 @@ internal static class HierarchyMappings
             CreatedBy = Clean(request.CreatedBy),
             CreatedAt = DateTime.UtcNow,
             ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            IsDeleted = false,
             TimeTakenAssemblePoint = request.TimeTakenAssemblePoint?.ToString() ?? string.Empty,
             MapPath = Clean(request.MapPath)
         };
@@ -197,6 +259,8 @@ internal static class HierarchyMappings
         subZone.Status = request.Status;
         subZone.TimeTakenAssemblePoint = request.TimeTakenAssemblePoint?.ToString() ?? string.Empty;
         subZone.MapPath = Clean(request.MapPath);
+        subZone.UpdatedBy = request.UpdatedBy;
+        subZone.UpdatedAt = DateTime.UtcNow;
     }
 
     public static ZoneMappingEntity ToEntity(this CreateZoneMappingRequest request)
@@ -206,6 +270,7 @@ internal static class HierarchyMappings
             ProjectId = Clean(request.ProjectId),
             CountryId = Clean(request.CountryId),
             AreaId = Clean(request.AreaId),
+            OuterZoneId = Clean(request.OuterZoneId),
             BuildingId = Clean(request.BuildingId),
             FloorId = Clean(request.FloorId),
             ZoneId = Clean(request.ZoneId),
@@ -219,6 +284,8 @@ internal static class HierarchyMappings
             CreatedBy = Clean(request.CreatedBy),
             CreatedAt = DateTime.UtcNow,
             ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            IsDeleted = false,
             ZoneColour = request.ZoneColour,
             GeoJsonData = GeoJsonConversion.ToBsonDocuments(request.GeoJsonData)
         };
@@ -235,6 +302,8 @@ internal static class HierarchyMappings
         zoneMapping.Status = request.Status;
         zoneMapping.ZoneColour = request.ZoneColour;
         zoneMapping.GeoJsonData = GeoJsonConversion.ToBsonDocuments(request.GeoJsonData);
+        zoneMapping.UpdatedBy = request.UpdatedBy;
+        zoneMapping.UpdatedAt = DateTime.UtcNow;
     }
 
     public static DeviceZoneMappingEntity ToEntity(this CreateDeviceZoneMappingRequest request)
@@ -244,6 +313,7 @@ internal static class HierarchyMappings
             ProjectId = Clean(request.ProjectId),
             CountryId = Clean(request.CountryId),
             AreaId = Clean(request.AreaId),
+            OuterZoneId = Clean(request.OuterZoneId),
             BuildingId = Clean(request.BuildingId),
             FloorId = Clean(request.FloorId),
             ZoneId = Clean(request.ZoneId),
@@ -259,6 +329,8 @@ internal static class HierarchyMappings
             CreatedBy = Clean(request.CreatedBy),
             CreatedAt = DateTime.UtcNow,
             ClientId = Clean(request.ClientId),
+            TenantId = request.TenantId,
+            IsDeleted = false,
             DeviceGeoJsonData = GeoJsonConversion.ToBsonDocuments(request.DeviceGeoJsonData)
         };
     }
@@ -273,6 +345,8 @@ internal static class HierarchyMappings
         deviceZoneMapping.Exit = request.Exit;
         deviceZoneMapping.Status = request.Status;
         deviceZoneMapping.DeviceGeoJsonData = GeoJsonConversion.ToBsonDocuments(request.DeviceGeoJsonData);
+        deviceZoneMapping.UpdatedBy = request.UpdatedBy;
+        deviceZoneMapping.UpdatedAt = DateTime.UtcNow;
     }
 
     private static string Clean(string? value)

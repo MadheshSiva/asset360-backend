@@ -25,6 +25,7 @@ public sealed record CreateDeviceRequest(
     string? MydeviceImage,
     string? CreatedBy,
     string? ClientId,
+    string? TenantId,
     string? Flexi1,
     string? Flexi2,
     List<string>? Flexi3,
@@ -81,6 +82,7 @@ public sealed record CreateDeviceRequest(
 
             CreatedBy = CreatedBy,
             ClientId = ClientId,
+            TenantId = TenantId,
 
             Flexi1 = Flexi1,
             Flexi2 = Flexi2,
@@ -105,7 +107,8 @@ public sealed record CreateDeviceRequest(
 
             Module = Module ?? new List<string>(),
 
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
         };
     }
 }
@@ -149,7 +152,9 @@ public sealed record UpdateDeviceRequest(
     string? Flexi18,
     string? Flexi19,
     string? Flexi20,
-    List<string>? Module)
+    List<string>? Module,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(DeviceEntity device)
     {
@@ -202,6 +207,13 @@ public sealed record UpdateDeviceRequest(
         device.Flexi20 = Flexi20;
 
         device.Module = Module ?? new List<string>();
+
+        device.UpdatedBy = UpdatedBy;
+        device.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            device.Status = Status;
+        }
     }
 }
 
@@ -226,9 +238,9 @@ public sealed record DeviceResponse(
     string CountryId,
     string CountryName,
     string MydeviceImage,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? ClientId,
     string? Flexi1,
     string? Flexi2,
     List<string>? Flexi3,
@@ -249,7 +261,12 @@ public sealed record DeviceResponse(
     string? Flexi18,
     string? Flexi19,
     string? Flexi20,
-    List<string>? Module)
+    List<string>? Module,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted)
 {
     public static DeviceResponse FromEntity(DeviceEntity device)
     {
@@ -283,10 +300,10 @@ public sealed record DeviceResponse(
 
             device.MydeviceImage ?? string.Empty,
 
-            device.CreatedBy ?? string.Empty,
+            device.CreatedBy,
             device.CreatedAt,
 
-            device.ClientId ?? string.Empty,
+            device.ClientId,
 
             device.Flexi1,
             device.Flexi2,
@@ -309,7 +326,13 @@ public sealed record DeviceResponse(
             device.Flexi19,
             device.Flexi20,
 
-            device.Module
+            device.Module,
+
+            device.UpdatedBy,
+            device.UpdatedAt,
+            device.TenantId,
+            device.Status,
+            device.IsDeleted
         );
     }
 }

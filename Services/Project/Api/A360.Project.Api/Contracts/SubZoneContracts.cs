@@ -6,6 +6,7 @@ public sealed record CreateSubZoneRequest(
     string? ProjectId,
     string? CountryId,
     string? AreaId,
+    string? OuterZoneId,
     string? BuildingId,
     string? FloorId,
     string? ZoneId,
@@ -18,6 +19,7 @@ public sealed record CreateSubZoneRequest(
     bool Status,
     string? CreatedBy,
     string? ClientId,
+    string? TenantId,
     int? TimeTakenAssemblePoint,
     string? MapPath);
 
@@ -30,13 +32,15 @@ public sealed record UpdateSubZoneRequest(
     bool Exit,
     bool Status,
     int? TimeTakenAssemblePoint,
-    string? MapPath);
+    string? MapPath,
+    string? UpdatedBy);
 
 public sealed record SubZoneResponse(
     string Id,
     string ProjectId,
     string CountryId,
     string AreaId,
+    string OuterZoneId,
     string BuildingId,
     string FloorId,
     string ZoneId,
@@ -47,9 +51,13 @@ public sealed record SubZoneResponse(
     bool AssemblyPoint,
     string Exit,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted,
     string TimeTakenAssemblePoint,
     string MapPath)
 {
@@ -60,6 +68,7 @@ public sealed record SubZoneResponse(
             subZone.ProjectId,
             subZone.CountryId,
             subZone.AreaId,
+            subZone.OuterZoneId,
             subZone.BuildingId,
             subZone.FloorId,
             subZone.ZoneId,
@@ -72,7 +81,11 @@ public sealed record SubZoneResponse(
             subZone.Status,
             subZone.CreatedBy,
             subZone.CreatedAt,
+            subZone.UpdatedBy,
+            subZone.UpdatedAt,
             subZone.ClientId,
+            subZone.TenantId,
+            subZone.IsDeleted,
             subZone.TimeTakenAssemblePoint,
             subZone.MapPath);
     }

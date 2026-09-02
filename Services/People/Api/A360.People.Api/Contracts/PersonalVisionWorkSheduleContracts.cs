@@ -13,7 +13,9 @@ public sealed record CreatePersonalWorkScheduleRequest(
     List<WorkScheduleItem>? WorkSchedules,
     string? CreatedBy,
     string? ScheduleType,
-    List<ScheduleMember>? Member)
+    List<ScheduleMember>? Member,
+    string? ClientId,
+    string? TenantId)
 {
     public WorkScheduleEntity ToEntity()
     {
@@ -29,7 +31,10 @@ public sealed record CreatePersonalWorkScheduleRequest(
             CreatedBy = CreatedBy,
             CreatedAt = DateTime.UtcNow,
             ScheduleType = ScheduleType,
-            Member = Member ?? []
+            Member = Member ?? [],
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -43,7 +48,8 @@ public sealed record UpdatePersonalWorkScheduleRequest(
     bool Status,
     List<WorkScheduleItem>? WorkSchedules,
     string? ScheduleType,
-    List<ScheduleMember>? Member)
+    List<ScheduleMember>? Member,
+    string? UpdatedBy)
 {
     public void ApplyTo(WorkScheduleEntity workSchedule)
     {
@@ -56,6 +62,8 @@ public sealed record UpdatePersonalWorkScheduleRequest(
         workSchedule.WorkSchedules = WorkSchedules ?? [];
         workSchedule.ScheduleType = ScheduleType;
         workSchedule.Member = Member ?? [];
+        workSchedule.UpdatedBy = UpdatedBy;
+        workSchedule.UpdatedAt = DateTime.UtcNow;
     }
 }
 
@@ -69,9 +77,14 @@ public sealed record PersonalWorkScheduleResponse(
     bool Status,
     List<WorkScheduleItem> WorkSchedules,
     string CreatedBy,
-    DateTime CreatedAt,
+    DateTime? CreatedAt,
     string ScheduleType,
-    List<ScheduleMember> Member)
+    List<ScheduleMember> Member,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static PersonalWorkScheduleResponse FromEntity(
         WorkScheduleEntity workSchedule)
@@ -88,6 +101,11 @@ public sealed record PersonalWorkScheduleResponse(
             workSchedule.CreatedBy ?? string.Empty,
             workSchedule.CreatedAt,
             workSchedule.ScheduleType ?? string.Empty,
-            workSchedule.Member ?? []);
+            workSchedule.Member ?? [],
+            workSchedule.UpdatedBy,
+            workSchedule.UpdatedAt,
+            workSchedule.ClientId,
+            workSchedule.TenantId,
+            workSchedule.IsDeleted);
     }
 }

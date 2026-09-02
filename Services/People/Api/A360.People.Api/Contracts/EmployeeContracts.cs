@@ -19,7 +19,8 @@ public sealed record CreateEmployeeRequest(
     string? NationalId,
     string? SOWIdVehicleId,
     string? CardBadgeNumber,
-    string? Variables)
+    string? Variables,
+    string? TenantId)
 {
     public PeopleEntity ToEntity()
     {
@@ -34,6 +35,7 @@ public sealed record CreateEmployeeRequest(
             EmployeeImage = EmployeeImage,
             CreatedBy = CreatedBy,
             ClientId = ClientId,
+            TenantId = TenantId,
             IDNumber = IDNumber,
             StartDate = StartDate,
             EndDate = EndDate,
@@ -42,7 +44,8 @@ public sealed record CreateEmployeeRequest(
             SOWIdVehicleId = SOWIdVehicleId,
             CardBadgeNumber = CardBadgeNumber,
             Variables = Variables,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
         };
     }
 }
@@ -61,7 +64,9 @@ public sealed record UpdateEmployeeRequest(
     string? NationalId,
     string? SOWIdVehicleId,
     string? CardBadgeNumber,
-    string? Variables)
+    string? Variables,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(PeopleEntity employee)
     {
@@ -79,6 +84,12 @@ public sealed record UpdateEmployeeRequest(
         employee.SOWIdVehicleId = SOWIdVehicleId;
         employee.CardBadgeNumber = CardBadgeNumber;
         employee.Variables = Variables;
+        employee.UpdatedBy = UpdatedBy;
+        employee.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            employee.Status = Status;
+        }
     }
 }
 
@@ -92,7 +103,7 @@ public sealed record EmployeeResponse(
     string PhoneNo,
     string EmployeeImage,
     string CreatedBy,
-    DateTime CreatedAt,
+    DateTime? CreatedAt,
     string ClientId,
     string IDNumber,
     DateTime StartDate,
@@ -101,7 +112,12 @@ public sealed record EmployeeResponse(
     string NationalId,
     string SOWIdVehicleId,
     string CardBadgeNumber,
-    string Variables)
+    string Variables,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted)
 {
     public static EmployeeResponse FromEntity(
         PeopleEntity employee)
@@ -125,6 +141,11 @@ public sealed record EmployeeResponse(
             employee.NationalId ?? string.Empty,
             employee.SOWIdVehicleId ?? string.Empty,
             employee.CardBadgeNumber ?? string.Empty,
-            employee.Variables ?? string.Empty);
+            employee.Variables ?? string.Empty,
+            employee.UpdatedBy,
+            employee.UpdatedAt,
+            employee.TenantId,
+            employee.Status,
+            employee.IsDeleted);
     }
 }

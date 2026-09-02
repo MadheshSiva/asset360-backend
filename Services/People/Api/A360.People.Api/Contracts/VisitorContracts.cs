@@ -23,7 +23,8 @@ public sealed record CreateVisitorRequest(
     string? VisitorCompany,
     string? Action,
     string? HostPerson,
-    string? HostPersonEmail)
+    string? HostPersonEmail,
+    string? TenantId)
 {
     public PeopleEntity ToEntity()
     {
@@ -50,7 +51,9 @@ public sealed record CreateVisitorRequest(
             Action = Action,
             HostPerson = HostPerson,
             HostPersonEmail = HostPersonEmail,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -75,7 +78,9 @@ public sealed record UpdateVisitorRequest(
     string? VisitorCompany,
     string? Action,
     string? HostPerson,
-    string? HostPersonEmail)
+    string? HostPersonEmail,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(PeopleEntity visitor)
     {
@@ -99,6 +104,12 @@ public sealed record UpdateVisitorRequest(
         visitor.Action = Action;
         visitor.HostPerson = HostPerson;
         visitor.HostPersonEmail = HostPersonEmail;
+        visitor.UpdatedBy = UpdatedBy;
+        visitor.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            visitor.Status = Status;
+        }
     }
 }
 
@@ -140,7 +151,7 @@ public sealed record VisitorResponse(
     string CardBadgeNumber,
     string VisitorImage,
     string CreatedBy,
-    DateTime CreatedAt,
+    DateTime? CreatedAt,
     string ClientId,
     string Email,
     string AuthCode,
@@ -149,7 +160,12 @@ public sealed record VisitorResponse(
     string VisitorCompany,
     string Action,
     string HostPerson,
-    string HostPersonEmail)
+    string HostPersonEmail,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted)
 {
     public static VisitorResponse FromEntity(
         PeopleEntity visitor)
@@ -179,6 +195,11 @@ public sealed record VisitorResponse(
             visitor.VisitorCompany ?? string.Empty,
             visitor.Action ?? string.Empty,
             visitor.HostPerson ?? string.Empty,
-            visitor.HostPersonEmail ?? string.Empty);
+            visitor.HostPersonEmail ?? string.Empty,
+            visitor.UpdatedBy,
+            visitor.UpdatedAt,
+            visitor.TenantId,
+            visitor.Status,
+            visitor.IsDeleted);
     }
 }

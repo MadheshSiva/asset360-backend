@@ -10,7 +10,9 @@ public sealed record CreateVisitorIdentificationRequest(
     string? EntryExistPoint,
     string? ReaderTypeId,
     string? ReaderTypeName,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public VisitorIdentificationEntity ToEntity()
     {
@@ -24,7 +26,10 @@ public sealed record CreateVisitorIdentificationRequest(
             ReaderTypeId = ReaderTypeId,
             ReaderTypeName = ReaderTypeName,
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -36,7 +41,9 @@ public sealed record UpdateVisitorIdentificationRequest(
     string? EntryExistId,
     string? EntryExistPoint,
     string? ReaderTypeId,
-    string? ReaderTypeName)
+    string? ReaderTypeName,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(VisitorIdentificationEntity identification)
     {
@@ -47,6 +54,12 @@ public sealed record UpdateVisitorIdentificationRequest(
         identification.EntryExistPoint = EntryExistPoint;
         identification.ReaderTypeId = ReaderTypeId;
         identification.ReaderTypeName = ReaderTypeName;
+        identification.UpdatedBy = UpdatedBy;
+        identification.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            identification.Status = Status;
+        }
     }
 }
 
@@ -60,7 +73,12 @@ public sealed record VisitorIdentificationResponse(
     string ReaderTypeId,
     string ReaderTypeName,
     string CreatedBy,
-    DateTime CreatedAt)
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    bool IsDeleted,
+    string? Status)
 {
     public static VisitorIdentificationResponse FromEntity(
         VisitorIdentificationEntity identification)
@@ -75,6 +93,11 @@ public sealed record VisitorIdentificationResponse(
             identification.ReaderTypeId ?? string.Empty,
             identification.ReaderTypeName ?? string.Empty,
             identification.CreatedBy ?? string.Empty,
-            identification.CreatedAt);
+            identification.CreatedAt,
+            identification.UpdatedBy,
+            identification.UpdatedAt,
+            identification.TenantId,
+            identification.IsDeleted,
+            identification.Status);
     }
 }

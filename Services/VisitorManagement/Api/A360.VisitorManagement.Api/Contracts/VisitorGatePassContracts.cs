@@ -182,7 +182,8 @@ public sealed record CreateVisitorGatePassRequest(
     string? IdType,
     string? ClientId,
     List<GatePassAssignAccessDto>? AssignAccess,
-    string? VisitorIdNo)
+    string? VisitorIdNo,
+    string? TenantId)
 {
     public GatePassEntity ToEntity()
     {
@@ -228,7 +229,9 @@ public sealed record CreateVisitorGatePassRequest(
             ClientId = ClientId,
             AssignAccess = AssignAccess?.Select(x => x.ToEntity()).ToList() ?? [],
             VisitorIdNo = VisitorIdNo,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -280,7 +283,9 @@ public sealed record UpdateVisitorGatePassRequest(
     string? EntryCreatedBy,
     string? ExitCreatedBy,
     string? ReturnStatusCreatedBy,
-    string? VisitorIdNo)
+    string? VisitorIdNo,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(GatePassEntity gatePass)
     {
@@ -331,6 +336,12 @@ public sealed record UpdateVisitorGatePassRequest(
         gatePass.ExitCreatedBy = ExitCreatedBy;
         gatePass.ReturnStatusCreatedBy = ReturnStatusCreatedBy;
         gatePass.VisitorIdNo = VisitorIdNo;
+        gatePass.UpdatedBy = UpdatedBy;
+        gatePass.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            gatePass.Status = Status;
+        }
     }
 }
 
@@ -361,7 +372,7 @@ public sealed record VisitorGatePassResponse(
     string HostPerson,
     string HostPersonEmail,
     string CreatedBy,
-    DateTime CreatedAt,
+    DateTime? CreatedAt,
     string Status,
     List<GatePassDocumentDto> VisitorDocuments,
     string ApprovedBy,
@@ -407,7 +418,11 @@ public sealed record VisitorGatePassResponse(
     string ReturnStatusCreatedBy,
     DateTime? ReturnStatusProcessedAt,
     string VisitorIdNo,
-    List<string> ApproverChain)
+    List<string> ApproverChain,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static VisitorGatePassResponse FromEntity(GatePassEntity gatePass)
     {
@@ -476,6 +491,10 @@ public sealed record VisitorGatePassResponse(
             gatePass.ReturnStatusCreatedBy ?? string.Empty,
             gatePass.ReturnStatusProcessedAt,
             gatePass.VisitorIdNo ?? string.Empty,
-            gatePass.ApproverChain);
+            gatePass.ApproverChain,
+            gatePass.UpdatedBy,
+            gatePass.UpdatedAt,
+            gatePass.TenantId,
+            gatePass.IsDeleted);
     }
 }

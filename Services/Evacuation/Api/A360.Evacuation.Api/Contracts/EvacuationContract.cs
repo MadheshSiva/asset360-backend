@@ -20,7 +20,8 @@ public sealed record CreateEvacuationRequest(
     string? CameraUrl,
     string? CameraName,
     string? CreatedBy,
-    string? ClientId)
+    string? ClientId,
+    string? TenantId)
 {
     public EvacuationEntity ToEntity()
     {
@@ -51,8 +52,10 @@ public sealed record CreateEvacuationRequest(
 
             CreatedBy = CreatedBy,
             ClientId = ClientId,
+            TenantId = TenantId,
 
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
         };
     }
 }
@@ -71,7 +74,9 @@ public sealed record UpdateEvacuationRequest(
     string? ZoneId,
     string? ZoneName,
     string? CameraUrl,
-    string? CameraName)
+    string? CameraName,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(EvacuationEntity evacuation)
     {
@@ -95,6 +100,13 @@ public sealed record UpdateEvacuationRequest(
 
         evacuation.CameraUrl = CameraUrl;
         evacuation.CameraName = CameraName;
+
+        evacuation.UpdatedBy = UpdatedBy;
+        evacuation.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            evacuation.Status = Status;
+        }
     }
 }
 
@@ -115,9 +127,14 @@ public sealed record EvacuationResponse(
     string ZoneName,
     string? CameraUrl,
     string? CameraName,
-    string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId)
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? ClientId,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted)
 {
     public static EvacuationResponse FromEntity(EvacuationEntity evacuation)
     {
@@ -146,10 +163,16 @@ public sealed record EvacuationResponse(
             evacuation.CameraUrl,
             evacuation.CameraName,
 
-            evacuation.CreatedBy ?? string.Empty,
+            evacuation.CreatedBy,
             evacuation.CreatedAt,
 
-            evacuation.ClientId ?? string.Empty
+            evacuation.ClientId,
+
+            evacuation.UpdatedBy,
+            evacuation.UpdatedAt,
+            evacuation.TenantId,
+            evacuation.Status,
+            evacuation.IsDeleted
         );
     }
 }

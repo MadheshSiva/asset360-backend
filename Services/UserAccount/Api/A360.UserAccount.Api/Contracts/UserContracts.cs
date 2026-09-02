@@ -11,7 +11,8 @@ public sealed record CreateUserRequest(
     string? ActiveDirectoryUserName,
     string? UserRoleId,
     string? CreatedBy,
-    string? ClientId);
+    string? ClientId,
+    string? TenantId);
 
 public sealed record UpdateUserRequest(
     string? UserName,
@@ -20,7 +21,9 @@ public sealed record UpdateUserRequest(
     string? Email,
     string? LoginPassword,
     string? ActiveDirectoryUserName,
-    string? UserRoleId);
+    string? UserRoleId,
+    string? UpdatedBy,
+    string? Status);
 
 public sealed record UserResponse(
     string Id,
@@ -31,9 +34,14 @@ public sealed record UserResponse(
     string Email,
     string ActiveDirectoryUserName,
     string UserRoleId,
-    string CreatedBy,
-    DateTime CreatedDate,
-    string ClientId,
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted,
     DateTime? LastLogin,
     string LoginStatus)
 {
@@ -49,8 +57,13 @@ public sealed record UserResponse(
             user.ActiveDirectoryUserName,
             user.UserRoleId,
             user.CreatedBy,
-            user.CreatedDate,
+            user.CreatedAt,
+            user.UpdatedBy,
+            user.UpdatedAt,
             user.ClientId,
+            user.TenantId,
+            user.Status,
+            user.IsDeleted,
             user.LastLogin,
             user.LoginStatus);
     }

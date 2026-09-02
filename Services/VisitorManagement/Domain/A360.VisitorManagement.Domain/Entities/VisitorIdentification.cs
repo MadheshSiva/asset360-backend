@@ -25,10 +25,4 @@ public class VisitorIdentification : BaseEntity
 
     [BsonElement("readertype_name")]
     public string? ReaderTypeName { get; set; }
-
-    [BsonElement("created_by")]
-    public string? CreatedBy { get; set; }
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
 }

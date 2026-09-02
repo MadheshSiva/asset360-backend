@@ -10,7 +10,8 @@ public sealed record CreateVisitorPanelSettingRequest(
     string? CreatedBy,
     bool IsAuthCode,
     bool IsApproved,
-    string? VisitorPanelName)
+    string? VisitorPanelName,
+    string? TenantId)
 {
     public PanelSettingEntity ToEntity()
     {
@@ -19,12 +20,14 @@ public sealed record CreateVisitorPanelSettingRequest(
             BackgroundImg = BackgroundImg,
             Logo = Logo,
             CompanyName = CompanyName,
-            ClientId = ClientId!,
+            ClientId = ClientId,
             CreatedBy = CreatedBy,
             IsAuthCode = IsAuthCode,
             IsApproved = IsApproved,
             VisitorPanelName = VisitorPanelName,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -35,7 +38,9 @@ public sealed record UpdateVisitorPanelSettingRequest(
     string? CompanyName,
     bool IsAuthCode,
     bool IsApproved,
-    string? VisitorPanelName)
+    string? VisitorPanelName,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(PanelSettingEntity setting)
     {
@@ -45,6 +50,12 @@ public sealed record UpdateVisitorPanelSettingRequest(
         setting.IsAuthCode = IsAuthCode;
         setting.IsApproved = IsApproved;
         setting.VisitorPanelName = VisitorPanelName;
+        setting.UpdatedBy = UpdatedBy;
+        setting.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            setting.Status = Status;
+        }
     }
 }
 
@@ -55,10 +66,15 @@ public sealed record VisitorPanelSettingResponse(
     string CompanyName,
     string ClientId,
     string CreatedBy,
-    DateTime CreatedAt,
+    DateTime? CreatedAt,
     bool IsAuthCode,
     bool IsApproved,
-    string VisitorPanelName)
+    string VisitorPanelName,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    bool IsDeleted,
+    string? Status)
 {
     public static VisitorPanelSettingResponse FromEntity(
         PanelSettingEntity setting)
@@ -73,6 +89,11 @@ public sealed record VisitorPanelSettingResponse(
             setting.CreatedAt,
             setting.IsAuthCode,
             setting.IsApproved,
-            setting.VisitorPanelName ?? string.Empty);
+            setting.VisitorPanelName ?? string.Empty,
+            setting.UpdatedBy,
+            setting.UpdatedAt,
+            setting.TenantId,
+            setting.IsDeleted,
+            setting.Status);
     }
 }

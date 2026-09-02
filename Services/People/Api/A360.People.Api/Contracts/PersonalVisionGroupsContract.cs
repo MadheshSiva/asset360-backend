@@ -13,7 +13,8 @@ public sealed record CreatePersonalVisionGroupRequest(
     string? GroupType,
     string? GroupName,
     List<GroupMemberRequest>? Members,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? TenantId)
 {
     public PersonalVisionGroupEntity ToEntity()
     {
@@ -25,7 +26,9 @@ public sealed record CreatePersonalVisionGroupRequest(
             GroupName = GroupName,
             CreatedBy = CreatedBy,
             CreatedAt = DateTime.UtcNow,
+            TenantId = TenantId,
             IsActive = true,
+            IsDeleted = false,
             Members = Members?
                 .Select(x => new GroupMember
                 {
@@ -41,17 +44,22 @@ public sealed record UpdatePersonalVisionGroupRequest(
     string? GroupType,
     string? GroupName,
     List<GroupMemberRequest>? Members,
-    string? ModifiedBy,
-    bool IsActive)
+    string? UpdatedBy,
+    bool IsActive,
+    string? Status)
 {
     public void ApplyTo(
         PersonalVisionGroupEntity group)
     {
         group.GroupType = GroupType;
         group.GroupName = GroupName;
-        group.ModifiedBy = ModifiedBy;
-        group.ModifiedAt = DateTime.UtcNow;
+        group.UpdatedBy = UpdatedBy;
+        group.UpdatedAt = DateTime.UtcNow;
         group.IsActive = IsActive;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            group.Status = Status;
+        }
 
         group.Members = Members?
             .Select(x => new GroupMember
@@ -75,10 +83,13 @@ public sealed record PersonalVisionGroupResponse(
     string GroupName,
     List<GroupMemberResponse> Members,
     string CreatedBy,
-    DateTime CreatedAt,
-    string ModifiedBy,
-    DateTime ModifiedAt,
-    bool IsActive)
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    bool IsActive,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted)
 {
     public static PersonalVisionGroupResponse FromEntity(
         PersonalVisionGroupEntity group)
@@ -96,8 +107,11 @@ public sealed record PersonalVisionGroupResponse(
                 .ToList(),
             group.CreatedBy ?? string.Empty,
             group.CreatedAt,
-            group.ModifiedBy ?? string.Empty,
-            group.ModifiedAt,
-            group.IsActive);
+            group.UpdatedBy,
+            group.UpdatedAt,
+            group.IsActive,
+            group.TenantId,
+            group.Status,
+            group.IsDeleted);
     }
 }

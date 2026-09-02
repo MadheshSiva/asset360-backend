@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "c+LrcQzhYO+QZCE7O6mXUFPOFjyXgtMtO+QSbKjiCxM=",
+  "Source": "A360.Asset.Api",
+  "BasePath": "_content/A360.Asset.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

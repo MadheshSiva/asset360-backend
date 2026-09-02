@@ -28,18 +28,6 @@ public class PersonalVisionManualAttendance : BaseEntity
     [BsonElement("approve_status")]
     public string? ApproveStatus { get; set; }
 
-    [BsonElement("created_by")]
-    public string? CreatedBy { get; set; }
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("modified_by")]
-    public string? ModifiedBy { get; set; }
-
-    [BsonElement("modified_at")]
-    public DateTime? ModifiedAt { get; set; }
-
     [BsonElement("approved_by")]
     public string? ApprovedBy { get; set; }
 

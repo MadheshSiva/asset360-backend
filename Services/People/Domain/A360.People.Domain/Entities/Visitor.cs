@@ -45,15 +45,6 @@ public class Visitor : BaseEntity
     [BsonElement("visitor_image")]
     public string VisitorImage { get; set; } = null!;
 
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("client_id")]
-    public string ClientId { get; set; } = null!;
-
     [BsonElement("email")]
     public string Email { get; set; } = null!;
 

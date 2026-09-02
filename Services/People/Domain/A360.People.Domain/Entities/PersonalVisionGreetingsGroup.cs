@@ -21,22 +21,10 @@ public class PersonalVisionGreetingsGroups : BaseEntity
     public string GreetingsDescription { get; set; } = null!;
 
     [BsonElement("status")]
-    public bool Status { get; set; }
+    public new bool Status { get; set; }
 
     [BsonElement("GreetingsTimeSchedules")]
     public List<GreetingsTimeSchedule1> GreetingsTimeSchedules { get; set; } = new();
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("modified_by")]
-    public string? ModifiedBy { get; set; }
-
-    [BsonElement("modified_at")]
-    public DateTime? ModifiedAt { get; set; }
 }
 
 public class GreetingsGroupMember

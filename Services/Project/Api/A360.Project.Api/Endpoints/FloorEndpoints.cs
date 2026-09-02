@@ -53,6 +53,7 @@ public static class FloorEndpoints
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
+        IOuterZoneRepository outerZoneRepository,
         IBuildingRepository buildingRepository,
         CancellationToken cancellationToken)
     {
@@ -66,6 +67,7 @@ public static class FloorEndpoints
             projectRepository,
             countryRepository,
             areaRepository,
+            outerZoneRepository,
             buildingRepository,
             cancellationToken);
         if (relationshipErrors.Count > 0)

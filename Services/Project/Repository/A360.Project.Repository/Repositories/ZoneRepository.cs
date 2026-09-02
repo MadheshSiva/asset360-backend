@@ -22,9 +22,10 @@ public sealed class ZoneRepository : MongoRepository<ZoneEntity>, IZoneRepositor
                     .Ascending(zone => zone.ProjectId)
                     .Ascending(zone => zone.CountryId)
                     .Ascending(zone => zone.AreaId)
+                    .Ascending(zone => zone.OuterZoneId)
                     .Ascending(zone => zone.BuildingId)
                     .Ascending(zone => zone.FloorId),
-                new CreateIndexOptions { Name = "ix_zone_project_country_area_building_floor" }),
+                new CreateIndexOptions { Name = "ix_zone_project_country_area_outerzone_building_floor" }),
             new CreateIndexModel<ZoneEntity>(
                 Builders<ZoneEntity>.IndexKeys
                     .Ascending(zone => zone.FloorId)

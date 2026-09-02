@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "yNV71tICbs7oBFmFVLbHeUBhmOhXLEEW8OkLDlQ6ZT4=",
+  "Source": "A360.MasterManagement.Api",
+  "BasePath": "_content/A360.MasterManagement.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

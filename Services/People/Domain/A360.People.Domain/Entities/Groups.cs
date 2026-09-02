@@ -14,15 +14,6 @@ public class Group : BaseEntity
     [BsonElement("members")]
     public List<string> Members { get; set; } = [];
 
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = null!;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("client_id")]
-    public string ClientId { get; set; } = null!;
-
     [BsonElement("action")]
     public string? Action { get; set; }
 }

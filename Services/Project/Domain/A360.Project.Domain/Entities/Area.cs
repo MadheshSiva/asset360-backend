@@ -31,16 +31,7 @@ public sealed class Area : BaseEntity
     public string Longitude { get; set; } = string.Empty;
 
     [BsonElement("status")]
-    public bool Status { get; set; }
-
-    [BsonElement("created_by")]
-    public string CreatedBy { get; set; } = string.Empty;
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
-    [BsonElement("client_id")]
-    public string ClientId { get; set; } = string.Empty;
+    public new bool Status { get; set; }
 
     [BsonElement("map_path")]
     public string MapPath { get; set; } = string.Empty;

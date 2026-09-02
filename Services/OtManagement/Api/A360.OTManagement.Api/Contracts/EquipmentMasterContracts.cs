@@ -11,7 +11,9 @@ public sealed record CreateEquipmentMasterRequest(
     string? TagId,
     DateTime ServiceDate,
     bool Status,
-    string? CreatedBy)
+    string? CreatedBy,
+    string? ClientId,
+    string? TenantId)
 {
     public EquipmentMasterEntity ToEntity()
     {
@@ -26,7 +28,10 @@ public sealed record CreateEquipmentMasterRequest(
             ServiceDate = ServiceDate,
             Status = Status,
             CreatedBy = CreatedBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -38,7 +43,8 @@ public sealed record UpdateEquipmentMasterRequest(
     string? Location,
     string? TagId,
     DateTime ServiceDate,
-    bool Status)
+    bool Status,
+    string? UpdatedBy)
 {
     public void ApplyTo(
         EquipmentMasterEntity equipmentMaster)
@@ -50,6 +56,8 @@ public sealed record UpdateEquipmentMasterRequest(
         equipmentMaster.TagId = TagId;
         equipmentMaster.ServiceDate = ServiceDate;
         equipmentMaster.Status = Status;
+        equipmentMaster.UpdatedBy = UpdatedBy;
+        equipmentMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
 
@@ -63,8 +71,13 @@ public sealed record EquipmentMasterResponse(
     string TagId,
     DateTime ServiceDate,
     bool Status,
-    string CreatedBy,
-    DateTime CreatedAt)
+    string? CreatedBy,
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static EquipmentMasterResponse FromEntity(
         EquipmentMasterEntity equipmentMaster)
@@ -79,7 +92,12 @@ public sealed record EquipmentMasterResponse(
             equipmentMaster.TagId ?? string.Empty,
             equipmentMaster.ServiceDate,
             equipmentMaster.Status,
-            equipmentMaster.CreatedBy ?? string.Empty,
-            equipmentMaster.CreatedAt);
+            equipmentMaster.CreatedBy,
+            equipmentMaster.CreatedAt,
+            equipmentMaster.UpdatedBy,
+            equipmentMaster.UpdatedAt,
+            equipmentMaster.ClientId,
+            equipmentMaster.TenantId,
+            equipmentMaster.IsDeleted);
     }
 }

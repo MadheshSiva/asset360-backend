@@ -1,0 +1,15 @@
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/bin/Debug/net8.0/A360.MasterManagement.Domain.deps.json
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/bin/Debug/net8.0/A360.MasterManagement.Domain.dll
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/bin/Debug/net8.0/A360.MasterManagement.Domain.pdb
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/bin/Debug/net8.0/A360.Domain.dll
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/bin/Debug/net8.0/A360.Domain.pdb
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/A360.MasterManagement.Domain.csproj.AssemblyReference.cache
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/A360.MasterManagement.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/A360.MasterManagement.Domain.AssemblyInfoInputs.cache
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/A360.MasterManagement.Domain.AssemblyInfo.cs
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/A360.MasterManagement.Domain.csproj.CoreCompileInputs.cache
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/A360.MasterManagement.Domain.csproj.CopyComplete
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/A360.MasterManagement.Domain.dll
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/refint/A360.MasterManagement.Domain.dll
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/A360.MasterManagement.Domain.pdb
+/home/piq1/People3601/People360/src/Services/MasterManagement/Domain/A360.MasterManagement.Domain/obj/Debug/net8.0/ref/A360.MasterManagement.Domain.dll

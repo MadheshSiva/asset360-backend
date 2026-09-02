@@ -11,7 +11,8 @@ public sealed record CreateAccessRequest(
     DateTime FromDateTime,
     DateTime ToDateTime,
     string? CreatedBy,
-    string? ClientId)
+    string? ClientId,
+    string? TenantId)
 {
     public AccessEntity ToEntity()
     {
@@ -26,7 +27,9 @@ public sealed record CreateAccessRequest(
             ToDateTime = ToDateTime,
             CreatedBy = CreatedBy,
             ClientId = ClientId,
-            CreatedAt = DateTime.UtcNow
+            TenantId = TenantId,
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
         };
     }
 }
@@ -38,7 +41,8 @@ public sealed record UpdateAccessRequest(
     List<string>? Readers,
     bool Status,
     DateTime FromDateTime,
-    DateTime ToDateTime)
+    DateTime ToDateTime,
+    string? UpdatedBy)
 {
     public void ApplyTo(AccessEntity access)
     {
@@ -49,6 +53,8 @@ public sealed record UpdateAccessRequest(
         access.Status = Status;
         access.FromDateTime = FromDateTime;
         access.ToDateTime = ToDateTime;
+        access.UpdatedBy = UpdatedBy;
+        access.UpdatedAt = DateTime.UtcNow;
     }
 }
 
@@ -63,7 +69,11 @@ public sealed record AccessResponse(
     DateTime ToDateTime,
     string CreatedBy,
     string ClientId,
-    DateTime CreatedAt)
+    DateTime? CreatedAt,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static AccessResponse FromEntity(
         AccessEntity access)
@@ -79,6 +89,10 @@ public sealed record AccessResponse(
             access.ToDateTime,
             access.CreatedBy ?? string.Empty,
             access.ClientId ?? string.Empty,
-            access.CreatedAt);
+            access.CreatedAt,
+            access.UpdatedBy,
+            access.UpdatedAt,
+            access.TenantId,
+            access.IsDeleted);
     }
 }

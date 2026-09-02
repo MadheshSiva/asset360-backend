@@ -1,23 +1,59 @@
+using A360.ApiGateway.Swagger;
+using Microsoft.Extensions.Caching.Memory;
+
 namespace A360.ApiGateway.Middlewares;
 
 public static class ApiGatewayApplicationBuilderExtensions
 {
+    private const string MergedSwaggerCacheKey = "MergedSwaggerDocument";
+
     public static WebApplication UseApiGatewayMiddlewares(this WebApplication app)
     {
         if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled"))
         {
             app.UseSwagger();
+
+            app.MapGet("/openapi/all.json", async (
+                IConfiguration configuration,
+                IHttpClientFactory httpClientFactory,
+                IMemoryCache cache,
+                ILoggerFactory loggerFactory,
+                CancellationToken cancellationToken) =>
+            {
+                if (cache.TryGetValue(MergedSwaggerCacheKey, out string? cached) && cached is not null)
+                {
+                    return Results.Content(cached, "application/json");
+                }
+
+                var sources = SwaggerAggregator.GetSources(configuration);
+                var merged = await SwaggerAggregator.BuildMergedDocumentAsync(
+                    sources,
+                    httpClientFactory,
+                    loggerFactory.CreateLogger("SwaggerAggregator"),
+                    cancellationToken);
+
+                var json = merged.ToJsonString();
+                cache.Set(MergedSwaggerCacheKey, json, TimeSpan.FromSeconds(30));
+
+                return Results.Content(json, "application/json");
+            })
+                .WithName("MergedSwagger")
+                .WithTags("Gateway")
+                .ExcludeFromDescription();
+
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "A360 API Gateway");
+                options.SwaggerEndpoint("/openapi/all.json", "All Services (Aggregated)");
                 options.SwaggerEndpoint("/project/swagger/v1/swagger.json", "Project Service");
                 options.SwaggerEndpoint("/user-account/swagger/v1/swagger.json", "User Account Service");
-                options.SwaggerEndpoint("/people/swagger/v1/swagger.json","People Service");
-                options.SwaggerEndpoint("/device/swagger/v1/swagger.json", "Device Service"); 
-                options.SwaggerEndpoint("/otmanagement/swagger/v1/swagger.json","OT Management Service");
-                options.SwaggerEndpoint("/visitormanagement/swagger/v1/swagger.json","Visitor Management Service");
+                options.SwaggerEndpoint("/people/swagger/v1/swagger.json", "People Service");
+                options.SwaggerEndpoint("/device/swagger/v1/swagger.json", "Device Service");
+                options.SwaggerEndpoint("/otmanagement/swagger/v1/swagger.json", "OT Management Service");
+                options.SwaggerEndpoint("/visitormanagement/swagger/v1/swagger.json", "Visitor Management Service");
                 options.SwaggerEndpoint("/evacuation/swagger/v1/swagger.json", "Evacuation Service");
                 options.SwaggerEndpoint("/media/swagger/v1/swagger.json", "Media Service");
+                options.SwaggerEndpoint("/asset/swagger/v1/swagger.json", "Asset Service");
+                options.SwaggerEndpoint("/master-management/swagger/v1/swagger.json", "Master Management Service");
 
                 options.RoutePrefix = "swagger";
             });

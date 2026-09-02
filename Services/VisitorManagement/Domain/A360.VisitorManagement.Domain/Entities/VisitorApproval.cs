@@ -5,12 +5,6 @@ namespace A360.VisitorManagement.Domain.Entities;
 
 public class VisitorApproval : BaseEntity
 {
-    [BsonElement("created_by")]
-    public string? CreatedBy { get; set; }
-
-    [BsonElement("created_at")]
-    public DateTime CreatedAt { get; set; }
-
     [BsonElement("precedence")]
     public string? Precedence { get; set; }
 

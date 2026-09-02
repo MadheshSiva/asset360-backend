@@ -10,7 +10,9 @@ public sealed record CreateStaffManagementRequest(
     string? TagId,
     string? ContactNumber,
     string? Shift,
-    bool Status)
+    bool Status,
+    string? ClientId,
+    string? TenantId)
 {
     public StaffEntity ToEntity()
     {
@@ -24,7 +26,10 @@ public sealed record CreateStaffManagementRequest(
             ContactNumber = ContactNumber,
             Shift = Shift,
             Status = Status,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ClientId = ClientId,
+            TenantId = TenantId,
+            IsDeleted = false
         };
     }
 }
@@ -37,7 +42,8 @@ public sealed record UpdateStaffManagementRequest(
     string? TagId,
     string? ContactNumber,
     string? Shift,
-    bool Status)
+    bool Status,
+    string? UpdatedBy)
 {
     public void UpdateEntity(StaffEntity entity)
     {
@@ -49,7 +55,8 @@ public sealed record UpdateStaffManagementRequest(
         entity.ContactNumber = ContactNumber!;
         entity.Shift = Shift!;
         entity.Status = Status;
-       
+        entity.UpdatedBy = UpdatedBy;
+        entity.UpdatedAt = DateTime.UtcNow;
     }
 }
 
@@ -62,7 +69,12 @@ public sealed record StaffManagementResponse(
     string TagId,
     string ContactNumber,
     string Shift,
-    bool Status)
+    bool Status,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? ClientId,
+    string? TenantId,
+    bool IsDeleted)
 {
     public static StaffManagementResponse FromEntity(
         StaffEntity entity)
@@ -76,6 +88,11 @@ public sealed record StaffManagementResponse(
             entity.TagId,
             entity.ContactNumber,
             entity.Shift,
-            entity.Status);
+            entity.Status,
+            entity.UpdatedBy,
+            entity.UpdatedAt,
+            entity.ClientId,
+            entity.TenantId,
+            entity.IsDeleted);
     }
 }

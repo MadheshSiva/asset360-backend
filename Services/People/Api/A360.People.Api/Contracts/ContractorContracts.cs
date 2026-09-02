@@ -17,7 +17,8 @@ public sealed record CreateContractorRequest(
     string? VehicleId,
     string? ContractorImage,
     string? CreatedBy,
-    string? ClientId)
+    string? ClientId,
+    string? TenantId)
 {
     public ContractorEntity ToEntity()
     {
@@ -38,7 +39,9 @@ public sealed record CreateContractorRequest(
             ContractorImage = ContractorImage,
             CreatedBy = CreatedBy,
             ClientId = ClientId,
-            CreatedAt = DateTime.UtcNow
+            TenantId = TenantId,
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
         };
     }
 }
@@ -55,7 +58,9 @@ public sealed record UpdateContractorRequest(
     string? Nationality,
     string? VehicleName,
     string? VehicleId,
-    string? ContractorImage)
+    string? ContractorImage,
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ContractorEntity contractor)
     {
@@ -71,6 +76,12 @@ public sealed record UpdateContractorRequest(
         contractor.VehicleName = VehicleName;
         contractor.VehicleId = VehicleId;
         contractor.ContractorImage = ContractorImage;
+        contractor.UpdatedBy = UpdatedBy;
+        contractor.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrWhiteSpace(Status))
+        {
+            contractor.Status = Status;
+        }
     }
 }
 
@@ -90,8 +101,13 @@ public sealed record ContractorResponse(
     string VehicleId,
     string ContractorImage,
     string CreatedBy,
-    DateTime CreatedAt,
-    string ClientId)
+    DateTime? CreatedAt,
+    string ClientId,
+    string? UpdatedBy,
+    DateTime? UpdatedAt,
+    string? TenantId,
+    string? Status,
+    bool IsDeleted)
 {
     public static ContractorResponse FromEntity(
         ContractorEntity contractor)
@@ -113,6 +129,11 @@ public sealed record ContractorResponse(
             contractor.ContractorImage ?? string.Empty,
             contractor.CreatedBy ?? string.Empty,
             contractor.CreatedAt,
-            contractor.ClientId ?? string.Empty);
+            contractor.ClientId ?? string.Empty,
+            contractor.UpdatedBy,
+            contractor.UpdatedAt,
+            contractor.TenantId,
+            contractor.Status,
+            contractor.IsDeleted);
     }
 }
