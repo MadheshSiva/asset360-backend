@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="../build/A360.Inspection.Api.props" />
-</Project>

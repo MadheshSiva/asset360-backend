@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="../build/P360.Device.Api.props" />
-</Project>
