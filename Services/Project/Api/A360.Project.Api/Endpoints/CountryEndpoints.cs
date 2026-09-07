@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.Project.Api.Contracts;
 using A360.Project.Api.Validation;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Project.Api.Endpoints;
@@ -31,6 +33,7 @@ public static class CountryEndpoints
     private static async Task<IResult> GetCountryByIdAsync(
         string id,
         ICountryRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -39,13 +42,21 @@ public static class CountryEndpoints
         }
 
         var country = await repository.GetByIdAsync(id, cancellationToken);
-        return country is null ? Results.NotFound() : Results.Ok(CountryResponse.FromEntity(country));
+        if (country is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Country", country.Id, country.CountryName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(CountryResponse.FromEntity(country));
     }
 
     private static async Task<IResult> CreateCountryAsync(
         CreateCountryRequest request,
         ICountryRepository repository,
         IProjectRepository projectRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -61,6 +72,9 @@ public static class CountryEndpoints
         }
 
         var country = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+
+        await eventLogger.LogAsync("Country", country.Id, country.CountryName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/countries/{country.Id}", CountryResponse.FromEntity(country));
     }
 
@@ -68,6 +82,7 @@ public static class CountryEndpoints
         string id,
         UpdateCountryRequest request,
         ICountryRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -90,12 +105,20 @@ public static class CountryEndpoints
         request.ApplyTo(country);
 
         var updated = await repository.UpdateAsync(id, country, cancellationToken);
-        return updated ? Results.Ok(CountryResponse.FromEntity(country)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Country", country.Id, country.CountryName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(CountryResponse.FromEntity(country));
     }
 
     private static async Task<IResult> DeleteCountryAsync(
         string id,
         ICountryRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -103,7 +126,20 @@ public static class CountryEndpoints
             return Results.BadRequest(new { message = "Invalid country id." });
         }
 
+        var country = await repository.GetByIdAsync(id, cancellationToken);
+        if (country is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Country", country.Id, country.CountryName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

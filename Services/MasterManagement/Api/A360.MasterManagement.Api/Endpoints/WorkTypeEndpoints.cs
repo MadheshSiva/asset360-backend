@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class WorkTypeEndpoints
     private static async Task<IResult> GetWorkTypeByIdAsync(
         string id,
         IWorkTypeRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class WorkTypeEndpoints
         }
 
         var workType = await repository.GetByIdAsync(id, cancellationToken);
-        return workType is null ? Results.NotFound() : Results.Ok(WorkTypeResponse.FromEntity(workType));
+        if (workType is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("WorkType", workType.WorkTypeId, workType.WorkTypeName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(WorkTypeResponse.FromEntity(workType));
     }
 
     private static async Task<IResult> CreateWorkTypeAsync(
@@ -52,6 +62,7 @@ public static class WorkTypeEndpoints
         IWorkTypeRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class WorkTypeEndpoints
             request.ToEntity(workTypeId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("WorkType", workType.WorkTypeId, workType.WorkTypeName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/work-types/{workType.Id}", WorkTypeResponse.FromEntity(workType));
     }
 
@@ -84,6 +97,7 @@ public static class WorkTypeEndpoints
         UpdateWorkTypeRequest request,
         IWorkTypeRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class WorkTypeEndpoints
         request.ApplyTo(workType, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, workType, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("WorkType", workType.WorkTypeId, workType.WorkTypeName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(WorkTypeResponse.FromEntity(workType)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteWorkTypeAsync(
         string id,
         IWorkTypeRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class WorkTypeEndpoints
             return Results.BadRequest(new { message = "Invalid work type id." });
         }
 
+        var workType = await repository.GetByIdAsync(id, cancellationToken);
+        if (workType is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("WorkType", workType.WorkTypeId, workType.WorkTypeName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

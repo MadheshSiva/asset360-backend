@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class ConditionMasterEndpoints
     private static async Task<IResult> GetConditionMasterByIdAsync(
         string id,
         IConditionMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ConditionMasterEndpoints
         }
 
         var conditionMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return conditionMaster is null ? Results.NotFound() : Results.Ok(ConditionMasterResponse.FromEntity(conditionMaster));
+        if (conditionMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ConditionMaster", conditionMaster.ConditionId, conditionMaster.ConditionName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ConditionMasterResponse.FromEntity(conditionMaster));
     }
 
     private static async Task<IResult> CreateConditionMasterAsync(
@@ -52,6 +62,7 @@ public static class ConditionMasterEndpoints
         IConditionMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class ConditionMasterEndpoints
             request.ToEntity(conditionId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("ConditionMaster", conditionMaster.ConditionId, conditionMaster.ConditionName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/condition-masters/{conditionMaster.Id}", ConditionMasterResponse.FromEntity(conditionMaster));
     }
 
@@ -84,6 +97,7 @@ public static class ConditionMasterEndpoints
         UpdateConditionMasterRequest request,
         IConditionMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class ConditionMasterEndpoints
         request.ApplyTo(conditionMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, conditionMaster, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("ConditionMaster", conditionMaster.ConditionId, conditionMaster.ConditionName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(ConditionMasterResponse.FromEntity(conditionMaster)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteConditionMasterAsync(
         string id,
         IConditionMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class ConditionMasterEndpoints
             return Results.BadRequest(new { message = "Invalid condition master id." });
         }
 
+        var conditionMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (conditionMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("ConditionMaster", conditionMaster.ConditionId, conditionMaster.ConditionName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

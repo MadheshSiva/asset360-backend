@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -35,6 +37,7 @@ public static class CurrentLocationEndpoints
     private static async Task<IResult> GetCurrentLocationByIdAsync(
         string id,
         ICurrentLocationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -43,13 +46,21 @@ public static class CurrentLocationEndpoints
         }
 
         var currentLocation = await repository.GetByIdAsync(id, cancellationToken);
-        return currentLocation is null ? Results.NotFound() : Results.Ok(CurrentLocationResponse.FromEntity(currentLocation));
+        if (currentLocation is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("CurrentLocation", currentLocation.LocationId, currentLocation.CurrentLocationName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(CurrentLocationResponse.FromEntity(currentLocation));
     }
 
     private static async Task<IResult> CreateCurrentLocationAsync(
         CreateCurrentLocationRequest request,
         ICurrentLocationRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -65,6 +76,8 @@ public static class CurrentLocationEndpoints
             request.ToEntity(locationId),
             cancellationToken);
 
+        await eventLogger.LogAsync("CurrentLocation", currentLocation.LocationId, currentLocation.CurrentLocationName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/current-locations/{currentLocation.Id}", CurrentLocationResponse.FromEntity(currentLocation));
     }
 
@@ -72,6 +85,7 @@ public static class CurrentLocationEndpoints
         string id,
         UpdateCurrentLocationRequest request,
         ICurrentLocationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -94,12 +108,18 @@ public static class CurrentLocationEndpoints
         request.ApplyTo(currentLocation);
 
         var updated = await repository.UpdateAsync(id, currentLocation, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("CurrentLocation", currentLocation.LocationId, currentLocation.CurrentLocationName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(CurrentLocationResponse.FromEntity(currentLocation)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteCurrentLocationAsync(
         string id,
         ICurrentLocationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -107,7 +127,18 @@ public static class CurrentLocationEndpoints
             return Results.BadRequest(new { message = "Invalid current location id." });
         }
 
+        var currentLocation = await repository.GetByIdAsync(id, cancellationToken);
+        if (currentLocation is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("CurrentLocation", currentLocation.LocationId, currentLocation.CurrentLocationName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

@@ -17,3 +17,4 @@
 /home/piq1/People3601/People360/src/Services/UserAccount/Repository/A360.UserAccount.Repository/obj/Debug/net8.0/refint/A360.UserAccount.Repository.dll
 /home/piq1/People3601/People360/src/Services/UserAccount/Repository/A360.UserAccount.Repository/obj/Debug/net8.0/A360.UserAccount.Repository.pdb
 /home/piq1/People3601/People360/src/Services/UserAccount/Repository/A360.UserAccount.Repository/obj/Debug/net8.0/ref/A360.UserAccount.Repository.dll
+/home/piq1/People3601/People360/src/Services/UserAccount/Repository/A360.UserAccount.Repository/obj/Debug/net8.0/A360.UserAccount.Repository.sourcelink.json

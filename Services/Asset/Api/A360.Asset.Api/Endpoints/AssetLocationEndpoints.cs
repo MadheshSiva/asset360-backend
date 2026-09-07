@@ -2,6 +2,8 @@ using A360.Asset.Api.Contracts;
 using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -31,6 +33,7 @@ public static class AssetLocationEndpoints
     private static async Task<IResult> GetAssetLocationByIdAsync(
         string id,
         IAssetLocationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -39,13 +42,20 @@ public static class AssetLocationEndpoints
         }
 
         var location = await repository.GetByIdAsync(id, cancellationToken);
-        return location is null ? Results.NotFound() : Results.Ok(AssetLocationResponse.FromEntity(location));
+        if (location is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetLocation", location.Id, location.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetLocationResponse.FromEntity(location));
     }
 
     private static async Task<IResult> CreateAssetLocationAsync(
         CreateAssetLocationRequest request,
         IAssetLocationRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -61,6 +71,7 @@ public static class AssetLocationEndpoints
         }
 
         var location = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+        await eventLogger.LogAsync("AssetLocation", location.Id, location.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-locations/{location.Id}", AssetLocationResponse.FromEntity(location));
     }
 
@@ -68,6 +79,7 @@ public static class AssetLocationEndpoints
         string id,
         UpdateAssetLocationRequest request,
         IAssetLocationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -90,12 +102,19 @@ public static class AssetLocationEndpoints
         request.ApplyTo(location);
 
         var updated = await repository.UpdateAsync(id, location, cancellationToken);
-        return updated ? Results.Ok(AssetLocationResponse.FromEntity(location)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetLocation", location.Id, location.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetLocationResponse.FromEntity(location));
     }
 
     private static async Task<IResult> DeleteAssetLocationAsync(
         string id,
         IAssetLocationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -103,7 +122,19 @@ public static class AssetLocationEndpoints
             return Results.BadRequest(new { message = "Invalid asset location id." });
         }
 
+        var location = await repository.GetByIdAsync(id, cancellationToken);
+        if (location is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetLocation", location.Id, location.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

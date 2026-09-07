@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetCertificationEndpoints
     private static async Task<IResult> GetAssetCertificationByIdAsync(
         string id,
         IAssetCertificationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetCertificationEndpoints
         }
 
         var certification = await repository.GetByIdAsync(id, cancellationToken);
-        return certification is null ? Results.NotFound() : Results.Ok(AssetCertificationResponse.FromEntity(certification));
+        if (certification is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetCertification", certification.CertificationId, certification.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetCertificationResponse.FromEntity(certification));
     }
 
     private static async Task<IResult> GetAssetCertificationsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetCertificationEndpoints
         CreateAssetCertificationRequest request,
         IAssetCertificationRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetCertificationEndpoints
         var certificationId = $"{CertificationIdPrefix}{nextSequence:D6}";
 
         var certification = await repository.CreateAsync(request.ToEntity(certificationId), cancellationToken);
+        await eventLogger.LogAsync("AssetCertification", certification.CertificationId, certification.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-certifications/{certification.Id}", AssetCertificationResponse.FromEntity(certification));
     }
 
@@ -79,6 +90,7 @@ public static class AssetCertificationEndpoints
         string id,
         UpdateAssetCertificationRequest request,
         IAssetCertificationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetCertificationEndpoints
         request.ApplyTo(certification);
 
         var updated = await repository.UpdateAsync(id, certification, cancellationToken);
-        return updated ? Results.Ok(AssetCertificationResponse.FromEntity(certification)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetCertification", certification.CertificationId, certification.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetCertificationResponse.FromEntity(certification));
     }
 
     private static async Task<IResult> DeleteAssetCertificationAsync(
         string id,
         IAssetCertificationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetCertificationEndpoints
             return Results.BadRequest(new { message = "Invalid asset certification id." });
         }
 
+        var certification = await repository.GetByIdAsync(id, cancellationToken);
+        if (certification is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetCertification", certification.CertificationId, certification.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

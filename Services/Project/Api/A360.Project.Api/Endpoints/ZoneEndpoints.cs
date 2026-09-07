@@ -1,7 +1,9 @@
+using A360.Domain.Entities;
 using A360.Project.Api.Contracts;
 using A360.Project.Api.Services;
 using A360.Project.Api.Validation;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Project.Api.Endpoints;
@@ -36,6 +38,7 @@ public static class ZoneEndpoints
     private static async Task<IResult> GetZoneByIdAsync(
         string id,
         IZoneRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ZoneEndpoints
         }
 
         var zone = await repository.GetByIdAsync(id, cancellationToken);
-        return zone is null ? Results.NotFound() : Results.Ok(ZoneResponse.FromEntity(zone));
+        if (zone is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Zone", zone.Id, zone.ZoneName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ZoneResponse.FromEntity(zone));
     }
 
     private static async Task<IResult> CreateZoneAsync(
@@ -56,6 +66,7 @@ public static class ZoneEndpoints
         IOuterZoneRepository outerZoneRepository,
         IBuildingRepository buildingRepository,
         IFloorRepository floorRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -78,6 +89,9 @@ public static class ZoneEndpoints
         }
 
         var zone = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+
+        await eventLogger.LogAsync("Zone", zone.Id, zone.ZoneName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/zones/{zone.Id}", ZoneResponse.FromEntity(zone));
     }
 
@@ -85,6 +99,7 @@ public static class ZoneEndpoints
         string id,
         UpdateZoneRequest request,
         IZoneRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -107,12 +122,20 @@ public static class ZoneEndpoints
         request.ApplyTo(zone);
 
         var updated = await repository.UpdateAsync(id, zone, cancellationToken);
-        return updated ? Results.Ok(ZoneResponse.FromEntity(zone)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Zone", zone.Id, zone.ZoneName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(ZoneResponse.FromEntity(zone));
     }
 
     private static async Task<IResult> DeleteZoneAsync(
         string id,
         IZoneRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -120,8 +143,21 @@ public static class ZoneEndpoints
             return Results.BadRequest(new { message = "Invalid zone id." });
         }
 
+        var zone = await repository.GetByIdAsync(id, cancellationToken);
+        if (zone is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Zone", zone.Id, zone.ZoneName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 
     private static async Task<IResult> UploadZoneMapAsync(

@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetIntegrationEndpoints
     private static async Task<IResult> GetAssetIntegrationByIdAsync(
         string id,
         IAssetIntegrationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetIntegrationEndpoints
         }
 
         var integration = await repository.GetByIdAsync(id, cancellationToken);
-        return integration is null ? Results.NotFound() : Results.Ok(AssetIntegrationResponse.FromEntity(integration));
+        if (integration is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetIntegration", integration.IntegrationId, integration.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetIntegrationResponse.FromEntity(integration));
     }
 
     private static async Task<IResult> GetAssetIntegrationsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetIntegrationEndpoints
         CreateAssetIntegrationRequest request,
         IAssetIntegrationRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetIntegrationEndpoints
         var integrationId = $"{IntegrationIdPrefix}{nextSequence:D6}";
 
         var integration = await repository.CreateAsync(request.ToEntity(integrationId), cancellationToken);
+        await eventLogger.LogAsync("AssetIntegration", integration.IntegrationId, integration.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-integrations/{integration.Id}", AssetIntegrationResponse.FromEntity(integration));
     }
 
@@ -79,6 +90,7 @@ public static class AssetIntegrationEndpoints
         string id,
         UpdateAssetIntegrationRequest request,
         IAssetIntegrationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetIntegrationEndpoints
         request.ApplyTo(integration);
 
         var updated = await repository.UpdateAsync(id, integration, cancellationToken);
-        return updated ? Results.Ok(AssetIntegrationResponse.FromEntity(integration)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetIntegration", integration.IntegrationId, integration.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetIntegrationResponse.FromEntity(integration));
     }
 
     private static async Task<IResult> DeleteAssetIntegrationAsync(
         string id,
         IAssetIntegrationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetIntegrationEndpoints
             return Results.BadRequest(new { message = "Invalid asset integration id." });
         }
 
+        var integration = await repository.GetByIdAsync(id, cancellationToken);
+        if (integration is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetIntegration", integration.IntegrationId, integration.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

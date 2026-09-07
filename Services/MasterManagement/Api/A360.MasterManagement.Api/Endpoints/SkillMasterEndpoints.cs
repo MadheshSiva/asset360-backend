@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class SkillMasterEndpoints
     private static async Task<IResult> GetSkillMasterByIdAsync(
         string id,
         ISkillMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class SkillMasterEndpoints
         }
 
         var skillMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return skillMaster is null ? Results.NotFound() : Results.Ok(SkillMasterResponse.FromEntity(skillMaster));
+        if (skillMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("SkillMaster", skillMaster.SkillId, skillMaster.SkillName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(SkillMasterResponse.FromEntity(skillMaster));
     }
 
     private static async Task<IResult> CreateSkillMasterAsync(
@@ -52,6 +62,7 @@ public static class SkillMasterEndpoints
         ISkillMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class SkillMasterEndpoints
             request.ToEntity(skillId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("SkillMaster", skillMaster.SkillId, skillMaster.SkillName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/skill-masters/{skillMaster.Id}", SkillMasterResponse.FromEntity(skillMaster));
     }
 
@@ -84,6 +97,7 @@ public static class SkillMasterEndpoints
         UpdateSkillMasterRequest request,
         ISkillMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,20 @@ public static class SkillMasterEndpoints
         request.ApplyTo(skillMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, skillMaster, cancellationToken);
-        return updated ? Results.Ok(SkillMasterResponse.FromEntity(skillMaster)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("SkillMaster", skillMaster.SkillId, skillMaster.SkillName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(SkillMasterResponse.FromEntity(skillMaster));
     }
 
     private static async Task<IResult> DeleteSkillMasterAsync(
         string id,
         ISkillMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +150,20 @@ public static class SkillMasterEndpoints
             return Results.BadRequest(new { message = "Invalid skill master id." });
         }
 
+        var skillMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (skillMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("SkillMaster", skillMaster.SkillId, skillMaster.SkillName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

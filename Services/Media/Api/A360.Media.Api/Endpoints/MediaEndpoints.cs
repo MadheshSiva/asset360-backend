@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using A360.Domain.Entities;
 using A360.Media.Api.Contracts;
 using A360.Media.Api.Services;
+using A360.Repository.Activity;
 
 namespace A360.Media.Api.Endpoints;
 
@@ -23,6 +25,7 @@ public static class MediaEndpoints
         IFormFile file,
         [FromForm] string category,
         IMediaFileStorageService fileStorageService,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (file.Length == 0)
@@ -38,6 +41,7 @@ public static class MediaEndpoints
         try
         {
             var url = await fileStorageService.SaveFileAsync(file, category, cancellationToken);
+            await eventLogger.LogAsync("Media", url, file.FileName, EventAction.Created, cancellationToken);
             return Results.Ok(new MediaUploadResponse(url));
         }
         catch (InvalidOperationException ex)

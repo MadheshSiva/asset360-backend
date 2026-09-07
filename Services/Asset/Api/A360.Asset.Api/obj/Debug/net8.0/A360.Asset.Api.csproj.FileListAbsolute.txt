@@ -45,3 +45,4 @@
 /home/piq1/People3601/People360/src/Services/Asset/Api/A360.Asset.Api/obj/Debug/net8.0/A360.Asset.Api.pdb
 /home/piq1/People3601/People360/src/Services/Asset/Api/A360.Asset.Api/obj/Debug/net8.0/A360.Asset.Api.genruntimeconfig.cache
 /home/piq1/People3601/People360/src/Services/Asset/Api/A360.Asset.Api/obj/Debug/net8.0/ref/A360.Asset.Api.dll
+/home/piq1/People3601/People360/src/Services/Asset/Api/A360.Asset.Api/obj/Debug/net8.0/A360.Asset.Api.sourcelink.json

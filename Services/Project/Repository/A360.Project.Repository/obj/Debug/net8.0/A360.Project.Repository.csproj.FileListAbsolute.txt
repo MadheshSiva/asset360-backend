@@ -17,3 +17,4 @@
 /home/piq1/People3601/People360/src/Services/Project/Repository/A360.Project.Repository/obj/Debug/net8.0/refint/A360.Project.Repository.dll
 /home/piq1/People3601/People360/src/Services/Project/Repository/A360.Project.Repository/obj/Debug/net8.0/A360.Project.Repository.pdb
 /home/piq1/People3601/People360/src/Services/Project/Repository/A360.Project.Repository/obj/Debug/net8.0/ref/A360.Project.Repository.dll
+/home/piq1/People3601/People360/src/Services/Project/Repository/A360.Project.Repository/obj/Debug/net8.0/A360.Project.Repository.sourcelink.json

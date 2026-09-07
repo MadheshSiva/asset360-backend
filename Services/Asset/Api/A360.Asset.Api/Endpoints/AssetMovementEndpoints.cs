@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetMovementEndpoints
     private static async Task<IResult> GetAssetMovementByIdAsync(
         string id,
         IAssetMovementRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetMovementEndpoints
         }
 
         var movement = await repository.GetByIdAsync(id, cancellationToken);
-        return movement is null ? Results.NotFound() : Results.Ok(AssetMovementResponse.FromEntity(movement));
+        if (movement is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetMovement", movement.MovementId, movement.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetMovementResponse.FromEntity(movement));
     }
 
     private static async Task<IResult> GetAssetMovementsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetMovementEndpoints
         CreateAssetMovementRequest request,
         IAssetMovementRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetMovementEndpoints
         var movementId = $"{MovementIdPrefix}{nextSequence:D6}";
 
         var movement = await repository.CreateAsync(request.ToEntity(movementId), cancellationToken);
+        await eventLogger.LogAsync("AssetMovement", movement.MovementId, movement.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-movements/{movement.Id}", AssetMovementResponse.FromEntity(movement));
     }
 
@@ -79,6 +90,7 @@ public static class AssetMovementEndpoints
         string id,
         UpdateAssetMovementRequest request,
         IAssetMovementRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetMovementEndpoints
         request.ApplyTo(movement);
 
         var updated = await repository.UpdateAsync(id, movement, cancellationToken);
-        return updated ? Results.Ok(AssetMovementResponse.FromEntity(movement)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetMovement", movement.MovementId, movement.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetMovementResponse.FromEntity(movement));
     }
 
     private static async Task<IResult> DeleteAssetMovementAsync(
         string id,
         IAssetMovementRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetMovementEndpoints
             return Results.BadRequest(new { message = "Invalid asset movement id." });
         }
 
+        var movement = await repository.GetByIdAsync(id, cancellationToken);
+        if (movement is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetMovement", movement.MovementId, movement.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

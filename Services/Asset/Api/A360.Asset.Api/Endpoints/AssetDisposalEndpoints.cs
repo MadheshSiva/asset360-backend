@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetDisposalEndpoints
     private static async Task<IResult> GetAssetDisposalByIdAsync(
         string id,
         IAssetDisposalRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetDisposalEndpoints
         }
 
         var disposal = await repository.GetByIdAsync(id, cancellationToken);
-        return disposal is null ? Results.NotFound() : Results.Ok(AssetDisposalResponse.FromEntity(disposal));
+        if (disposal is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetDisposal", disposal.DisposalId, disposal.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetDisposalResponse.FromEntity(disposal));
     }
 
     private static async Task<IResult> GetAssetDisposalsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetDisposalEndpoints
         CreateAssetDisposalRequest request,
         IAssetDisposalRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetDisposalEndpoints
         var disposalId = $"{DisposalIdPrefix}{nextSequence:D6}";
 
         var disposal = await repository.CreateAsync(request.ToEntity(disposalId), cancellationToken);
+        await eventLogger.LogAsync("AssetDisposal", disposal.DisposalId, disposal.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-disposals/{disposal.Id}", AssetDisposalResponse.FromEntity(disposal));
     }
 
@@ -79,6 +90,7 @@ public static class AssetDisposalEndpoints
         string id,
         UpdateAssetDisposalRequest request,
         IAssetDisposalRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetDisposalEndpoints
         request.ApplyTo(disposal);
 
         var updated = await repository.UpdateAsync(id, disposal, cancellationToken);
-        return updated ? Results.Ok(AssetDisposalResponse.FromEntity(disposal)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetDisposal", disposal.DisposalId, disposal.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetDisposalResponse.FromEntity(disposal));
     }
 
     private static async Task<IResult> DeleteAssetDisposalAsync(
         string id,
         IAssetDisposalRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetDisposalEndpoints
             return Results.BadRequest(new { message = "Invalid asset disposal id." });
         }
 
+        var disposal = await repository.GetByIdAsync(id, cancellationToken);
+        if (disposal is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetDisposal", disposal.DisposalId, disposal.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.Project.Api.Contracts;
 using A360.Project.Api.Validation;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Project.Api.Endpoints;
@@ -31,6 +33,7 @@ public static class AreaEndpoints
     private static async Task<IResult> GetAreaByIdAsync(
         string id,
         IAreaRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -39,7 +42,14 @@ public static class AreaEndpoints
         }
 
         var area = await repository.GetByIdAsync(id, cancellationToken);
-        return area is null ? Results.NotFound() : Results.Ok(AreaResponse.FromEntity(area));
+        if (area is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Area", area.Id, area.AreaName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(AreaResponse.FromEntity(area));
     }
 
     private static async Task<IResult> CreateAreaAsync(
@@ -47,6 +57,7 @@ public static class AreaEndpoints
         IAreaRepository repository,
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -65,6 +76,9 @@ public static class AreaEndpoints
         }
 
         var area = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+
+        await eventLogger.LogAsync("Area", area.Id, area.AreaName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/areas/{area.Id}", AreaResponse.FromEntity(area));
     }
 
@@ -72,6 +86,7 @@ public static class AreaEndpoints
         string id,
         UpdateAreaRequest request,
         IAreaRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -94,12 +109,20 @@ public static class AreaEndpoints
         request.ApplyTo(area);
 
         var updated = await repository.UpdateAsync(id, area, cancellationToken);
-        return updated ? Results.Ok(AreaResponse.FromEntity(area)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Area", area.Id, area.AreaName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(AreaResponse.FromEntity(area));
     }
 
     private static async Task<IResult> DeleteAreaAsync(
         string id,
         IAreaRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -107,7 +130,20 @@ public static class AreaEndpoints
             return Results.BadRequest(new { message = "Invalid area id." });
         }
 
+        var area = await repository.GetByIdAsync(id, cancellationToken);
+        if (area is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Area", area.Id, area.AreaName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

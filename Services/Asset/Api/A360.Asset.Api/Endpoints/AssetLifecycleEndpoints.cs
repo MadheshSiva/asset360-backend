@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetLifecycleEndpoints
     private static async Task<IResult> GetAssetLifecycleByIdAsync(
         string id,
         IAssetLifecycleRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetLifecycleEndpoints
         }
 
         var lifecycle = await repository.GetByIdAsync(id, cancellationToken);
-        return lifecycle is null ? Results.NotFound() : Results.Ok(AssetLifecycleResponse.FromEntity(lifecycle));
+        if (lifecycle is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetLifecycle", lifecycle.LifecycleId, lifecycle.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetLifecycleResponse.FromEntity(lifecycle));
     }
 
     private static async Task<IResult> GetAssetLifecyclesByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetLifecycleEndpoints
         CreateAssetLifecycleRequest request,
         IAssetLifecycleRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetLifecycleEndpoints
         var lifecycleId = $"{LifecycleIdPrefix}{nextSequence:D6}";
 
         var lifecycle = await repository.CreateAsync(request.ToEntity(lifecycleId), cancellationToken);
+        await eventLogger.LogAsync("AssetLifecycle", lifecycle.LifecycleId, lifecycle.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-lifecycles/{lifecycle.Id}", AssetLifecycleResponse.FromEntity(lifecycle));
     }
 
@@ -79,6 +90,7 @@ public static class AssetLifecycleEndpoints
         string id,
         UpdateAssetLifecycleRequest request,
         IAssetLifecycleRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetLifecycleEndpoints
         request.ApplyTo(lifecycle);
 
         var updated = await repository.UpdateAsync(id, lifecycle, cancellationToken);
-        return updated ? Results.Ok(AssetLifecycleResponse.FromEntity(lifecycle)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetLifecycle", lifecycle.LifecycleId, lifecycle.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetLifecycleResponse.FromEntity(lifecycle));
     }
 
     private static async Task<IResult> DeleteAssetLifecycleAsync(
         string id,
         IAssetLifecycleRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetLifecycleEndpoints
             return Results.BadRequest(new { message = "Invalid asset lifecycle id." });
         }
 
+        var lifecycle = await repository.GetByIdAsync(id, cancellationToken);
+        if (lifecycle is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetLifecycle", lifecycle.LifecycleId, lifecycle.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

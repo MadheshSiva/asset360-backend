@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.Project.Api.Contracts;
 using A360.Project.Api.Validation;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Project.Api.Endpoints;
@@ -31,6 +33,7 @@ public static class OuterZoneEndpoints
     private static async Task<IResult> GetOuterZoneByIdAsync(
         string id,
         IOuterZoneRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -39,7 +42,14 @@ public static class OuterZoneEndpoints
         }
 
         var outerZone = await repository.GetByIdAsync(id, cancellationToken);
-        return outerZone is null ? Results.NotFound() : Results.Ok(OuterZoneResponse.FromEntity(outerZone));
+        if (outerZone is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("OuterZone", outerZone.Id, outerZone.OuterZoneName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(OuterZoneResponse.FromEntity(outerZone));
     }
 
     private static async Task<IResult> CreateOuterZoneAsync(
@@ -48,6 +58,7 @@ public static class OuterZoneEndpoints
         IProjectRepository projectRepository,
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -67,6 +78,9 @@ public static class OuterZoneEndpoints
         }
 
         var outerZone = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+
+        await eventLogger.LogAsync("OuterZone", outerZone.Id, outerZone.OuterZoneName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/outer-zones/{outerZone.Id}", OuterZoneResponse.FromEntity(outerZone));
     }
 
@@ -74,6 +88,7 @@ public static class OuterZoneEndpoints
         string id,
         UpdateOuterZoneRequest request,
         IOuterZoneRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -96,12 +111,20 @@ public static class OuterZoneEndpoints
         request.ApplyTo(outerZone);
 
         var updated = await repository.UpdateAsync(id, outerZone, cancellationToken);
-        return updated ? Results.Ok(OuterZoneResponse.FromEntity(outerZone)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("OuterZone", outerZone.Id, outerZone.OuterZoneName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(OuterZoneResponse.FromEntity(outerZone));
     }
 
     private static async Task<IResult> DeleteOuterZoneAsync(
         string id,
         IOuterZoneRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -109,7 +132,20 @@ public static class OuterZoneEndpoints
             return Results.BadRequest(new { message = "Invalid outer zone id." });
         }
 
+        var outerZone = await repository.GetByIdAsync(id, cancellationToken);
+        if (outerZone is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("OuterZone", outerZone.Id, outerZone.OuterZoneName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class TagEndpoints
     private static async Task<IResult> GetTagByIdAsync(
         string id,
         ITagRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class TagEndpoints
         }
 
         var tag = await repository.GetByIdAsync(id, cancellationToken);
-        return tag is null ? Results.NotFound() : Results.Ok(TagResponse.FromEntity(tag));
+        if (tag is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Tag", tag.TagId, tag.TagCode, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(TagResponse.FromEntity(tag));
     }
 
     private static async Task<IResult> CreateTagAsync(
@@ -52,6 +62,7 @@ public static class TagEndpoints
         ITagRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class TagEndpoints
             request.ToEntity(tagId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("Tag", tag.TagId, tag.TagCode, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/tags/{tag.Id}", TagResponse.FromEntity(tag));
     }
 
@@ -84,6 +97,7 @@ public static class TagEndpoints
         UpdateTagRequest request,
         ITagRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class TagEndpoints
         request.ApplyTo(tag, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, tag, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("Tag", tag.TagId, tag.TagCode, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(TagResponse.FromEntity(tag)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteTagAsync(
         string id,
         ITagRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class TagEndpoints
             return Results.BadRequest(new { message = "Invalid tag id." });
         }
 
+        var tag = await repository.GetByIdAsync(id, cancellationToken);
+        if (tag is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("Tag", tag.TagId, tag.TagCode, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

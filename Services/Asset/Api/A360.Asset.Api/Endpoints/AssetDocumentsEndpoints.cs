@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetDocumentsEndpoints
     private static async Task<IResult> GetAssetDocumentsByIdAsync(
         string id,
         IAssetDocumentsRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetDocumentsEndpoints
         }
 
         var document = await repository.GetByIdAsync(id, cancellationToken);
-        return document is null ? Results.NotFound() : Results.Ok(AssetDocumentsResponse.FromEntity(document));
+        if (document is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetDocuments", document.DocumentId, document.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetDocumentsResponse.FromEntity(document));
     }
 
     private static async Task<IResult> GetAssetDocumentsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetDocumentsEndpoints
         CreateAssetDocumentsRequest request,
         IAssetDocumentsRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetDocumentsEndpoints
         var documentId = $"{DocumentIdPrefix}{nextSequence:D6}";
 
         var document = await repository.CreateAsync(request.ToEntity(documentId), cancellationToken);
+        await eventLogger.LogAsync("AssetDocuments", document.DocumentId, document.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-documents/{document.Id}", AssetDocumentsResponse.FromEntity(document));
     }
 
@@ -79,6 +90,7 @@ public static class AssetDocumentsEndpoints
         string id,
         UpdateAssetDocumentsRequest request,
         IAssetDocumentsRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetDocumentsEndpoints
         request.ApplyTo(document);
 
         var updated = await repository.UpdateAsync(id, document, cancellationToken);
-        return updated ? Results.Ok(AssetDocumentsResponse.FromEntity(document)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetDocuments", document.DocumentId, document.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetDocumentsResponse.FromEntity(document));
     }
 
     private static async Task<IResult> DeleteAssetDocumentsAsync(
         string id,
         IAssetDocumentsRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetDocumentsEndpoints
             return Results.BadRequest(new { message = "Invalid asset documents id." });
         }
 
+        var document = await repository.GetByIdAsync(id, cancellationToken);
+        if (document is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetDocuments", document.DocumentId, document.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

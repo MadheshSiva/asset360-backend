@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "6WC3LVqODMW5jJKIKSMjAi5AzfZaott5j18XyM7AniI=",
+  "Source": "A360.EventLog.Api",
+  "BasePath": "_content/A360.EventLog.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class StatusMasterEndpoints
     private static async Task<IResult> GetStatusMasterByIdAsync(
         string id,
         IStatusMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class StatusMasterEndpoints
         }
 
         var statusMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return statusMaster is null ? Results.NotFound() : Results.Ok(StatusMasterResponse.FromEntity(statusMaster));
+        if (statusMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("StatusMaster", statusMaster.StatusId, statusMaster.StatusName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(StatusMasterResponse.FromEntity(statusMaster));
     }
 
     private static async Task<IResult> CreateStatusMasterAsync(
@@ -52,6 +62,7 @@ public static class StatusMasterEndpoints
         IStatusMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class StatusMasterEndpoints
             request.ToEntity(statusId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("StatusMaster", statusMaster.StatusId, statusMaster.StatusName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/status-masters/{statusMaster.Id}", StatusMasterResponse.FromEntity(statusMaster));
     }
 
@@ -84,6 +97,7 @@ public static class StatusMasterEndpoints
         UpdateStatusMasterRequest request,
         IStatusMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,20 @@ public static class StatusMasterEndpoints
         request.ApplyTo(statusMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, statusMaster, cancellationToken);
-        return updated ? Results.Ok(StatusMasterResponse.FromEntity(statusMaster)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("StatusMaster", statusMaster.StatusId, statusMaster.StatusName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(StatusMasterResponse.FromEntity(statusMaster));
     }
 
     private static async Task<IResult> DeleteStatusMasterAsync(
         string id,
         IStatusMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +150,20 @@ public static class StatusMasterEndpoints
             return Results.BadRequest(new { message = "Invalid status master id." });
         }
 
+        var statusMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (statusMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("StatusMaster", statusMaster.StatusId, statusMaster.StatusName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class AssetTypeFieldEndpoints
     private static async Task<IResult> GetAssetTypeFieldByIdAsync(
         string id,
         IAssetTypeFieldRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class AssetTypeFieldEndpoints
         }
 
         var assetTypeField = await repository.GetByIdAsync(id, cancellationToken);
-        return assetTypeField is null ? Results.NotFound() : Results.Ok(AssetTypeFieldResponse.FromEntity(assetTypeField));
+        if (assetTypeField is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetTypeField", assetTypeField.FieldId, assetTypeField.FieldName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(AssetTypeFieldResponse.FromEntity(assetTypeField));
     }
 
     private static async Task<IResult> CreateAssetTypeFieldAsync(
@@ -52,6 +62,7 @@ public static class AssetTypeFieldEndpoints
         IAssetTypeFieldRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class AssetTypeFieldEndpoints
             request.ToEntity(fieldId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("AssetTypeField", assetTypeField.FieldId, assetTypeField.FieldName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/asset-type-fields/{assetTypeField.Id}", AssetTypeFieldResponse.FromEntity(assetTypeField));
     }
 
@@ -84,6 +97,7 @@ public static class AssetTypeFieldEndpoints
         UpdateAssetTypeFieldRequest request,
         IAssetTypeFieldRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class AssetTypeFieldEndpoints
         request.ApplyTo(assetTypeField, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, assetTypeField, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("AssetTypeField", assetTypeField.FieldId, assetTypeField.FieldName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(AssetTypeFieldResponse.FromEntity(assetTypeField)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteAssetTypeFieldAsync(
         string id,
         IAssetTypeFieldRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class AssetTypeFieldEndpoints
             return Results.BadRequest(new { message = "Invalid asset type field id." });
         }
 
+        var assetTypeField = await repository.GetByIdAsync(id, cancellationToken);
+        if (assetTypeField is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("AssetTypeField", assetTypeField.FieldId, assetTypeField.FieldName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

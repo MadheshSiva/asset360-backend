@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class UpdateSourceMasterEndpoints
     private static async Task<IResult> GetUpdateSourceMasterByIdAsync(
         string id,
         IUpdateSourceMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class UpdateSourceMasterEndpoints
         }
 
         var updateSourceMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return updateSourceMaster is null ? Results.NotFound() : Results.Ok(UpdateSourceMasterResponse.FromEntity(updateSourceMaster));
+        if (updateSourceMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("UpdateSourceMaster", updateSourceMaster.SourceId, updateSourceMaster.SourceName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(UpdateSourceMasterResponse.FromEntity(updateSourceMaster));
     }
 
     private static async Task<IResult> CreateUpdateSourceMasterAsync(
@@ -52,6 +62,7 @@ public static class UpdateSourceMasterEndpoints
         IUpdateSourceMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class UpdateSourceMasterEndpoints
             request.ToEntity(sourceId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("UpdateSourceMaster", updateSourceMaster.SourceId, updateSourceMaster.SourceName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/update-source-masters/{updateSourceMaster.Id}", UpdateSourceMasterResponse.FromEntity(updateSourceMaster));
     }
 
@@ -84,6 +97,7 @@ public static class UpdateSourceMasterEndpoints
         UpdateUpdateSourceMasterRequest request,
         IUpdateSourceMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class UpdateSourceMasterEndpoints
         request.ApplyTo(updateSourceMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, updateSourceMaster, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("UpdateSourceMaster", updateSourceMaster.SourceId, updateSourceMaster.SourceName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(UpdateSourceMasterResponse.FromEntity(updateSourceMaster)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteUpdateSourceMasterAsync(
         string id,
         IUpdateSourceMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class UpdateSourceMasterEndpoints
             return Results.BadRequest(new { message = "Invalid update source master id." });
         }
 
+        var updateSourceMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (updateSourceMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("UpdateSourceMaster", updateSourceMaster.SourceId, updateSourceMaster.SourceName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

@@ -46,14 +46,11 @@ public static class ApiGatewayApplicationBuilderExtensions
                 options.SwaggerEndpoint("/openapi/all.json", "All Services (Aggregated)");
                 options.SwaggerEndpoint("/project/swagger/v1/swagger.json", "Project Service");
                 options.SwaggerEndpoint("/user-account/swagger/v1/swagger.json", "User Account Service");
-                options.SwaggerEndpoint("/people/swagger/v1/swagger.json", "People Service");
                 options.SwaggerEndpoint("/device/swagger/v1/swagger.json", "Device Service");
-                options.SwaggerEndpoint("/otmanagement/swagger/v1/swagger.json", "OT Management Service");
-                options.SwaggerEndpoint("/visitormanagement/swagger/v1/swagger.json", "Visitor Management Service");
-                options.SwaggerEndpoint("/evacuation/swagger/v1/swagger.json", "Evacuation Service");
                 options.SwaggerEndpoint("/media/swagger/v1/swagger.json", "Media Service");
                 options.SwaggerEndpoint("/asset/swagger/v1/swagger.json", "Asset Service");
                 options.SwaggerEndpoint("/master-management/swagger/v1/swagger.json", "Master Management Service");
+                options.SwaggerEndpoint("/eventlog/swagger/v1/swagger.json", "Event Log Service");
 
                 options.RoutePrefix = "swagger";
             });
@@ -81,13 +78,6 @@ public static class ApiGatewayApplicationBuilderExtensions
                 },
                 new
                {
-                    service = "People",
-                    gatewaySwaggerUrl ="/people/swagger/v1/swagger.json",
-                    serviceBaseUrl ="http://172.16.100.26:5055",
-                    healthUrl ="/people/health"
-               },
-                new
-               {
                     service = "Device",
                     gatewaySwaggerUrl = "/device/swagger/v1/swagger.json",
                     serviceBaseUrl = "http://172.16.100.26:5077",
@@ -95,31 +85,17 @@ public static class ApiGatewayApplicationBuilderExtensions
                },
                 new
                {
-                    service = "OTManagement",
-                    gatewaySwaggerUrl = "/otmanagement/swagger/v1/swagger.json",
-                    serviceBaseUrl = "http://172.16.100.26:5123",
-                    healthUrl = "/otmanagement/health"
-               },
-                new
-               {
-                    service = "VisitorManagement",
-                    gatewaySwaggerUrl = "/visitormanagement/swagger/v1/swagger.json",
-                    serviceBaseUrl = "http://172.16.100.26:5125",
-                    healthUrl = "/visitormanagement/health"
-               },
-                new
-               {
-                    service = "Evacuation",
-                    gatewaySwaggerUrl = "/evacuation/swagger/v1/swagger.json",
-                    serviceBaseUrl = "http://172.16.100.26:5140",
-                    healthUrl = "/evacuation/health"
-               },
-                new
-               {
                     service = "Media",
                     gatewaySwaggerUrl = "/media/swagger/v1/swagger.json",
                     serviceBaseUrl = "http://172.16.100.26:5300",
                     healthUrl = "/media/health"
+               },
+                new
+               {
+                    service = "EventLog",
+                    gatewaySwaggerUrl = "/eventlog/swagger/v1/swagger.json",
+                    serviceBaseUrl = "http://172.16.100.26:5420",
+                    healthUrl = "/eventlog/health"
                }
             }))
             .WithName("GatewayDownstreamSwagger")

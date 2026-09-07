@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class CategoryEndpoints
     private static async Task<IResult> GetCategoryByIdAsync(
         string id,
         ICategoryRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class CategoryEndpoints
         }
 
         var category = await repository.GetByIdAsync(id, cancellationToken);
-        return category is null ? Results.NotFound() : Results.Ok(CategoryResponse.FromEntity(category));
+        if (category is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Category", category.CategoryId, category.CategoryName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(CategoryResponse.FromEntity(category));
     }
 
     private static async Task<IResult> CreateCategoryAsync(
@@ -52,6 +62,7 @@ public static class CategoryEndpoints
         ICategoryRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class CategoryEndpoints
             request.ToEntity(categoryId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("Category", category.CategoryId, category.CategoryName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/categories/{category.Id}", CategoryResponse.FromEntity(category));
     }
 
@@ -84,6 +97,7 @@ public static class CategoryEndpoints
         UpdateCategoryRequest request,
         ICategoryRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class CategoryEndpoints
         request.ApplyTo(category, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, category, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("Category", category.CategoryId, category.CategoryName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(CategoryResponse.FromEntity(category)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteCategoryAsync(
         string id,
         ICategoryRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class CategoryEndpoints
             return Results.BadRequest(new { message = "Invalid category id." });
         }
 
+        var category = await repository.GetByIdAsync(id, cancellationToken);
+        if (category is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("Category", category.CategoryId, category.CategoryName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

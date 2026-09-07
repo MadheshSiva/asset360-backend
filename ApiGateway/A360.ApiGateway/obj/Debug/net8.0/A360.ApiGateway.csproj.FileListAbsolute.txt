@@ -32,3 +32,4 @@
 /home/piq1/People3601/People360/src/ApiGateway/A360.ApiGateway/obj/Debug/net8.0/A360.ApiGateway.pdb
 /home/piq1/People3601/People360/src/ApiGateway/A360.ApiGateway/obj/Debug/net8.0/A360.ApiGateway.genruntimeconfig.cache
 /home/piq1/People3601/People360/src/ApiGateway/A360.ApiGateway/obj/Debug/net8.0/ref/A360.ApiGateway.dll
+/home/piq1/People3601/People360/src/ApiGateway/A360.ApiGateway/obj/Debug/net8.0/A360.ApiGateway.sourcelink.json

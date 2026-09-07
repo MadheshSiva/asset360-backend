@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.Project.Api.Contracts;
 using A360.Project.Api.Validation;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Project.Api.Endpoints;
@@ -31,6 +33,7 @@ public static class BuildingEndpoints
     private static async Task<IResult> GetBuildingByIdAsync(
         string id,
         IBuildingRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -39,7 +42,14 @@ public static class BuildingEndpoints
         }
 
         var building = await repository.GetByIdAsync(id, cancellationToken);
-        return building is null ? Results.NotFound() : Results.Ok(BuildingResponse.FromEntity(building));
+        if (building is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Building", building.Id, building.BuildingName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(BuildingResponse.FromEntity(building));
     }
 
     private static async Task<IResult> CreateBuildingAsync(
@@ -49,6 +59,7 @@ public static class BuildingEndpoints
         ICountryRepository countryRepository,
         IAreaRepository areaRepository,
         IOuterZoneRepository outerZoneRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -69,6 +80,9 @@ public static class BuildingEndpoints
         }
 
         var building = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+
+        await eventLogger.LogAsync("Building", building.Id, building.BuildingName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/buildings/{building.Id}", BuildingResponse.FromEntity(building));
     }
 
@@ -76,6 +90,7 @@ public static class BuildingEndpoints
         string id,
         UpdateBuildingRequest request,
         IBuildingRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -98,12 +113,20 @@ public static class BuildingEndpoints
         request.ApplyTo(building);
 
         var updated = await repository.UpdateAsync(id, building, cancellationToken);
-        return updated ? Results.Ok(BuildingResponse.FromEntity(building)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Building", building.Id, building.BuildingName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(BuildingResponse.FromEntity(building));
     }
 
     private static async Task<IResult> DeleteBuildingAsync(
         string id,
         IBuildingRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -111,7 +134,20 @@ public static class BuildingEndpoints
             return Results.BadRequest(new { message = "Invalid building id." });
         }
 
+        var building = await repository.GetByIdAsync(id, cancellationToken);
+        if (building is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Building", building.Id, building.BuildingName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

@@ -1,3 +1,5 @@
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.UserAccount.Api.Contracts;
 using A360.UserAccount.Api.Security;
@@ -47,6 +49,7 @@ public static class UserEndpoints
     private static async Task<IResult> GetUserByIdAsync(
         string id,
         IUserRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -55,7 +58,13 @@ public static class UserEndpoints
         }
 
         var user = await repository.GetByIdAsync(id, cancellationToken);
-        return user is null ? Results.NotFound() : Results.Ok(UserResponse.FromEntity(user));
+        if (user is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("User", user.Id, user.UserName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(UserResponse.FromEntity(user));
     }
 
     private static async Task<IResult> CreateUserAsync(
@@ -63,6 +72,7 @@ public static class UserEndpoints
         IUserRepository repository,
         IRoleRepository roleRepository,
         PasswordHashingService passwordHashingService,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -83,6 +93,7 @@ public static class UserEndpoints
         }
 
         var user = await repository.CreateAsync(request.ToEntity(passwordHashingService), cancellationToken);
+        await eventLogger.LogAsync("User", user.Id, user.UserName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/users/{user.Id}", UserResponse.FromEntity(user));
     }
 
@@ -92,6 +103,7 @@ public static class UserEndpoints
         IUserRepository repository,
         IRoleRepository roleRepository,
         PasswordHashingService passwordHashingService,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -125,12 +137,19 @@ public static class UserEndpoints
         request.ApplyTo(user, passwordHashingService);
 
         var updated = await repository.UpdateAsync(id, user, cancellationToken);
-        return updated ? Results.Ok(UserResponse.FromEntity(user)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("User", user.Id, user.UserName, EventAction.Updated, cancellationToken);
+        return Results.Ok(UserResponse.FromEntity(user));
     }
 
     private static async Task<IResult> DeleteUserAsync(
         string id,
         IUserRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -138,7 +157,19 @@ public static class UserEndpoints
             return Results.BadRequest(new { message = "Invalid user id." });
         }
 
+        var user = await repository.GetByIdAsync(id, cancellationToken);
+        if (user is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("User", user.Id, user.UserName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

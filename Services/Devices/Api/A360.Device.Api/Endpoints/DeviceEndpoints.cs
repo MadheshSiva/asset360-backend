@@ -2,6 +2,8 @@
 using A360.Devices.Api.Contracts;
 using A360.Devices.Api.Validation;
 using A360.Devices.Repository.Repositories;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Devices.Api.Endpoints;
@@ -49,6 +51,7 @@ public static class DeviceEndpoints
     private static async Task<IResult> GetDeviceByIdAsync(
         string id,
         IDeviceRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -61,9 +64,19 @@ public static class DeviceEndpoints
             id,
             cancellationToken);
 
-        return device is null
-            ? Results.NotFound()
-            : Results.Ok(DeviceResponse.FromEntity(device));
+        if (device is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync(
+            "Device",
+            device.Id,
+            device.ReferenceId,
+            EventAction.Viewed,
+            cancellationToken);
+
+        return Results.Ok(DeviceResponse.FromEntity(device));
     }
 
     private static async Task<IResult> GetDevicesByTypeAsync(
@@ -88,6 +101,7 @@ public static class DeviceEndpoints
     private static async Task<IResult> CreateDeviceAsync(
         CreateDeviceRequest request,
         IDeviceRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -101,6 +115,13 @@ public static class DeviceEndpoints
             request.ToEntity(),
             cancellationToken);
 
+        await eventLogger.LogAsync(
+            "Device",
+            device.Id,
+            device.ReferenceId,
+            EventAction.Created,
+            cancellationToken);
+
         return Results.Created(
             $"/api/devices/{device.Id}",
             DeviceResponse.FromEntity(device));
@@ -110,6 +131,7 @@ public static class DeviceEndpoints
         string id,
         UpdateDeviceRequest request,
         IDeviceRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -141,14 +163,25 @@ public static class DeviceEndpoints
             device,
             cancellationToken);
 
-        return updated
-            ? Results.Ok(DeviceResponse.FromEntity(device))
-            : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync(
+            "Device",
+            device.Id,
+            device.ReferenceId,
+            EventAction.Updated,
+            cancellationToken);
+
+        return Results.Ok(DeviceResponse.FromEntity(device));
     }
 
     private static async Task<IResult> DeleteDeviceAsync(
         string id,
         IDeviceRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -157,12 +190,31 @@ public static class DeviceEndpoints
                 new { message = "Invalid device id." });
         }
 
+        var device = await repository.GetByIdAsync(
+            id,
+            cancellationToken);
+
+        if (device is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(
             id,
             cancellationToken);
 
-        return deleted
-            ? Results.NoContent()
-            : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync(
+            "Device",
+            device.Id,
+            device.ReferenceId,
+            EventAction.Deleted,
+            cancellationToken);
+
+        return Results.NoContent();
     }
 }

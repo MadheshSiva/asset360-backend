@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.Project.Api.Contracts;
 using A360.Project.Api.Validation;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Project.Api.Endpoints;
@@ -31,6 +33,7 @@ public static class DeviceZoneMappingEndpoints
     private static async Task<IResult> GetDeviceZoneMappingByIdAsync(
         string id,
         IDeviceZoneMappingRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -39,7 +42,14 @@ public static class DeviceZoneMappingEndpoints
         }
 
         var deviceZoneMapping = await repository.GetByIdAsync(id, cancellationToken);
-        return deviceZoneMapping is null ? Results.NotFound() : Results.Ok(DeviceZoneMappingResponse.FromEntity(deviceZoneMapping));
+        if (deviceZoneMapping is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("DeviceZoneMapping", deviceZoneMapping.Id, deviceZoneMapping.DeviceName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(DeviceZoneMappingResponse.FromEntity(deviceZoneMapping));
     }
 
     private static async Task<IResult> CreateDeviceZoneMappingAsync(
@@ -52,6 +62,7 @@ public static class DeviceZoneMappingEndpoints
         IBuildingRepository buildingRepository,
         IFloorRepository floorRepository,
         IZoneRepository zoneRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -75,6 +86,9 @@ public static class DeviceZoneMappingEndpoints
         }
 
         var deviceZoneMapping = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+
+        await eventLogger.LogAsync("DeviceZoneMapping", deviceZoneMapping.Id, deviceZoneMapping.DeviceName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/device-zone-mappings/{deviceZoneMapping.Id}", DeviceZoneMappingResponse.FromEntity(deviceZoneMapping));
     }
 
@@ -82,6 +96,7 @@ public static class DeviceZoneMappingEndpoints
         string id,
         UpdateDeviceZoneMappingRequest request,
         IDeviceZoneMappingRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -104,12 +119,20 @@ public static class DeviceZoneMappingEndpoints
         request.ApplyTo(deviceZoneMapping);
 
         var updated = await repository.UpdateAsync(id, deviceZoneMapping, cancellationToken);
-        return updated ? Results.Ok(DeviceZoneMappingResponse.FromEntity(deviceZoneMapping)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("DeviceZoneMapping", deviceZoneMapping.Id, deviceZoneMapping.DeviceName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(DeviceZoneMappingResponse.FromEntity(deviceZoneMapping));
     }
 
     private static async Task<IResult> DeleteDeviceZoneMappingAsync(
         string id,
         IDeviceZoneMappingRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -117,7 +140,20 @@ public static class DeviceZoneMappingEndpoints
             return Results.BadRequest(new { message = "Invalid device zone mapping id." });
         }
 
+        var deviceZoneMapping = await repository.GetByIdAsync(id, cancellationToken);
+        if (deviceZoneMapping is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("DeviceZoneMapping", deviceZoneMapping.Id, deviceZoneMapping.DeviceName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

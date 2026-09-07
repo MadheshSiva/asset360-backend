@@ -51,6 +51,10 @@ public static class MasterManagementApplicationBuilderExtensions
         app.MapModuleAccessMasterEndpoints();
         app.MapOrganizationEndpoints();
         app.MapBusinessUnitEndpoints();
+        app.MapDepartmentEndpoints();
+        app.MapSiteEndpoints();
+        app.MapManufacturerEndpoints();
+        app.MapSupplierEndpoints();
 
         return app;
     }

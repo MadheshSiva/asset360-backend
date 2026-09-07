@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class ChartTypeMasterEndpoints
     private static async Task<IResult> GetChartTypeMasterByIdAsync(
         string id,
         IChartTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ChartTypeMasterEndpoints
         }
 
         var chartTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return chartTypeMaster is null ? Results.NotFound() : Results.Ok(ChartTypeMasterResponse.FromEntity(chartTypeMaster));
+        if (chartTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ChartTypeMaster", chartTypeMaster.WidgetId, chartTypeMaster.WidgetName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ChartTypeMasterResponse.FromEntity(chartTypeMaster));
     }
 
     private static async Task<IResult> CreateChartTypeMasterAsync(
@@ -52,6 +62,7 @@ public static class ChartTypeMasterEndpoints
         IChartTypeMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class ChartTypeMasterEndpoints
             request.ToEntity(widgetId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("ChartTypeMaster", chartTypeMaster.WidgetId, chartTypeMaster.WidgetName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/chart-type-masters/{chartTypeMaster.Id}", ChartTypeMasterResponse.FromEntity(chartTypeMaster));
     }
 
@@ -84,6 +97,7 @@ public static class ChartTypeMasterEndpoints
         UpdateChartTypeMasterRequest request,
         IChartTypeMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class ChartTypeMasterEndpoints
         request.ApplyTo(chartTypeMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, chartTypeMaster, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("ChartTypeMaster", chartTypeMaster.WidgetId, chartTypeMaster.WidgetName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(ChartTypeMasterResponse.FromEntity(chartTypeMaster)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteChartTypeMasterAsync(
         string id,
         IChartTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class ChartTypeMasterEndpoints
             return Results.BadRequest(new { message = "Invalid chart type master id." });
         }
 
+        var chartTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (chartTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("ChartTypeMaster", chartTypeMaster.WidgetId, chartTypeMaster.WidgetName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

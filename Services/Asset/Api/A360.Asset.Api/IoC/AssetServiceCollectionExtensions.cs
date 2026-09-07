@@ -1,5 +1,6 @@
 using MongoDB.Driver;
 using A360.Asset.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 using A360.Repository.Settings;
@@ -29,6 +30,11 @@ public static class AssetServiceCollectionExtensions
         });
 
         services.AddSingleton<ISequenceGenerator, MongoSequenceGenerator>();
+
+        services.AddScoped<EventLogRepository>();
+        services.AddScoped<IEventLogRepository>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IEventLogger>(serviceProvider => new EventLogger(serviceProvider.GetRequiredService<IEventLogRepository>(), "Asset"));
 
         services.AddScoped<AssetRepository>();
         services.AddScoped<IAssetRepository>(serviceProvider => serviceProvider.GetRequiredService<AssetRepository>());

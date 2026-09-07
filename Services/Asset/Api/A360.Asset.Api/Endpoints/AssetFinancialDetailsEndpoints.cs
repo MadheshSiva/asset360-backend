@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetFinancialDetailsEndpoints
     private static async Task<IResult> GetAssetFinancialDetailsByIdAsync(
         string id,
         IAssetFinancialDetailsRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetFinancialDetailsEndpoints
         }
 
         var record = await repository.GetByIdAsync(id, cancellationToken);
-        return record is null ? Results.NotFound() : Results.Ok(AssetFinancialDetailsResponse.FromEntity(record));
+        if (record is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetFinancialDetails", record.FinancialDetailsId, record.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetFinancialDetailsResponse.FromEntity(record));
     }
 
     private static async Task<IResult> GetAssetFinancialDetailsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetFinancialDetailsEndpoints
         CreateAssetFinancialDetailsRequest request,
         IAssetFinancialDetailsRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetFinancialDetailsEndpoints
         var financialDetailsId = $"{FinancialDetailsIdPrefix}{nextSequence:D6}";
 
         var record = await repository.CreateAsync(request.ToEntity(financialDetailsId), cancellationToken);
+        await eventLogger.LogAsync("AssetFinancialDetails", record.FinancialDetailsId, record.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-financial-details/{record.Id}", AssetFinancialDetailsResponse.FromEntity(record));
     }
 
@@ -79,6 +90,7 @@ public static class AssetFinancialDetailsEndpoints
         string id,
         UpdateAssetFinancialDetailsRequest request,
         IAssetFinancialDetailsRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetFinancialDetailsEndpoints
         request.ApplyTo(record);
 
         var updated = await repository.UpdateAsync(id, record, cancellationToken);
-        return updated ? Results.Ok(AssetFinancialDetailsResponse.FromEntity(record)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetFinancialDetails", record.FinancialDetailsId, record.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetFinancialDetailsResponse.FromEntity(record));
     }
 
     private static async Task<IResult> DeleteAssetFinancialDetailsAsync(
         string id,
         IAssetFinancialDetailsRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetFinancialDetailsEndpoints
             return Results.BadRequest(new { message = "Invalid asset financial details id." });
         }
 
+        var record = await repository.GetByIdAsync(id, cancellationToken);
+        if (record is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetFinancialDetails", record.FinancialDetailsId, record.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

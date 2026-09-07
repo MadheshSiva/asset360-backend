@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class OrganizationEndpoints
     private static async Task<IResult> GetOrganizationByIdAsync(
         string id,
         IOrganizationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class OrganizationEndpoints
         }
 
         var organization = await repository.GetByIdAsync(id, cancellationToken);
-        return organization is null ? Results.NotFound() : Results.Ok(OrganizationResponse.FromEntity(organization));
+        if (organization is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Organization", organization.OrganizationCode, organization.OrganizationName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(OrganizationResponse.FromEntity(organization));
     }
 
     private static async Task<IResult> CreateOrganizationAsync(
@@ -52,6 +61,7 @@ public static class OrganizationEndpoints
         IOrganizationRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +86,8 @@ public static class OrganizationEndpoints
             request.ToEntity(organizationCode, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("Organization", organization.OrganizationCode, organization.OrganizationName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/organizations/{organization.Id}", OrganizationResponse.FromEntity(organization));
     }
 
@@ -84,6 +96,7 @@ public static class OrganizationEndpoints
         UpdateOrganizationRequest request,
         IOrganizationRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +128,19 @@ public static class OrganizationEndpoints
         request.ApplyTo(organization, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, organization, cancellationToken);
-        return updated ? Results.Ok(OrganizationResponse.FromEntity(organization)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Organization", organization.OrganizationCode, organization.OrganizationName, EventAction.Updated, cancellationToken);
+        return Results.Ok(OrganizationResponse.FromEntity(organization));
     }
 
     private static async Task<IResult> DeleteOrganizationAsync(
         string id,
         IOrganizationRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,19 @@ public static class OrganizationEndpoints
             return Results.BadRequest(new { message = "Invalid organization id." });
         }
 
+        var organization = await repository.GetByIdAsync(id, cancellationToken);
+        if (organization is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Organization", organization.OrganizationCode, organization.OrganizationName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

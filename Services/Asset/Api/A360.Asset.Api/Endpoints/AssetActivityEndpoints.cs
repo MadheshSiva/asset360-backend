@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetActivityEndpoints
     private static async Task<IResult> GetAssetActivityByIdAsync(
         string id,
         IAssetActivityRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetActivityEndpoints
         }
 
         var activity = await repository.GetByIdAsync(id, cancellationToken);
-        return activity is null ? Results.NotFound() : Results.Ok(AssetActivityResponse.FromEntity(activity));
+        if (activity is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetActivity", activity.ActivityId, activity.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetActivityResponse.FromEntity(activity));
     }
 
     private static async Task<IResult> GetAssetActivitiesByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetActivityEndpoints
         CreateAssetActivityRequest request,
         IAssetActivityRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetActivityEndpoints
         var activityId = $"{ActivityIdPrefix}{nextSequence:D6}";
 
         var activity = await repository.CreateAsync(request.ToEntity(activityId), cancellationToken);
+        await eventLogger.LogAsync("AssetActivity", activity.ActivityId, activity.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-activities/{activity.Id}", AssetActivityResponse.FromEntity(activity));
     }
 
@@ -79,6 +90,7 @@ public static class AssetActivityEndpoints
         string id,
         UpdateAssetActivityRequest request,
         IAssetActivityRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetActivityEndpoints
         request.ApplyTo(activity);
 
         var updated = await repository.UpdateAsync(id, activity, cancellationToken);
-        return updated ? Results.Ok(AssetActivityResponse.FromEntity(activity)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetActivity", activity.ActivityId, activity.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetActivityResponse.FromEntity(activity));
     }
 
     private static async Task<IResult> DeleteAssetActivityAsync(
         string id,
         IAssetActivityRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetActivityEndpoints
             return Results.BadRequest(new { message = "Invalid asset activity id." });
         }
 
+        var activity = await repository.GetByIdAsync(id, cancellationToken);
+        if (activity is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetActivity", activity.ActivityId, activity.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

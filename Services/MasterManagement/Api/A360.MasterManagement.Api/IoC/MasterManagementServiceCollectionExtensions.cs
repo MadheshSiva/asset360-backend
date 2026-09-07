@@ -1,6 +1,7 @@
 using MongoDB.Driver;
 using A360.Asset.Repository.Repositories;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 using A360.Repository.Settings;
@@ -30,6 +31,11 @@ public static class MasterManagementServiceCollectionExtensions
         });
 
         services.AddSingleton<ISequenceGenerator, MongoSequenceGenerator>();
+
+        services.AddScoped<EventLogRepository>();
+        services.AddScoped<IEventLogRepository>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IEventLogger>(serviceProvider => new EventLogger(serviceProvider.GetRequiredService<IEventLogRepository>(), "MasterManagement"));
 
         services.AddScoped<MasterMaintenanceRepository>();
         services.AddScoped<IMasterMaintenanceRepository>(serviceProvider => serviceProvider.GetRequiredService<MasterMaintenanceRepository>());
@@ -173,6 +179,22 @@ public static class MasterManagementServiceCollectionExtensions
         services.AddScoped<BusinessUnitRepository>();
         services.AddScoped<IBusinessUnitRepository>(serviceProvider => serviceProvider.GetRequiredService<BusinessUnitRepository>());
         services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<BusinessUnitRepository>());
+
+        services.AddScoped<DepartmentRepository>();
+        services.AddScoped<IDepartmentRepository>(serviceProvider => serviceProvider.GetRequiredService<DepartmentRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<DepartmentRepository>());
+
+        services.AddScoped<SiteRepository>();
+        services.AddScoped<ISiteRepository>(serviceProvider => serviceProvider.GetRequiredService<SiteRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<SiteRepository>());
+
+        services.AddScoped<ManufacturerRepository>();
+        services.AddScoped<IManufacturerRepository>(serviceProvider => serviceProvider.GetRequiredService<ManufacturerRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<ManufacturerRepository>());
+
+        services.AddScoped<SupplierRepository>();
+        services.AddScoped<ISupplierRepository>(serviceProvider => serviceProvider.GetRequiredService<SupplierRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<SupplierRepository>());
 
         services.AddHostedService<MongoIndexHostedService>();
         services.AddEndpointsApiExplorer();

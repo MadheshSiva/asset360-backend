@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class ApiSyncStatusMasterEndpoints
     private static async Task<IResult> GetApiSyncStatusMasterByIdAsync(
         string id,
         IApiSyncStatusMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ApiSyncStatusMasterEndpoints
         }
 
         var apiSyncStatusMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return apiSyncStatusMaster is null ? Results.NotFound() : Results.Ok(ApiSyncStatusMasterResponse.FromEntity(apiSyncStatusMaster));
+        if (apiSyncStatusMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ApiSyncStatusMaster", apiSyncStatusMaster.StatusId, apiSyncStatusMaster.StatusName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ApiSyncStatusMasterResponse.FromEntity(apiSyncStatusMaster));
     }
 
     private static async Task<IResult> CreateApiSyncStatusMasterAsync(
@@ -52,6 +62,7 @@ public static class ApiSyncStatusMasterEndpoints
         IApiSyncStatusMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class ApiSyncStatusMasterEndpoints
             request.ToEntity(statusId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("ApiSyncStatusMaster", apiSyncStatusMaster.StatusId, apiSyncStatusMaster.StatusName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/api-sync-status-masters/{apiSyncStatusMaster.Id}", ApiSyncStatusMasterResponse.FromEntity(apiSyncStatusMaster));
     }
 
@@ -84,6 +97,7 @@ public static class ApiSyncStatusMasterEndpoints
         UpdateApiSyncStatusMasterRequest request,
         IApiSyncStatusMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class ApiSyncStatusMasterEndpoints
         request.ApplyTo(apiSyncStatusMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, apiSyncStatusMaster, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("ApiSyncStatusMaster", apiSyncStatusMaster.StatusId, apiSyncStatusMaster.StatusName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(ApiSyncStatusMasterResponse.FromEntity(apiSyncStatusMaster)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteApiSyncStatusMasterAsync(
         string id,
         IApiSyncStatusMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class ApiSyncStatusMasterEndpoints
             return Results.BadRequest(new { message = "Invalid api sync status master id." });
         }
 
+        var apiSyncStatusMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (apiSyncStatusMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("ApiSyncStatusMaster", apiSyncStatusMaster.StatusId, apiSyncStatusMaster.StatusName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

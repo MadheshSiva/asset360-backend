@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class ModuleAccessMasterEndpoints
     private static async Task<IResult> GetModuleAccessMasterByIdAsync(
         string id,
         IModuleAccessMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ModuleAccessMasterEndpoints
         }
 
         var moduleAccessMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return moduleAccessMaster is null ? Results.NotFound() : Results.Ok(ModuleAccessMasterResponse.FromEntity(moduleAccessMaster));
+        if (moduleAccessMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ModuleAccessMaster", moduleAccessMaster.ModuleId, moduleAccessMaster.ModuleName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ModuleAccessMasterResponse.FromEntity(moduleAccessMaster));
     }
 
     private static async Task<IResult> CreateModuleAccessMasterAsync(
@@ -52,6 +62,7 @@ public static class ModuleAccessMasterEndpoints
         IModuleAccessMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class ModuleAccessMasterEndpoints
             request.ToEntity(moduleId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("ModuleAccessMaster", moduleAccessMaster.ModuleId, moduleAccessMaster.ModuleName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/module-access-masters/{moduleAccessMaster.Id}", ModuleAccessMasterResponse.FromEntity(moduleAccessMaster));
     }
 
@@ -84,6 +97,7 @@ public static class ModuleAccessMasterEndpoints
         UpdateModuleAccessMasterRequest request,
         IModuleAccessMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class ModuleAccessMasterEndpoints
         request.ApplyTo(moduleAccessMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, moduleAccessMaster, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("ModuleAccessMaster", moduleAccessMaster.ModuleId, moduleAccessMaster.ModuleName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(ModuleAccessMasterResponse.FromEntity(moduleAccessMaster)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteModuleAccessMasterAsync(
         string id,
         IModuleAccessMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class ModuleAccessMasterEndpoints
             return Results.BadRequest(new { message = "Invalid module access master id." });
         }
 
+        var moduleAccessMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (moduleAccessMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("ModuleAccessMaster", moduleAccessMaster.ModuleId, moduleAccessMaster.ModuleName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

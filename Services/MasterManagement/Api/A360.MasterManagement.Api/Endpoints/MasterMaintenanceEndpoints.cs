@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class MasterMaintenanceEndpoints
     private static async Task<IResult> GetMasterMaintenanceByIdAsync(
         string id,
         IMasterMaintenanceRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class MasterMaintenanceEndpoints
         }
 
         var masterMaintenance = await repository.GetByIdAsync(id, cancellationToken);
-        return masterMaintenance is null ? Results.NotFound() : Results.Ok(MasterMaintenanceResponse.FromEntity(masterMaintenance));
+        if (masterMaintenance is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("MasterMaintenance", masterMaintenance.MasterMaintenanceId, masterMaintenance.MasterMaintenanceName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(MasterMaintenanceResponse.FromEntity(masterMaintenance));
     }
 
     private static async Task<IResult> CreateMasterMaintenanceAsync(
@@ -52,6 +62,7 @@ public static class MasterMaintenanceEndpoints
         IMasterMaintenanceRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class MasterMaintenanceEndpoints
             request.ToEntity(masterMaintenanceId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("MasterMaintenance", masterMaintenance.MasterMaintenanceId, masterMaintenance.MasterMaintenanceName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/master-maintenances/{masterMaintenance.Id}", MasterMaintenanceResponse.FromEntity(masterMaintenance));
     }
 
@@ -84,6 +97,7 @@ public static class MasterMaintenanceEndpoints
         UpdateMasterMaintenanceRequest request,
         IMasterMaintenanceRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class MasterMaintenanceEndpoints
         request.ApplyTo(masterMaintenance, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, masterMaintenance, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("MasterMaintenance", masterMaintenance.MasterMaintenanceId, masterMaintenance.MasterMaintenanceName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(MasterMaintenanceResponse.FromEntity(masterMaintenance)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteMasterMaintenanceAsync(
         string id,
         IMasterMaintenanceRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class MasterMaintenanceEndpoints
             return Results.BadRequest(new { message = "Invalid master maintenance id." });
         }
 
+        var masterMaintenance = await repository.GetByIdAsync(id, cancellationToken);
+        if (masterMaintenance is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("MasterMaintenance", masterMaintenance.MasterMaintenanceId, masterMaintenance.MasterMaintenanceName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

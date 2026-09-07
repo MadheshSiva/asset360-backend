@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class ResponseTypeMasterEndpoints
     private static async Task<IResult> GetResponseTypeMasterByIdAsync(
         string id,
         IResponseTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ResponseTypeMasterEndpoints
         }
 
         var responseTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return responseTypeMaster is null ? Results.NotFound() : Results.Ok(ResponseTypeMasterResponse.FromEntity(responseTypeMaster));
+        if (responseTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ResponseTypeMaster", responseTypeMaster.TypeId, responseTypeMaster.TypeName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ResponseTypeMasterResponse.FromEntity(responseTypeMaster));
     }
 
     private static async Task<IResult> CreateResponseTypeMasterAsync(
@@ -52,6 +62,7 @@ public static class ResponseTypeMasterEndpoints
         IResponseTypeMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class ResponseTypeMasterEndpoints
             request.ToEntity(typeId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("ResponseTypeMaster", responseTypeMaster.TypeId, responseTypeMaster.TypeName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/response-type-masters/{responseTypeMaster.Id}", ResponseTypeMasterResponse.FromEntity(responseTypeMaster));
     }
 
@@ -84,6 +97,7 @@ public static class ResponseTypeMasterEndpoints
         UpdateResponseTypeMasterRequest request,
         IResponseTypeMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,20 @@ public static class ResponseTypeMasterEndpoints
         request.ApplyTo(responseTypeMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, responseTypeMaster, cancellationToken);
-        return updated ? Results.Ok(ResponseTypeMasterResponse.FromEntity(responseTypeMaster)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ResponseTypeMaster", responseTypeMaster.TypeId, responseTypeMaster.TypeName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(ResponseTypeMasterResponse.FromEntity(responseTypeMaster));
     }
 
     private static async Task<IResult> DeleteResponseTypeMasterAsync(
         string id,
         IResponseTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +150,20 @@ public static class ResponseTypeMasterEndpoints
             return Results.BadRequest(new { message = "Invalid response type master id." });
         }
 
+        var responseTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (responseTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ResponseTypeMaster", responseTypeMaster.TypeId, responseTypeMaster.TypeName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

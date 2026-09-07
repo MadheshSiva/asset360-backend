@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class PermissionMasterEndpoints
     private static async Task<IResult> GetPermissionMasterByIdAsync(
         string id,
         IPermissionMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class PermissionMasterEndpoints
         }
 
         var permissionMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return permissionMaster is null ? Results.NotFound() : Results.Ok(PermissionMasterResponse.FromEntity(permissionMaster));
+        if (permissionMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("PermissionMaster", permissionMaster.PermissionId, permissionMaster.PermissionName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(PermissionMasterResponse.FromEntity(permissionMaster));
     }
 
     private static async Task<IResult> CreatePermissionMasterAsync(
@@ -52,6 +61,7 @@ public static class PermissionMasterEndpoints
         IPermissionMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +86,8 @@ public static class PermissionMasterEndpoints
             request.ToEntity(permissionId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("PermissionMaster", permissionMaster.PermissionId, permissionMaster.PermissionName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/permission-masters/{permissionMaster.Id}", PermissionMasterResponse.FromEntity(permissionMaster));
     }
 
@@ -84,6 +96,7 @@ public static class PermissionMasterEndpoints
         UpdatePermissionMasterRequest request,
         IPermissionMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +128,19 @@ public static class PermissionMasterEndpoints
         request.ApplyTo(permissionMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, permissionMaster, cancellationToken);
-        return updated ? Results.Ok(PermissionMasterResponse.FromEntity(permissionMaster)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("PermissionMaster", permissionMaster.PermissionId, permissionMaster.PermissionName, EventAction.Updated, cancellationToken);
+        return Results.Ok(PermissionMasterResponse.FromEntity(permissionMaster));
     }
 
     private static async Task<IResult> DeletePermissionMasterAsync(
         string id,
         IPermissionMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,19 @@ public static class PermissionMasterEndpoints
             return Results.BadRequest(new { message = "Invalid permission master id." });
         }
 
+        var permissionMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (permissionMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("PermissionMaster", permissionMaster.PermissionId, permissionMaster.PermissionName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

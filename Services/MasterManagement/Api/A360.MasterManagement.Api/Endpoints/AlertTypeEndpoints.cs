@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class AlertTypeEndpoints
     private static async Task<IResult> GetAlertTypeByIdAsync(
         string id,
         IAlertTypeRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class AlertTypeEndpoints
         }
 
         var alertType = await repository.GetByIdAsync(id, cancellationToken);
-        return alertType is null ? Results.NotFound() : Results.Ok(AlertTypeResponse.FromEntity(alertType));
+        if (alertType is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AlertType", alertType.AlertTypeId, alertType.AlertName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(AlertTypeResponse.FromEntity(alertType));
     }
 
     private static async Task<IResult> CreateAlertTypeAsync(
@@ -52,6 +62,7 @@ public static class AlertTypeEndpoints
         IAlertTypeRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class AlertTypeEndpoints
             request.ToEntity(alertTypeId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("AlertType", alertType.AlertTypeId, alertType.AlertName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/alert-types/{alertType.Id}", AlertTypeResponse.FromEntity(alertType));
     }
 
@@ -84,6 +97,7 @@ public static class AlertTypeEndpoints
         UpdateAlertTypeRequest request,
         IAlertTypeRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class AlertTypeEndpoints
         request.ApplyTo(alertType, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, alertType, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("AlertType", alertType.AlertTypeId, alertType.AlertName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(AlertTypeResponse.FromEntity(alertType)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteAlertTypeAsync(
         string id,
         IAlertTypeRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class AlertTypeEndpoints
             return Results.BadRequest(new { message = "Invalid alert type id." });
         }
 
+        var alertType = await repository.GetByIdAsync(id, cancellationToken);
+        if (alertType is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("AlertType", alertType.AlertTypeId, alertType.AlertName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

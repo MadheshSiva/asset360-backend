@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class IssueTypeMasterEndpoints
     private static async Task<IResult> GetIssueTypeMasterByIdAsync(
         string id,
         IIssueTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class IssueTypeMasterEndpoints
         }
 
         var issueTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return issueTypeMaster is null ? Results.NotFound() : Results.Ok(IssueTypeMasterResponse.FromEntity(issueTypeMaster));
+        if (issueTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("IssueTypeMaster", issueTypeMaster.IssueTypeId, issueTypeMaster.IssueTypeName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(IssueTypeMasterResponse.FromEntity(issueTypeMaster));
     }
 
     private static async Task<IResult> CreateIssueTypeMasterAsync(
@@ -52,6 +62,7 @@ public static class IssueTypeMasterEndpoints
         IIssueTypeMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class IssueTypeMasterEndpoints
             request.ToEntity(issueTypeId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("IssueTypeMaster", issueTypeMaster.IssueTypeId, issueTypeMaster.IssueTypeName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/issue-type-masters/{issueTypeMaster.Id}", IssueTypeMasterResponse.FromEntity(issueTypeMaster));
     }
 
@@ -84,6 +97,7 @@ public static class IssueTypeMasterEndpoints
         UpdateIssueTypeMasterRequest request,
         IIssueTypeMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class IssueTypeMasterEndpoints
         request.ApplyTo(issueTypeMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, issueTypeMaster, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("IssueTypeMaster", issueTypeMaster.IssueTypeId, issueTypeMaster.IssueTypeName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(IssueTypeMasterResponse.FromEntity(issueTypeMaster)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteIssueTypeMasterAsync(
         string id,
         IIssueTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class IssueTypeMasterEndpoints
             return Results.BadRequest(new { message = "Invalid issue type id." });
         }
 
+        var issueTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (issueTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("IssueTypeMaster", issueTypeMaster.IssueTypeId, issueTypeMaster.IssueTypeName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

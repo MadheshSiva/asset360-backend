@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Settings;
 using A360.UserAccount.Api.Security;
@@ -29,6 +30,11 @@ public static class UserAccountServiceCollectionExtensions
         });
 
         services.AddSingleton<PasswordHashingService>();
+
+        services.AddScoped<EventLogRepository>();
+        services.AddScoped<IEventLogRepository>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IEventLogger>(serviceProvider => new EventLogger(serviceProvider.GetRequiredService<IEventLogRepository>(), "UserAccount"));
 
         services.AddScoped<UserRepository>();
         services.AddScoped<IUserRepository>(serviceProvider => serviceProvider.GetRequiredService<UserRepository>());

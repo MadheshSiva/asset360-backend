@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class ShiftMasterEndpoints
     private static async Task<IResult> GetShiftMasterByIdAsync(
         string id,
         IShiftMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ShiftMasterEndpoints
         }
 
         var shiftMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return shiftMaster is null ? Results.NotFound() : Results.Ok(ShiftMasterResponse.FromEntity(shiftMaster));
+        if (shiftMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ShiftMaster", shiftMaster.ShiftId, shiftMaster.ShiftName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ShiftMasterResponse.FromEntity(shiftMaster));
     }
 
     private static async Task<IResult> CreateShiftMasterAsync(
@@ -52,6 +62,7 @@ public static class ShiftMasterEndpoints
         IShiftMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class ShiftMasterEndpoints
             request.ToEntity(shiftId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("ShiftMaster", shiftMaster.ShiftId, shiftMaster.ShiftName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/shift-masters/{shiftMaster.Id}", ShiftMasterResponse.FromEntity(shiftMaster));
     }
 
@@ -84,6 +97,7 @@ public static class ShiftMasterEndpoints
         UpdateShiftMasterRequest request,
         IShiftMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,20 @@ public static class ShiftMasterEndpoints
         request.ApplyTo(shiftMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, shiftMaster, cancellationToken);
-        return updated ? Results.Ok(ShiftMasterResponse.FromEntity(shiftMaster)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ShiftMaster", shiftMaster.ShiftId, shiftMaster.ShiftName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(ShiftMasterResponse.FromEntity(shiftMaster));
     }
 
     private static async Task<IResult> DeleteShiftMasterAsync(
         string id,
         IShiftMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +150,20 @@ public static class ShiftMasterEndpoints
             return Results.BadRequest(new { message = "Invalid shift master id." });
         }
 
+        var shiftMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (shiftMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ShiftMaster", shiftMaster.ShiftId, shiftMaster.ShiftName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

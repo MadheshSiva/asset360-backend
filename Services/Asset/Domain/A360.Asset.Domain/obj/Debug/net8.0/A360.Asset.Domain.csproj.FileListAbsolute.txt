@@ -13,3 +13,4 @@
 /home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/refint/A360.Asset.Domain.dll
 /home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.pdb
 /home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/ref/A360.Asset.Domain.dll
+/home/piq1/People3601/People360/src/Services/Asset/Domain/A360.Asset.Domain/obj/Debug/net8.0/A360.Asset.Domain.sourcelink.json

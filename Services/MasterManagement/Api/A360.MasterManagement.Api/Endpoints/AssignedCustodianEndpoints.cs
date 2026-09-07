@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class AssignedCustodianEndpoints
     private static async Task<IResult> GetAssignedCustodianByIdAsync(
         string id,
         IAssignedCustodianRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class AssignedCustodianEndpoints
         }
 
         var assignedCustodian = await repository.GetByIdAsync(id, cancellationToken);
-        return assignedCustodian is null ? Results.NotFound() : Results.Ok(AssignedCustodianResponse.FromEntity(assignedCustodian));
+        if (assignedCustodian is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssignedCustodian", assignedCustodian.AssignedCustodianId, assignedCustodian.Name, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(AssignedCustodianResponse.FromEntity(assignedCustodian));
     }
 
     private static async Task<IResult> CreateAssignedCustodianAsync(
@@ -52,6 +62,7 @@ public static class AssignedCustodianEndpoints
         IAssignedCustodianRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class AssignedCustodianEndpoints
             request.ToEntity(assignedCustodianId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("AssignedCustodian", assignedCustodian.AssignedCustodianId, assignedCustodian.Name, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/assigned-custodians/{assignedCustodian.Id}", AssignedCustodianResponse.FromEntity(assignedCustodian));
     }
 
@@ -84,6 +97,7 @@ public static class AssignedCustodianEndpoints
         UpdateAssignedCustodianRequest request,
         IAssignedCustodianRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class AssignedCustodianEndpoints
         request.ApplyTo(assignedCustodian, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, assignedCustodian, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("AssignedCustodian", assignedCustodian.AssignedCustodianId, assignedCustodian.Name, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(AssignedCustodianResponse.FromEntity(assignedCustodian)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteAssignedCustodianAsync(
         string id,
         IAssignedCustodianRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class AssignedCustodianEndpoints
             return Results.BadRequest(new { message = "Invalid assigned custodian id." });
         }
 
+        var assignedCustodian = await repository.GetByIdAsync(id, cancellationToken);
+        if (assignedCustodian is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("AssignedCustodian", assignedCustodian.AssignedCustodianId, assignedCustodian.Name, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

@@ -1,3 +1,5 @@
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.UserAccount.Api.Contracts;
 using A360.UserAccount.Api.Validation;
@@ -46,6 +48,7 @@ public static class RoleEndpoints
     private static async Task<IResult> GetRoleByIdAsync(
         string id,
         IRoleRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -54,12 +57,19 @@ public static class RoleEndpoints
         }
 
         var role = await repository.GetByIdAsync(id, cancellationToken);
-        return role is null ? Results.NotFound() : Results.Ok(RoleResponse.FromEntity(role));
+        if (role is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Role", role.Id, role.RoleName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(RoleResponse.FromEntity(role));
     }
 
     private static async Task<IResult> CreateRoleAsync(
         CreateRoleRequest request,
         IRoleRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -69,6 +79,7 @@ public static class RoleEndpoints
         }
 
         var role = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+        await eventLogger.LogAsync("Role", role.Id, role.RoleName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/roles/{role.Id}", RoleResponse.FromEntity(role));
     }
 
@@ -76,6 +87,7 @@ public static class RoleEndpoints
         string id,
         UpdateRoleRequest request,
         IRoleRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -98,12 +110,19 @@ public static class RoleEndpoints
         request.ApplyTo(role);
 
         var updated = await repository.UpdateAsync(id, role, cancellationToken);
-        return updated ? Results.Ok(RoleResponse.FromEntity(role)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Role", role.Id, role.RoleName, EventAction.Updated, cancellationToken);
+        return Results.Ok(RoleResponse.FromEntity(role));
     }
 
     private static async Task<IResult> DeleteRoleAsync(
         string id,
         IRoleRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -111,7 +130,19 @@ public static class RoleEndpoints
             return Results.BadRequest(new { message = "Invalid role id." });
         }
 
+        var role = await repository.GetByIdAsync(id, cancellationToken);
+        if (role is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Role", role.Id, role.RoleName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

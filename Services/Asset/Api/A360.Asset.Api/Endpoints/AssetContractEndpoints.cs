@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetContractEndpoints
     private static async Task<IResult> GetAssetContractByIdAsync(
         string id,
         IAssetContractRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetContractEndpoints
         }
 
         var contract = await repository.GetByIdAsync(id, cancellationToken);
-        return contract is null ? Results.NotFound() : Results.Ok(AssetContractResponse.FromEntity(contract));
+        if (contract is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetContract", contract.ContractId, contract.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetContractResponse.FromEntity(contract));
     }
 
     private static async Task<IResult> GetAssetContractsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetContractEndpoints
         CreateAssetContractRequest request,
         IAssetContractRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetContractEndpoints
         var contractId = $"{ContractIdPrefix}{nextSequence:D6}";
 
         var contract = await repository.CreateAsync(request.ToEntity(contractId), cancellationToken);
+        await eventLogger.LogAsync("AssetContract", contract.ContractId, contract.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-contracts/{contract.Id}", AssetContractResponse.FromEntity(contract));
     }
 
@@ -79,6 +90,7 @@ public static class AssetContractEndpoints
         string id,
         UpdateAssetContractRequest request,
         IAssetContractRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetContractEndpoints
         request.ApplyTo(contract);
 
         var updated = await repository.UpdateAsync(id, contract, cancellationToken);
-        return updated ? Results.Ok(AssetContractResponse.FromEntity(contract)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetContract", contract.ContractId, contract.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetContractResponse.FromEntity(contract));
     }
 
     private static async Task<IResult> DeleteAssetContractAsync(
         string id,
         IAssetContractRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetContractEndpoints
             return Results.BadRequest(new { message = "Invalid asset contract id." });
         }
 
+        var contract = await repository.GetByIdAsync(id, cancellationToken);
+        if (contract is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetContract", contract.ContractId, contract.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

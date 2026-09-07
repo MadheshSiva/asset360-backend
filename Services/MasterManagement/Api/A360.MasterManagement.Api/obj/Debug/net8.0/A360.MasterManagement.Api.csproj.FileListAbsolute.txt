@@ -49,3 +49,4 @@
 /home/piq1/People3601/People360/src/Services/MasterManagement/Api/A360.MasterManagement.Api/obj/Debug/net8.0/A360.MasterManagement.Api.pdb
 /home/piq1/People3601/People360/src/Services/MasterManagement/Api/A360.MasterManagement.Api/obj/Debug/net8.0/A360.MasterManagement.Api.genruntimeconfig.cache
 /home/piq1/People3601/People360/src/Services/MasterManagement/Api/A360.MasterManagement.Api/obj/Debug/net8.0/ref/A360.MasterManagement.Api.dll
+/home/piq1/People3601/People360/src/Services/MasterManagement/Api/A360.MasterManagement.Api/obj/Debug/net8.0/A360.MasterManagement.Api.sourcelink.json

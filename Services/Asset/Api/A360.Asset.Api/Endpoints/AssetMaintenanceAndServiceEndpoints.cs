@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetMaintenanceAndServiceEndpoints
     private static async Task<IResult> GetAssetMaintenanceAndServiceByIdAsync(
         string id,
         IAssetMaintenanceAndServiceRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetMaintenanceAndServiceEndpoints
         }
 
         var service = await repository.GetByIdAsync(id, cancellationToken);
-        return service is null ? Results.NotFound() : Results.Ok(AssetMaintenanceAndServiceResponse.FromEntity(service));
+        if (service is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetMaintenanceAndService", service.MaintenanceServiceId, service.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetMaintenanceAndServiceResponse.FromEntity(service));
     }
 
     private static async Task<IResult> GetAssetMaintenanceAndServicesByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetMaintenanceAndServiceEndpoints
         CreateAssetMaintenanceAndServiceRequest request,
         IAssetMaintenanceAndServiceRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetMaintenanceAndServiceEndpoints
         var maintenanceServiceId = $"{MaintenanceServiceIdPrefix}{nextSequence:D6}";
 
         var service = await repository.CreateAsync(request.ToEntity(maintenanceServiceId), cancellationToken);
+        await eventLogger.LogAsync("AssetMaintenanceAndService", service.MaintenanceServiceId, service.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-maintenance-and-services/{service.Id}", AssetMaintenanceAndServiceResponse.FromEntity(service));
     }
 
@@ -79,6 +90,7 @@ public static class AssetMaintenanceAndServiceEndpoints
         string id,
         UpdateAssetMaintenanceAndServiceRequest request,
         IAssetMaintenanceAndServiceRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetMaintenanceAndServiceEndpoints
         request.ApplyTo(service);
 
         var updated = await repository.UpdateAsync(id, service, cancellationToken);
-        return updated ? Results.Ok(AssetMaintenanceAndServiceResponse.FromEntity(service)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetMaintenanceAndService", service.MaintenanceServiceId, service.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetMaintenanceAndServiceResponse.FromEntity(service));
     }
 
     private static async Task<IResult> DeleteAssetMaintenanceAndServiceAsync(
         string id,
         IAssetMaintenanceAndServiceRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetMaintenanceAndServiceEndpoints
             return Results.BadRequest(new { message = "Invalid asset maintenance and service id." });
         }
 
+        var service = await repository.GetByIdAsync(id, cancellationToken);
+        if (service is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetMaintenanceAndService", service.MaintenanceServiceId, service.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

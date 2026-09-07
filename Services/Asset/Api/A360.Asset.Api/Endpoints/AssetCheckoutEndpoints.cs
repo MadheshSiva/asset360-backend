@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetCheckoutEndpoints
     private static async Task<IResult> GetAssetCheckoutByIdAsync(
         string id,
         IAssetCheckoutRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetCheckoutEndpoints
         }
 
         var checkout = await repository.GetByIdAsync(id, cancellationToken);
-        return checkout is null ? Results.NotFound() : Results.Ok(AssetCheckoutResponse.FromEntity(checkout));
+        if (checkout is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetCheckout", checkout.CheckoutId, checkout.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetCheckoutResponse.FromEntity(checkout));
     }
 
     private static async Task<IResult> GetAssetCheckoutsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetCheckoutEndpoints
         CreateAssetCheckoutRequest request,
         IAssetCheckoutRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetCheckoutEndpoints
         var checkoutId = $"{CheckoutIdPrefix}{nextSequence:D6}";
 
         var checkout = await repository.CreateAsync(request.ToEntity(checkoutId), cancellationToken);
+        await eventLogger.LogAsync("AssetCheckout", checkout.CheckoutId, checkout.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-checkouts/{checkout.Id}", AssetCheckoutResponse.FromEntity(checkout));
     }
 
@@ -79,6 +90,7 @@ public static class AssetCheckoutEndpoints
         string id,
         UpdateAssetCheckoutRequest request,
         IAssetCheckoutRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetCheckoutEndpoints
         request.ApplyTo(checkout);
 
         var updated = await repository.UpdateAsync(id, checkout, cancellationToken);
-        return updated ? Results.Ok(AssetCheckoutResponse.FromEntity(checkout)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetCheckout", checkout.CheckoutId, checkout.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetCheckoutResponse.FromEntity(checkout));
     }
 
     private static async Task<IResult> DeleteAssetCheckoutAsync(
         string id,
         IAssetCheckoutRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetCheckoutEndpoints
             return Results.BadRequest(new { message = "Invalid asset checkout id." });
         }
 
+        var checkout = await repository.GetByIdAsync(id, cancellationToken);
+        if (checkout is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetCheckout", checkout.CheckoutId, checkout.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

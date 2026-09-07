@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -35,6 +37,7 @@ public static class CostCenterEndpoints
     private static async Task<IResult> GetCostCenterByIdAsync(
         string id,
         ICostCenterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -43,13 +46,21 @@ public static class CostCenterEndpoints
         }
 
         var costCenter = await repository.GetByIdAsync(id, cancellationToken);
-        return costCenter is null ? Results.NotFound() : Results.Ok(CostCenterResponse.FromEntity(costCenter));
+        if (costCenter is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("CostCenter", costCenter.CostCenterId, costCenter.CostCenterName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(CostCenterResponse.FromEntity(costCenter));
     }
 
     private static async Task<IResult> CreateCostCenterAsync(
         CreateCostCenterRequest request,
         ICostCenterRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -65,6 +76,8 @@ public static class CostCenterEndpoints
             request.ToEntity(costCenterId),
             cancellationToken);
 
+        await eventLogger.LogAsync("CostCenter", costCenter.CostCenterId, costCenter.CostCenterName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/cost-centers/{costCenter.Id}", CostCenterResponse.FromEntity(costCenter));
     }
 
@@ -72,6 +85,7 @@ public static class CostCenterEndpoints
         string id,
         UpdateCostCenterRequest request,
         ICostCenterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -94,12 +108,18 @@ public static class CostCenterEndpoints
         request.ApplyTo(costCenter);
 
         var updated = await repository.UpdateAsync(id, costCenter, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("CostCenter", costCenter.CostCenterId, costCenter.CostCenterName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(CostCenterResponse.FromEntity(costCenter)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteCostCenterAsync(
         string id,
         ICostCenterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -107,7 +127,18 @@ public static class CostCenterEndpoints
             return Results.BadRequest(new { message = "Invalid cost center id." });
         }
 
+        var costCenter = await repository.GetByIdAsync(id, cancellationToken);
+        if (costCenter is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("CostCenter", costCenter.CostCenterId, costCenter.CostCenterName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetAuditEndpoints
     private static async Task<IResult> GetAssetAuditByIdAsync(
         string id,
         IAssetAuditRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetAuditEndpoints
         }
 
         var audit = await repository.GetByIdAsync(id, cancellationToken);
-        return audit is null ? Results.NotFound() : Results.Ok(AssetAuditResponse.FromEntity(audit));
+        if (audit is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetAudit", audit.AuditId, audit.AuditName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetAuditResponse.FromEntity(audit));
     }
 
     private static async Task<IResult> GetAssetAuditsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetAuditEndpoints
         CreateAssetAuditRequest request,
         IAssetAuditRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetAuditEndpoints
         var auditId = $"{AuditIdPrefix}{nextSequence:D6}";
 
         var audit = await repository.CreateAsync(request.ToEntity(auditId), cancellationToken);
+        await eventLogger.LogAsync("AssetAudit", audit.AuditId, audit.AuditName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-audits/{audit.Id}", AssetAuditResponse.FromEntity(audit));
     }
 
@@ -79,6 +90,7 @@ public static class AssetAuditEndpoints
         string id,
         UpdateAssetAuditRequest request,
         IAssetAuditRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetAuditEndpoints
         request.ApplyTo(audit);
 
         var updated = await repository.UpdateAsync(id, audit, cancellationToken);
-        return updated ? Results.Ok(AssetAuditResponse.FromEntity(audit)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetAudit", audit.AuditId, audit.AuditName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetAuditResponse.FromEntity(audit));
     }
 
     private static async Task<IResult> DeleteAssetAuditAsync(
         string id,
         IAssetAuditRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetAuditEndpoints
             return Results.BadRequest(new { message = "Invalid asset audit id." });
         }
 
+        var audit = await repository.GetByIdAsync(id, cancellationToken);
+        if (audit is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetAudit", audit.AuditId, audit.AuditName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

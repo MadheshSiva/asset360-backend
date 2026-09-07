@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -35,6 +37,7 @@ public static class DepreciationMethodEndpoints
     private static async Task<IResult> GetDepreciationMethodByIdAsync(
         string id,
         IDepreciationMethodRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -43,13 +46,21 @@ public static class DepreciationMethodEndpoints
         }
 
         var depreciationMethod = await repository.GetByIdAsync(id, cancellationToken);
-        return depreciationMethod is null ? Results.NotFound() : Results.Ok(DepreciationMethodResponse.FromEntity(depreciationMethod));
+        if (depreciationMethod is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("DepreciationMethod", depreciationMethod.MethodId, depreciationMethod.MethodName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(DepreciationMethodResponse.FromEntity(depreciationMethod));
     }
 
     private static async Task<IResult> CreateDepreciationMethodAsync(
         CreateDepreciationMethodRequest request,
         IDepreciationMethodRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -65,6 +76,8 @@ public static class DepreciationMethodEndpoints
             request.ToEntity(methodId),
             cancellationToken);
 
+        await eventLogger.LogAsync("DepreciationMethod", depreciationMethod.MethodId, depreciationMethod.MethodName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/depreciation-methods/{depreciationMethod.Id}", DepreciationMethodResponse.FromEntity(depreciationMethod));
     }
 
@@ -72,6 +85,7 @@ public static class DepreciationMethodEndpoints
         string id,
         UpdateDepreciationMethodRequest request,
         IDepreciationMethodRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -94,12 +108,18 @@ public static class DepreciationMethodEndpoints
         request.ApplyTo(depreciationMethod);
 
         var updated = await repository.UpdateAsync(id, depreciationMethod, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("DepreciationMethod", depreciationMethod.MethodId, depreciationMethod.MethodName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(DepreciationMethodResponse.FromEntity(depreciationMethod)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteDepreciationMethodAsync(
         string id,
         IDepreciationMethodRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -107,7 +127,18 @@ public static class DepreciationMethodEndpoints
             return Results.BadRequest(new { message = "Invalid depreciation method id." });
         }
 
+        var depreciationMethod = await repository.GetByIdAsync(id, cancellationToken);
+        if (depreciationMethod is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("DepreciationMethod", depreciationMethod.MethodId, depreciationMethod.MethodName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

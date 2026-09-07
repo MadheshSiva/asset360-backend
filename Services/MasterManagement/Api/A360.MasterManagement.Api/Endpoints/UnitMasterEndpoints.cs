@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class UnitMasterEndpoints
     private static async Task<IResult> GetUnitMasterByIdAsync(
         string id,
         IUnitMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class UnitMasterEndpoints
         }
 
         var unitMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return unitMaster is null ? Results.NotFound() : Results.Ok(UnitMasterResponse.FromEntity(unitMaster));
+        if (unitMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("UnitMaster", unitMaster.UnitId, unitMaster.UnitName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(UnitMasterResponse.FromEntity(unitMaster));
     }
 
     private static async Task<IResult> CreateUnitMasterAsync(
@@ -52,6 +62,7 @@ public static class UnitMasterEndpoints
         IUnitMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class UnitMasterEndpoints
             request.ToEntity(unitId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("UnitMaster", unitMaster.UnitId, unitMaster.UnitName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/unit-masters/{unitMaster.Id}", UnitMasterResponse.FromEntity(unitMaster));
     }
 
@@ -84,6 +97,7 @@ public static class UnitMasterEndpoints
         UpdateUnitMasterRequest request,
         IUnitMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class UnitMasterEndpoints
         request.ApplyTo(unitMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, unitMaster, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("UnitMaster", unitMaster.UnitId, unitMaster.UnitName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(UnitMasterResponse.FromEntity(unitMaster)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteUnitMasterAsync(
         string id,
         IUnitMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class UnitMasterEndpoints
             return Results.BadRequest(new { message = "Invalid unit id." });
         }
 
+        var unitMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (unitMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("UnitMaster", unitMaster.UnitId, unitMaster.UnitName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

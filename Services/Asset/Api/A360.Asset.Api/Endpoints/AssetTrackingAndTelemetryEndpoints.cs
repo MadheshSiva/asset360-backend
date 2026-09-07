@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetTrackingAndTelemetryEndpoints
     private static async Task<IResult> GetAssetTrackingAndTelemetryByIdAsync(
         string id,
         IAssetTrackingAndTelemetryRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetTrackingAndTelemetryEndpoints
         }
 
         var telemetry = await repository.GetByIdAsync(id, cancellationToken);
-        return telemetry is null ? Results.NotFound() : Results.Ok(AssetTrackingAndTelemetryResponse.FromEntity(telemetry));
+        if (telemetry is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetTrackingAndTelemetry", telemetry.TrackingId, telemetry.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetTrackingAndTelemetryResponse.FromEntity(telemetry));
     }
 
     private static async Task<IResult> GetAssetTrackingAndTelemetriesByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetTrackingAndTelemetryEndpoints
         CreateAssetTrackingAndTelemetryRequest request,
         IAssetTrackingAndTelemetryRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetTrackingAndTelemetryEndpoints
         var trackingId = $"{TrackingIdPrefix}{nextSequence:D6}";
 
         var telemetry = await repository.CreateAsync(request.ToEntity(trackingId), cancellationToken);
+        await eventLogger.LogAsync("AssetTrackingAndTelemetry", telemetry.TrackingId, telemetry.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-tracking-and-telemetry/{telemetry.Id}", AssetTrackingAndTelemetryResponse.FromEntity(telemetry));
     }
 
@@ -79,6 +90,7 @@ public static class AssetTrackingAndTelemetryEndpoints
         string id,
         UpdateAssetTrackingAndTelemetryRequest request,
         IAssetTrackingAndTelemetryRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetTrackingAndTelemetryEndpoints
         request.ApplyTo(telemetry);
 
         var updated = await repository.UpdateAsync(id, telemetry, cancellationToken);
-        return updated ? Results.Ok(AssetTrackingAndTelemetryResponse.FromEntity(telemetry)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetTrackingAndTelemetry", telemetry.TrackingId, telemetry.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetTrackingAndTelemetryResponse.FromEntity(telemetry));
     }
 
     private static async Task<IResult> DeleteAssetTrackingAndTelemetryAsync(
         string id,
         IAssetTrackingAndTelemetryRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetTrackingAndTelemetryEndpoints
             return Results.BadRequest(new { message = "Invalid asset tracking and telemetry id." });
         }
 
+        var telemetry = await repository.GetByIdAsync(id, cancellationToken);
+        if (telemetry is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetTrackingAndTelemetry", telemetry.TrackingId, telemetry.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

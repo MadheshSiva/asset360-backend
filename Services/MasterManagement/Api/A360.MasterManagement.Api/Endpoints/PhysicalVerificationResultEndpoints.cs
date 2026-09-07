@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class PhysicalVerificationResultEndpoints
     private static async Task<IResult> GetPhysicalVerificationResultByIdAsync(
         string id,
         IPhysicalVerificationResultRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class PhysicalVerificationResultEndpoints
         }
 
         var physicalVerificationResult = await repository.GetByIdAsync(id, cancellationToken);
-        return physicalVerificationResult is null ? Results.NotFound() : Results.Ok(PhysicalVerificationResultResponse.FromEntity(physicalVerificationResult));
+        if (physicalVerificationResult is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("PhysicalVerificationResult", physicalVerificationResult.ResultId, physicalVerificationResult.ResultName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(PhysicalVerificationResultResponse.FromEntity(physicalVerificationResult));
     }
 
     private static async Task<IResult> CreatePhysicalVerificationResultAsync(
@@ -52,6 +61,7 @@ public static class PhysicalVerificationResultEndpoints
         IPhysicalVerificationResultRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +86,8 @@ public static class PhysicalVerificationResultEndpoints
             request.ToEntity(resultId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("PhysicalVerificationResult", physicalVerificationResult.ResultId, physicalVerificationResult.ResultName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/physical-verification-results/{physicalVerificationResult.Id}", PhysicalVerificationResultResponse.FromEntity(physicalVerificationResult));
     }
 
@@ -84,6 +96,7 @@ public static class PhysicalVerificationResultEndpoints
         UpdatePhysicalVerificationResultRequest request,
         IPhysicalVerificationResultRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +128,19 @@ public static class PhysicalVerificationResultEndpoints
         request.ApplyTo(physicalVerificationResult, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, physicalVerificationResult, cancellationToken);
-        return updated ? Results.Ok(PhysicalVerificationResultResponse.FromEntity(physicalVerificationResult)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("PhysicalVerificationResult", physicalVerificationResult.ResultId, physicalVerificationResult.ResultName, EventAction.Updated, cancellationToken);
+        return Results.Ok(PhysicalVerificationResultResponse.FromEntity(physicalVerificationResult));
     }
 
     private static async Task<IResult> DeletePhysicalVerificationResultAsync(
         string id,
         IPhysicalVerificationResultRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,19 @@ public static class PhysicalVerificationResultEndpoints
             return Results.BadRequest(new { message = "Invalid physical verification result id." });
         }
 
+        var physicalVerificationResult = await repository.GetByIdAsync(id, cancellationToken);
+        if (physicalVerificationResult is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("PhysicalVerificationResult", physicalVerificationResult.ResultId, physicalVerificationResult.ResultName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

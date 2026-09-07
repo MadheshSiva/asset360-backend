@@ -1,6 +1,7 @@
 
 using MongoDB.Driver;
 using A360.Devices.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Settings;
 
@@ -38,6 +39,13 @@ public static class DeviceServiceCollectionExtensions
             return client.GetDatabase(
                 mongoDbSettings.DatabaseName);
         });
+
+        // Event Log Repository Registration
+
+        services.AddScoped<EventLogRepository>();
+        services.AddScoped<IEventLogRepository>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IEventLogger>(serviceProvider => new EventLogger(serviceProvider.GetRequiredService<IEventLogRepository>(), "Device"));
 
         // Device Repository Registration
 

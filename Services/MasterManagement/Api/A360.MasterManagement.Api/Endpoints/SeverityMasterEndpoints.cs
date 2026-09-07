@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class SeverityMasterEndpoints
     private static async Task<IResult> GetSeverityMasterByIdAsync(
         string id,
         ISeverityMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class SeverityMasterEndpoints
         }
 
         var severityMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return severityMaster is null ? Results.NotFound() : Results.Ok(SeverityMasterResponse.FromEntity(severityMaster));
+        if (severityMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("SeverityMaster", severityMaster.SeverityId, severityMaster.SeverityName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(SeverityMasterResponse.FromEntity(severityMaster));
     }
 
     private static async Task<IResult> CreateSeverityMasterAsync(
@@ -52,6 +62,7 @@ public static class SeverityMasterEndpoints
         ISeverityMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class SeverityMasterEndpoints
             request.ToEntity(severityId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("SeverityMaster", severityMaster.SeverityId, severityMaster.SeverityName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/severity-masters/{severityMaster.Id}", SeverityMasterResponse.FromEntity(severityMaster));
     }
 
@@ -84,6 +97,7 @@ public static class SeverityMasterEndpoints
         UpdateSeverityMasterRequest request,
         ISeverityMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,20 @@ public static class SeverityMasterEndpoints
         request.ApplyTo(severityMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, severityMaster, cancellationToken);
-        return updated ? Results.Ok(SeverityMasterResponse.FromEntity(severityMaster)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("SeverityMaster", severityMaster.SeverityId, severityMaster.SeverityName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(SeverityMasterResponse.FromEntity(severityMaster));
     }
 
     private static async Task<IResult> DeleteSeverityMasterAsync(
         string id,
         ISeverityMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +150,20 @@ public static class SeverityMasterEndpoints
             return Results.BadRequest(new { message = "Invalid severity id." });
         }
 
+        var severityMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (severityMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("SeverityMaster", severityMaster.SeverityId, severityMaster.SeverityName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

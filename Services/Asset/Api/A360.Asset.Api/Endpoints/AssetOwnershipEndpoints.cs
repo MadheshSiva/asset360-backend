@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetOwnershipEndpoints
     private static async Task<IResult> GetAssetOwnershipByIdAsync(
         string id,
         IAssetOwnershipRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetOwnershipEndpoints
         }
 
         var ownership = await repository.GetByIdAsync(id, cancellationToken);
-        return ownership is null ? Results.NotFound() : Results.Ok(AssetOwnershipResponse.FromEntity(ownership));
+        if (ownership is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetOwnership", ownership.OwnershipId, ownership.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetOwnershipResponse.FromEntity(ownership));
     }
 
     private static async Task<IResult> GetAssetOwnershipsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetOwnershipEndpoints
         CreateAssetOwnershipRequest request,
         IAssetOwnershipRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetOwnershipEndpoints
         var ownershipId = $"{OwnershipIdPrefix}{nextSequence:D6}";
 
         var ownership = await repository.CreateAsync(request.ToEntity(ownershipId), cancellationToken);
+        await eventLogger.LogAsync("AssetOwnership", ownership.OwnershipId, ownership.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-ownerships/{ownership.Id}", AssetOwnershipResponse.FromEntity(ownership));
     }
 
@@ -79,6 +90,7 @@ public static class AssetOwnershipEndpoints
         string id,
         UpdateAssetOwnershipRequest request,
         IAssetOwnershipRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetOwnershipEndpoints
         request.ApplyTo(ownership);
 
         var updated = await repository.UpdateAsync(id, ownership, cancellationToken);
-        return updated ? Results.Ok(AssetOwnershipResponse.FromEntity(ownership)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetOwnership", ownership.OwnershipId, ownership.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetOwnershipResponse.FromEntity(ownership));
     }
 
     private static async Task<IResult> DeleteAssetOwnershipAsync(
         string id,
         IAssetOwnershipRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetOwnershipEndpoints
             return Results.BadRequest(new { message = "Invalid asset ownership id." });
         }
 
+        var ownership = await repository.GetByIdAsync(id, cancellationToken);
+        if (ownership is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetOwnership", ownership.OwnershipId, ownership.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class ResourceTypeEndpoints
     private static async Task<IResult> GetResourceTypeByIdAsync(
         string id,
         IResourceTypeRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ResourceTypeEndpoints
         }
 
         var resourceType = await repository.GetByIdAsync(id, cancellationToken);
-        return resourceType is null ? Results.NotFound() : Results.Ok(ResourceTypeResponse.FromEntity(resourceType));
+        if (resourceType is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ResourceType", resourceType.TypeId, resourceType.TypeName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ResourceTypeResponse.FromEntity(resourceType));
     }
 
     private static async Task<IResult> CreateResourceTypeAsync(
@@ -52,6 +62,7 @@ public static class ResourceTypeEndpoints
         IResourceTypeRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class ResourceTypeEndpoints
             request.ToEntity(typeId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("ResourceType", resourceType.TypeId, resourceType.TypeName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/resource-types/{resourceType.Id}", ResourceTypeResponse.FromEntity(resourceType));
     }
 
@@ -84,6 +97,7 @@ public static class ResourceTypeEndpoints
         UpdateResourceTypeRequest request,
         IResourceTypeRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,20 @@ public static class ResourceTypeEndpoints
         request.ApplyTo(resourceType, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, resourceType, cancellationToken);
-        return updated ? Results.Ok(ResourceTypeResponse.FromEntity(resourceType)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ResourceType", resourceType.TypeId, resourceType.TypeName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(ResourceTypeResponse.FromEntity(resourceType));
     }
 
     private static async Task<IResult> DeleteResourceTypeAsync(
         string id,
         IResourceTypeRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +150,20 @@ public static class ResourceTypeEndpoints
             return Results.BadRequest(new { message = "Invalid resource type id." });
         }
 
+        var resourceType = await repository.GetByIdAsync(id, cancellationToken);
+        if (resourceType is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ResourceType", resourceType.TypeId, resourceType.TypeName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class ResolutionStatusEndpoints
     private static async Task<IResult> GetResolutionStatusByIdAsync(
         string id,
         IResolutionStatusRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ResolutionStatusEndpoints
         }
 
         var resolutionStatus = await repository.GetByIdAsync(id, cancellationToken);
-        return resolutionStatus is null ? Results.NotFound() : Results.Ok(ResolutionStatusResponse.FromEntity(resolutionStatus));
+        if (resolutionStatus is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ResolutionStatus", resolutionStatus.StatusId, resolutionStatus.StatusName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ResolutionStatusResponse.FromEntity(resolutionStatus));
     }
 
     private static async Task<IResult> CreateResolutionStatusAsync(
@@ -52,6 +62,7 @@ public static class ResolutionStatusEndpoints
         IResolutionStatusRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class ResolutionStatusEndpoints
             request.ToEntity(statusId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("ResolutionStatus", resolutionStatus.StatusId, resolutionStatus.StatusName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/resolution-statuses/{resolutionStatus.Id}", ResolutionStatusResponse.FromEntity(resolutionStatus));
     }
 
@@ -84,6 +97,7 @@ public static class ResolutionStatusEndpoints
         UpdateResolutionStatusRequest request,
         IResolutionStatusRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,20 @@ public static class ResolutionStatusEndpoints
         request.ApplyTo(resolutionStatus, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, resolutionStatus, cancellationToken);
-        return updated ? Results.Ok(ResolutionStatusResponse.FromEntity(resolutionStatus)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ResolutionStatus", resolutionStatus.StatusId, resolutionStatus.StatusName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(ResolutionStatusResponse.FromEntity(resolutionStatus));
     }
 
     private static async Task<IResult> DeleteResolutionStatusAsync(
         string id,
         IResolutionStatusRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +150,20 @@ public static class ResolutionStatusEndpoints
             return Results.BadRequest(new { message = "Invalid resolution status id." });
         }
 
+        var resolutionStatus = await repository.GetByIdAsync(id, cancellationToken);
+        if (resolutionStatus is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ResolutionStatus", resolutionStatus.StatusId, resolutionStatus.StatusName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

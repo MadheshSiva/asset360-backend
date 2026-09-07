@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class PriorityEndpoints
     private static async Task<IResult> GetPriorityByIdAsync(
         string id,
         IPriorityRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class PriorityEndpoints
         }
 
         var priority = await repository.GetByIdAsync(id, cancellationToken);
-        return priority is null ? Results.NotFound() : Results.Ok(PriorityResponse.FromEntity(priority));
+        if (priority is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Priority", priority.PriorityId, priority.PriorityName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(PriorityResponse.FromEntity(priority));
     }
 
     private static async Task<IResult> CreatePriorityAsync(
@@ -52,6 +61,7 @@ public static class PriorityEndpoints
         IPriorityRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +86,8 @@ public static class PriorityEndpoints
             request.ToEntity(priorityId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("Priority", priority.PriorityId, priority.PriorityName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/priorities/{priority.Id}", PriorityResponse.FromEntity(priority));
     }
 
@@ -84,6 +96,7 @@ public static class PriorityEndpoints
         UpdatePriorityRequest request,
         IPriorityRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +128,19 @@ public static class PriorityEndpoints
         request.ApplyTo(priority, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, priority, cancellationToken);
-        return updated ? Results.Ok(PriorityResponse.FromEntity(priority)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Priority", priority.PriorityId, priority.PriorityName, EventAction.Updated, cancellationToken);
+        return Results.Ok(PriorityResponse.FromEntity(priority));
     }
 
     private static async Task<IResult> DeletePriorityAsync(
         string id,
         IPriorityRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,19 @@ public static class PriorityEndpoints
             return Results.BadRequest(new { message = "Invalid priority id." });
         }
 
+        var priority = await repository.GetByIdAsync(id, cancellationToken);
+        if (priority is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Priority", priority.PriorityId, priority.PriorityName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

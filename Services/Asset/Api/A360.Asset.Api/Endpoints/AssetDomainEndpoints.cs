@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -36,6 +38,7 @@ public static class AssetDomainEndpoints
     private static async Task<IResult> GetAssetDomainByIdAsync(
         string id,
         IAssetDomainRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class AssetDomainEndpoints
         }
 
         var record = await repository.GetByIdAsync(id, cancellationToken);
-        return record is null ? Results.NotFound() : Results.Ok(AssetDomainResponse.FromEntity(record));
+        if (record is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetDomain", record.AssetDomainId, record.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetDomainResponse.FromEntity(record));
     }
 
     private static async Task<IResult> GetAssetDomainsByAssetIdAsync(
@@ -60,6 +69,7 @@ public static class AssetDomainEndpoints
         CreateAssetDomainRequest request,
         IAssetDomainRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -72,6 +82,7 @@ public static class AssetDomainEndpoints
         var assetDomainId = $"{AssetDomainIdPrefix}{nextSequence:D6}";
 
         var record = await repository.CreateAsync(request.ToEntity(assetDomainId), cancellationToken);
+        await eventLogger.LogAsync("AssetDomain", record.AssetDomainId, record.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/asset-domains/{record.Id}", AssetDomainResponse.FromEntity(record));
     }
 
@@ -79,6 +90,7 @@ public static class AssetDomainEndpoints
         string id,
         UpdateAssetDomainRequest request,
         IAssetDomainRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -101,12 +113,19 @@ public static class AssetDomainEndpoints
         request.ApplyTo(record);
 
         var updated = await repository.UpdateAsync(id, record, cancellationToken);
-        return updated ? Results.Ok(AssetDomainResponse.FromEntity(record)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetDomain", record.AssetDomainId, record.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetDomainResponse.FromEntity(record));
     }
 
     private static async Task<IResult> DeleteAssetDomainAsync(
         string id,
         IAssetDomainRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -114,7 +133,19 @@ public static class AssetDomainEndpoints
             return Results.BadRequest(new { message = "Invalid asset domain id." });
         }
 
+        var record = await repository.GetByIdAsync(id, cancellationToken);
+        if (record is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("AssetDomain", record.AssetDomainId, record.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

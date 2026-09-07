@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class PermitTypeMasterEndpoints
     private static async Task<IResult> GetPermitTypeMasterByIdAsync(
         string id,
         IPermitTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,13 @@ public static class PermitTypeMasterEndpoints
         }
 
         var permitTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return permitTypeMaster is null ? Results.NotFound() : Results.Ok(PermitTypeMasterResponse.FromEntity(permitTypeMaster));
+        if (permitTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("PermitTypeMaster", permitTypeMaster.PermitTypeId, permitTypeMaster.PermitName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(PermitTypeMasterResponse.FromEntity(permitTypeMaster));
     }
 
     private static async Task<IResult> CreatePermitTypeMasterAsync(
@@ -52,6 +61,7 @@ public static class PermitTypeMasterEndpoints
         IPermitTypeMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +86,8 @@ public static class PermitTypeMasterEndpoints
             request.ToEntity(permitTypeId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("PermitTypeMaster", permitTypeMaster.PermitTypeId, permitTypeMaster.PermitName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/permit-type-masters/{permitTypeMaster.Id}", PermitTypeMasterResponse.FromEntity(permitTypeMaster));
     }
 
@@ -84,6 +96,7 @@ public static class PermitTypeMasterEndpoints
         UpdatePermitTypeMasterRequest request,
         IPermitTypeMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +128,19 @@ public static class PermitTypeMasterEndpoints
         request.ApplyTo(permitTypeMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, permitTypeMaster, cancellationToken);
-        return updated ? Results.Ok(PermitTypeMasterResponse.FromEntity(permitTypeMaster)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("PermitTypeMaster", permitTypeMaster.PermitTypeId, permitTypeMaster.PermitName, EventAction.Updated, cancellationToken);
+        return Results.Ok(PermitTypeMasterResponse.FromEntity(permitTypeMaster));
     }
 
     private static async Task<IResult> DeletePermitTypeMasterAsync(
         string id,
         IPermitTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,19 @@ public static class PermitTypeMasterEndpoints
             return Results.BadRequest(new { message = "Invalid permit type id." });
         }
 
+        var permitTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (permitTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("PermitTypeMaster", permitTypeMaster.PermitTypeId, permitTypeMaster.PermitName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

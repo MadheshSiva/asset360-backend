@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.Project.Api.Contracts;
 using A360.Project.Api.Validation;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Project.Api.Endpoints;
@@ -31,6 +33,7 @@ public static class ZoneMappingEndpoints
     private static async Task<IResult> GetZoneMappingByIdAsync(
         string id,
         IZoneMappingRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -39,7 +42,14 @@ public static class ZoneMappingEndpoints
         }
 
         var zoneMapping = await repository.GetByIdAsync(id, cancellationToken);
-        return zoneMapping is null ? Results.NotFound() : Results.Ok(ZoneMappingResponse.FromEntity(zoneMapping));
+        if (zoneMapping is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ZoneMapping", zoneMapping.Id, zoneMapping.ZoneName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ZoneMappingResponse.FromEntity(zoneMapping));
     }
 
     private static async Task<IResult> CreateZoneMappingAsync(
@@ -52,6 +62,7 @@ public static class ZoneMappingEndpoints
         IBuildingRepository buildingRepository,
         IFloorRepository floorRepository,
         IZoneRepository zoneRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -75,6 +86,9 @@ public static class ZoneMappingEndpoints
         }
 
         var zoneMapping = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+
+        await eventLogger.LogAsync("ZoneMapping", zoneMapping.Id, zoneMapping.ZoneName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/zone-mappings/{zoneMapping.Id}", ZoneMappingResponse.FromEntity(zoneMapping));
     }
 
@@ -82,6 +96,7 @@ public static class ZoneMappingEndpoints
         string id,
         UpdateZoneMappingRequest request,
         IZoneMappingRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -104,12 +119,20 @@ public static class ZoneMappingEndpoints
         request.ApplyTo(zoneMapping);
 
         var updated = await repository.UpdateAsync(id, zoneMapping, cancellationToken);
-        return updated ? Results.Ok(ZoneMappingResponse.FromEntity(zoneMapping)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ZoneMapping", zoneMapping.Id, zoneMapping.ZoneName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(ZoneMappingResponse.FromEntity(zoneMapping));
     }
 
     private static async Task<IResult> DeleteZoneMappingAsync(
         string id,
         IZoneMappingRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -117,7 +140,20 @@ public static class ZoneMappingEndpoints
             return Results.BadRequest(new { message = "Invalid zone mapping id." });
         }
 
+        var zoneMapping = await repository.GetByIdAsync(id, cancellationToken);
+        if (zoneMapping is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ZoneMapping", zoneMapping.Id, zoneMapping.ZoneName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

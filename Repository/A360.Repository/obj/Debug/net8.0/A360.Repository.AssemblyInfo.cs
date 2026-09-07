@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("A360.Repository")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+07994bee36ef3548b51c603c82df34ce48f75332")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+48db65bc73dd408f4b175371c716de6511ae7e25")]
 [assembly: System.Reflection.AssemblyProductAttribute("A360.Repository")]
 [assembly: System.Reflection.AssemblyTitleAttribute("A360.Repository")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -3,6 +3,8 @@ using A360.Asset.Api.Validation;
 using A360.Asset.Repository.Repositories;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
+using A360.Domain.Entities;
+using A360.Repository.Activity;
 
 namespace A360.Asset.Api.Endpoints;
 
@@ -35,6 +37,7 @@ public static class AssetEndpoints
     private static async Task<IResult> GetAssetByIdAsync(
         string id,
         IAssetRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -43,13 +46,20 @@ public static class AssetEndpoints
         }
 
         var asset = await repository.GetByIdAsync(id, cancellationToken);
-        return asset is null ? Results.NotFound() : Results.Ok(AssetResponse.FromEntity(asset));
+        if (asset is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Asset", asset.AssetId, asset.AssetName, EventAction.Viewed, cancellationToken);
+        return Results.Ok(AssetResponse.FromEntity(asset));
     }
 
     private static async Task<IResult> CreateAssetAsync(
         CreateAssetRequest request,
         IAssetRepository repository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -62,6 +72,7 @@ public static class AssetEndpoints
         var assetId = $"{AssetIdPrefix}{nextSequence:D6}";
 
         var asset = await repository.CreateAsync(request.ToEntity(assetId), cancellationToken);
+        await eventLogger.LogAsync("Asset", asset.AssetId, asset.AssetName, EventAction.Created, cancellationToken);
         return Results.Created($"/api/assets/{asset.Id}", AssetResponse.FromEntity(asset));
     }
 
@@ -69,6 +80,7 @@ public static class AssetEndpoints
         string id,
         UpdateAssetRequest request,
         IAssetRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -91,12 +103,19 @@ public static class AssetEndpoints
         request.ApplyTo(asset);
 
         var updated = await repository.UpdateAsync(id, asset, cancellationToken);
-        return updated ? Results.Ok(AssetResponse.FromEntity(asset)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Asset", asset.AssetId, asset.AssetName, EventAction.Updated, cancellationToken);
+        return Results.Ok(AssetResponse.FromEntity(asset));
     }
 
     private static async Task<IResult> DeleteAssetAsync(
         string id,
         IAssetRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -104,7 +123,19 @@ public static class AssetEndpoints
             return Results.BadRequest(new { message = "Invalid asset id." });
         }
 
+        var asset = await repository.GetByIdAsync(id, cancellationToken);
+        if (asset is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Asset", asset.AssetId, asset.AssetName, EventAction.Deleted, cancellationToken);
+        return Results.NoContent();
     }
 }

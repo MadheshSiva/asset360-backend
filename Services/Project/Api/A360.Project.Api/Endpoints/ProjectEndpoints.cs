@@ -1,6 +1,8 @@
+using A360.Domain.Entities;
 using A360.Project.Api.Contracts;
 using A360.Project.Api.Validation;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Project.Api.Endpoints;
@@ -31,6 +33,7 @@ public static class ProjectEndpoints
     private static async Task<IResult> GetProjectByIdAsync(
         string id,
         IProjectRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -39,14 +42,20 @@ public static class ProjectEndpoints
         }
 
         var project = await repository.GetByIdAsync(id, cancellationToken);
-        return project is null
-            ? Results.NotFound()
-            : Results.Ok(ProjectResponse.FromEntity(project));
+        if (project is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Project", project.Id, project.ProjectName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ProjectResponse.FromEntity(project));
     }
 
     private static async Task<IResult> CreateProjectAsync(
         CreateProjectRequest request,
         IProjectRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -57,6 +66,8 @@ public static class ProjectEndpoints
 
         var project = await repository.CreateAsync(request.ToEntity(), cancellationToken);
 
+        await eventLogger.LogAsync("Project", project.Id, project.ProjectName, EventAction.Created, cancellationToken);
+
         return Results.Created(
             $"/api/projects/{project.Id}",
             ProjectResponse.FromEntity(project));
@@ -66,6 +77,7 @@ public static class ProjectEndpoints
         string id,
         UpdateProjectRequest request,
         IProjectRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -88,14 +100,20 @@ public static class ProjectEndpoints
         request.ApplyTo(project);
 
         var updated = await repository.UpdateAsync(id, project, cancellationToken);
-        return updated
-            ? Results.Ok(ProjectResponse.FromEntity(project))
-            : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Project", project.Id, project.ProjectName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(ProjectResponse.FromEntity(project));
     }
 
     private static async Task<IResult> DeleteProjectAsync(
         string id,
         IProjectRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -103,7 +121,20 @@ public static class ProjectEndpoints
             return Results.BadRequest(new { message = "Invalid project id." });
         }
 
+        var project = await repository.GetByIdAsync(id, cancellationToken);
+        if (project is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Project", project.Id, project.ProjectName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

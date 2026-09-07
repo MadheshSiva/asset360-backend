@@ -2,6 +2,7 @@ using MongoDB.Driver;
 using A360.Media.Client;
 using A360.Project.Api.Services;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Settings;
 
@@ -28,6 +29,11 @@ public static class ProjectServiceCollectionExtensions
             var client = serviceProvider.GetRequiredService<IMongoClient>();
             return client.GetDatabase(mongoDbSettings.DatabaseName);
         });
+
+        services.AddScoped<EventLogRepository>();
+        services.AddScoped<IEventLogRepository>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<EventLogRepository>());
+        services.AddScoped<IEventLogger>(serviceProvider => new EventLogger(serviceProvider.GetRequiredService<IEventLogRepository>(), "Project"));
 
         services.AddScoped<ProjectRepository>();
         services.AddScoped<IProjectRepository>(serviceProvider => serviceProvider.GetRequiredService<ProjectRepository>());

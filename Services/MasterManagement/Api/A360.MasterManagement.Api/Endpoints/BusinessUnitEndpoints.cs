@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class BusinessUnitEndpoints
     private static async Task<IResult> GetBusinessUnitByIdAsync(
         string id,
         IBusinessUnitRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class BusinessUnitEndpoints
         }
 
         var businessUnit = await repository.GetByIdAsync(id, cancellationToken);
-        return businessUnit is null ? Results.NotFound() : Results.Ok(BusinessUnitResponse.FromEntity(businessUnit));
+        if (businessUnit is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("BusinessUnit", businessUnit.BusinessUnitCode, businessUnit.BusinessUnitName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(BusinessUnitResponse.FromEntity(businessUnit));
     }
 
     private static async Task<IResult> CreateBusinessUnitAsync(
@@ -53,6 +63,7 @@ public static class BusinessUnitEndpoints
         IAssetRepository assetRepository,
         IOrganizationRepository organizationRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -86,6 +97,8 @@ public static class BusinessUnitEndpoints
             request.ToEntity(businessUnitCode, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("BusinessUnit", businessUnit.BusinessUnitCode, businessUnit.BusinessUnitName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/business-units/{businessUnit.Id}", BusinessUnitResponse.FromEntity(businessUnit));
     }
 
@@ -95,6 +108,7 @@ public static class BusinessUnitEndpoints
         IBusinessUnitRepository repository,
         IAssetRepository assetRepository,
         IOrganizationRepository organizationRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -135,12 +149,18 @@ public static class BusinessUnitEndpoints
         request.ApplyTo(businessUnit, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, businessUnit, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("BusinessUnit", businessUnit.BusinessUnitCode, businessUnit.BusinessUnitName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(BusinessUnitResponse.FromEntity(businessUnit)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteBusinessUnitAsync(
         string id,
         IBusinessUnitRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -148,7 +168,18 @@ public static class BusinessUnitEndpoints
             return Results.BadRequest(new { message = "Invalid business unit id." });
         }
 
+        var businessUnit = await repository.GetByIdAsync(id, cancellationToken);
+        if (businessUnit is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("BusinessUnit", businessUnit.BusinessUnitCode, businessUnit.BusinessUnitName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

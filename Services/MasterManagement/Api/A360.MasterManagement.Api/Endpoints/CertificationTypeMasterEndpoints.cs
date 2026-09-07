@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class CertificationTypeMasterEndpoints
     private static async Task<IResult> GetCertificationTypeMasterByIdAsync(
         string id,
         ICertificationTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class CertificationTypeMasterEndpoints
         }
 
         var certificationTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return certificationTypeMaster is null ? Results.NotFound() : Results.Ok(CertificationTypeMasterResponse.FromEntity(certificationTypeMaster));
+        if (certificationTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("CertificationTypeMaster", certificationTypeMaster.CertificationId, certificationTypeMaster.CertificationName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(CertificationTypeMasterResponse.FromEntity(certificationTypeMaster));
     }
 
     private static async Task<IResult> CreateCertificationTypeMasterAsync(
@@ -52,6 +62,7 @@ public static class CertificationTypeMasterEndpoints
         ICertificationTypeMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class CertificationTypeMasterEndpoints
             request.ToEntity(certificationId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("CertificationTypeMaster", certificationTypeMaster.CertificationId, certificationTypeMaster.CertificationName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/certification-type-masters/{certificationTypeMaster.Id}", CertificationTypeMasterResponse.FromEntity(certificationTypeMaster));
     }
 
@@ -84,6 +97,7 @@ public static class CertificationTypeMasterEndpoints
         UpdateCertificationTypeMasterRequest request,
         ICertificationTypeMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class CertificationTypeMasterEndpoints
         request.ApplyTo(certificationTypeMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, certificationTypeMaster, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("CertificationTypeMaster", certificationTypeMaster.CertificationId, certificationTypeMaster.CertificationName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(CertificationTypeMasterResponse.FromEntity(certificationTypeMaster)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteCertificationTypeMasterAsync(
         string id,
         ICertificationTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class CertificationTypeMasterEndpoints
             return Results.BadRequest(new { message = "Invalid certification type master id." });
         }
 
+        var certificationTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (certificationTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("CertificationTypeMaster", certificationTypeMaster.CertificationId, certificationTypeMaster.CertificationName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class ChecklistTypeMasterEndpoints
     private static async Task<IResult> GetChecklistTypeMasterByIdAsync(
         string id,
         IChecklistTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class ChecklistTypeMasterEndpoints
         }
 
         var checklistTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
-        return checklistTypeMaster is null ? Results.NotFound() : Results.Ok(ChecklistTypeMasterResponse.FromEntity(checklistTypeMaster));
+        if (checklistTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("ChecklistTypeMaster", checklistTypeMaster.TypeId, checklistTypeMaster.TypeName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(ChecklistTypeMasterResponse.FromEntity(checklistTypeMaster));
     }
 
     private static async Task<IResult> CreateChecklistTypeMasterAsync(
@@ -52,6 +62,7 @@ public static class ChecklistTypeMasterEndpoints
         IChecklistTypeMasterRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class ChecklistTypeMasterEndpoints
             request.ToEntity(typeId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("ChecklistTypeMaster", checklistTypeMaster.TypeId, checklistTypeMaster.TypeName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/checklist-type-masters/{checklistTypeMaster.Id}", ChecklistTypeMasterResponse.FromEntity(checklistTypeMaster));
     }
 
@@ -84,6 +97,7 @@ public static class ChecklistTypeMasterEndpoints
         UpdateChecklistTypeMasterRequest request,
         IChecklistTypeMasterRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,18 @@ public static class ChecklistTypeMasterEndpoints
         request.ApplyTo(checklistTypeMaster, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, checklistTypeMaster, cancellationToken);
+        if (updated)
+        {
+            await eventLogger.LogAsync("ChecklistTypeMaster", checklistTypeMaster.TypeId, checklistTypeMaster.TypeName, EventAction.Updated, cancellationToken);
+        }
+
         return updated ? Results.Ok(ChecklistTypeMasterResponse.FromEntity(checklistTypeMaster)) : Results.NotFound();
     }
 
     private static async Task<IResult> DeleteChecklistTypeMasterAsync(
         string id,
         IChecklistTypeMasterRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +148,18 @@ public static class ChecklistTypeMasterEndpoints
             return Results.BadRequest(new { message = "Invalid checklist type master id." });
         }
 
+        var checklistTypeMaster = await repository.GetByIdAsync(id, cancellationToken);
+        if (checklistTypeMaster is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (deleted)
+        {
+            await eventLogger.LogAsync("ChecklistTypeMaster", checklistTypeMaster.TypeId, checklistTypeMaster.TypeName, EventAction.Deleted, cancellationToken);
+        }
+
         return deleted ? Results.NoContent() : Results.NotFound();
     }
 }

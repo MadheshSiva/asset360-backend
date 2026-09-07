@@ -1,7 +1,9 @@
 using A360.Asset.Repository.Repositories;
+using A360.Domain.Entities;
 using A360.MasterManagement.Api.Contracts;
 using A360.MasterManagement.Api.Validation;
 using A360.MasterManagement.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 using A360.Repository.Sequences;
 
@@ -36,6 +38,7 @@ public static class StatusChangeEndpoints
     private static async Task<IResult> GetStatusChangeByIdAsync(
         string id,
         IStatusChangeRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class StatusChangeEndpoints
         }
 
         var statusChange = await repository.GetByIdAsync(id, cancellationToken);
-        return statusChange is null ? Results.NotFound() : Results.Ok(StatusChangeResponse.FromEntity(statusChange));
+        if (statusChange is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("StatusChange", statusChange.StatusChangeId, statusChange.StatusName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(StatusChangeResponse.FromEntity(statusChange));
     }
 
     private static async Task<IResult> CreateStatusChangeAsync(
@@ -52,6 +62,7 @@ public static class StatusChangeEndpoints
         IStatusChangeRepository repository,
         IAssetRepository assetRepository,
         ISequenceGenerator sequenceGenerator,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,8 @@ public static class StatusChangeEndpoints
             request.ToEntity(statusChangeId, asset.AssetName),
             cancellationToken);
 
+        await eventLogger.LogAsync("StatusChange", statusChange.StatusChangeId, statusChange.StatusName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/status-changes/{statusChange.Id}", StatusChangeResponse.FromEntity(statusChange));
     }
 
@@ -84,6 +97,7 @@ public static class StatusChangeEndpoints
         UpdateStatusChangeRequest request,
         IStatusChangeRepository repository,
         IAssetRepository assetRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -115,12 +129,20 @@ public static class StatusChangeEndpoints
         request.ApplyTo(statusChange, asset.AssetName);
 
         var updated = await repository.UpdateAsync(id, statusChange, cancellationToken);
-        return updated ? Results.Ok(StatusChangeResponse.FromEntity(statusChange)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("StatusChange", statusChange.StatusChangeId, statusChange.StatusName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(StatusChangeResponse.FromEntity(statusChange));
     }
 
     private static async Task<IResult> DeleteStatusChangeAsync(
         string id,
         IStatusChangeRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -128,7 +150,20 @@ public static class StatusChangeEndpoints
             return Results.BadRequest(new { message = "Invalid status change id." });
         }
 
+        var statusChange = await repository.GetByIdAsync(id, cancellationToken);
+        if (statusChange is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("StatusChange", statusChange.StatusChangeId, statusChange.StatusName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 }

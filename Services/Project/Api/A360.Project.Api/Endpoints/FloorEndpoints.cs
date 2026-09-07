@@ -1,7 +1,9 @@
+using A360.Domain.Entities;
 using A360.Project.Api.Contracts;
 using A360.Project.Api.Services;
 using A360.Project.Api.Validation;
 using A360.Project.Repository.Repositories;
+using A360.Repository.Activity;
 using A360.Repository.Repositories;
 
 namespace A360.Project.Api.Endpoints;
@@ -36,6 +38,7 @@ public static class FloorEndpoints
     private static async Task<IResult> GetFloorByIdAsync(
         string id,
         IFloorRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -44,7 +47,14 @@ public static class FloorEndpoints
         }
 
         var floor = await repository.GetByIdAsync(id, cancellationToken);
-        return floor is null ? Results.NotFound() : Results.Ok(FloorResponse.FromEntity(floor));
+        if (floor is null)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Floor", floor.Id, floor.FloorName, EventAction.Viewed, cancellationToken);
+
+        return Results.Ok(FloorResponse.FromEntity(floor));
     }
 
     private static async Task<IResult> CreateFloorAsync(
@@ -55,6 +65,7 @@ public static class FloorEndpoints
         IAreaRepository areaRepository,
         IOuterZoneRepository outerZoneRepository,
         IBuildingRepository buildingRepository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         var validationErrors = request.Validate();
@@ -76,6 +87,9 @@ public static class FloorEndpoints
         }
 
         var floor = await repository.CreateAsync(request.ToEntity(), cancellationToken);
+
+        await eventLogger.LogAsync("Floor", floor.Id, floor.FloorName, EventAction.Created, cancellationToken);
+
         return Results.Created($"/api/floors/{floor.Id}", FloorResponse.FromEntity(floor));
     }
 
@@ -83,6 +97,7 @@ public static class FloorEndpoints
         string id,
         UpdateFloorRequest request,
         IFloorRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -105,12 +120,20 @@ public static class FloorEndpoints
         request.ApplyTo(floor);
 
         var updated = await repository.UpdateAsync(id, floor, cancellationToken);
-        return updated ? Results.Ok(FloorResponse.FromEntity(floor)) : Results.NotFound();
+        if (!updated)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Floor", floor.Id, floor.FloorName, EventAction.Updated, cancellationToken);
+
+        return Results.Ok(FloorResponse.FromEntity(floor));
     }
 
     private static async Task<IResult> DeleteFloorAsync(
         string id,
         IFloorRepository repository,
+        IEventLogger eventLogger,
         CancellationToken cancellationToken)
     {
         if (!MongoObjectId.IsValid(id))
@@ -118,8 +141,21 @@ public static class FloorEndpoints
             return Results.BadRequest(new { message = "Invalid floor id." });
         }
 
+        var floor = await repository.GetByIdAsync(id, cancellationToken);
+        if (floor is null)
+        {
+            return Results.NotFound();
+        }
+
         var deleted = await repository.DeleteAsync(id, cancellationToken);
-        return deleted ? Results.NoContent() : Results.NotFound();
+        if (!deleted)
+        {
+            return Results.NotFound();
+        }
+
+        await eventLogger.LogAsync("Floor", floor.Id, floor.FloorName, EventAction.Deleted, cancellationToken);
+
+        return Results.NoContent();
     }
 
     private static async Task<IResult> UploadFloorMapAsync(

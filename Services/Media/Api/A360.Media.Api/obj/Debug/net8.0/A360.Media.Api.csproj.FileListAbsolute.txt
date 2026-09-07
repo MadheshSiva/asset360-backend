@@ -31,3 +31,14 @@
 /home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/obj/Debug/net8.0/A360.Media.Api.pdb
 /home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/obj/Debug/net8.0/A360.Media.Api.genruntimeconfig.cache
 /home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/obj/Debug/net8.0/ref/A360.Media.Api.dll
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/obj/Debug/net8.0/A360.Media.Api.sourcelink.json
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/DnsClient.dll
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/MongoDB.Bson.dll
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/MongoDB.Driver.dll
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/SharpCompress.dll
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/Snappier.dll
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/ZstdSharp.dll
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/A360.Domain.dll
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/A360.Repository.dll
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/A360.Repository.pdb
+/home/piq1/People3601/People360/src/Services/Media/Api/A360.Media.Api/bin/Debug/net8.0/A360.Domain.pdb
