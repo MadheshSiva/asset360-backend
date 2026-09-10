@@ -33,7 +33,7 @@ public sealed class Floor : BaseEntity
     [BsonElement("description")]
     public string Description { get; set; } = string.Empty;
 
-    [BsonElement("status")]
+    [BsonElement("is_active")]
     public new bool Status { get; set; }
 
     [BsonElement("map_path")]

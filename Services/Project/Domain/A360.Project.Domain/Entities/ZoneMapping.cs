@@ -53,7 +53,7 @@ public sealed class ZoneMapping : BaseEntity
     [BsonElement("exit")]
     public string? Exit { get; set; }
 
-    [BsonElement("status")]
+    [BsonElement("is_active")]
     public new bool Status { get; set; }
 
     [BsonElement("zone_colour")]

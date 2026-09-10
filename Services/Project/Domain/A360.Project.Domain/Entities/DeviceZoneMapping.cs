@@ -60,7 +60,7 @@ public sealed class DeviceZoneMapping : BaseEntity
     [BsonElement("exit")]
     public string? Exit { get; set; }
 
-    [BsonElement("status")]
+    [BsonElement("is_active")]
     public new bool Status { get; set; }
 
     [BsonElement("devicegeoJsondata")]

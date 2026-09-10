@@ -32,7 +32,7 @@ public sealed class BuildingRepository : MongoRepository<BuildingEntity>, IBuild
             new CreateIndexModel<BuildingEntity>(
                 Builders<BuildingEntity>.IndexKeys
                     .Ascending(building => building.ClientId)
-                    .Ascending(building => building.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_building_client_status" })
         };
 

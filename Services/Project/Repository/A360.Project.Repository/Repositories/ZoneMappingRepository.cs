@@ -32,7 +32,7 @@ public sealed class ZoneMappingRepository : MongoRepository<ZoneMappingEntity>, 
             new CreateIndexModel<ZoneMappingEntity>(
                 Builders<ZoneMappingEntity>.IndexKeys
                     .Ascending(zoneMapping => zoneMapping.ClientId)
-                    .Ascending(zoneMapping => zoneMapping.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_zonemapping_client_status" })
         };
 

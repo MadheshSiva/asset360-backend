@@ -35,7 +35,7 @@ public sealed class DeviceZoneMappingRepository : MongoRepository<DeviceZoneMapp
             new CreateIndexModel<DeviceZoneMappingEntity>(
                 Builders<DeviceZoneMappingEntity>.IndexKeys
                     .Ascending(deviceZoneMapping => deviceZoneMapping.ClientId)
-                    .Ascending(deviceZoneMapping => deviceZoneMapping.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_devicezonemapping_client_status" })
         };
 

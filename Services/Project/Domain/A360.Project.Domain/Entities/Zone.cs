@@ -49,7 +49,7 @@ public sealed class Zone : BaseEntity
     [BsonElement("exit_point")]
     public bool ExitPoint { get; set; }
 
-    [BsonElement("status")]
+    [BsonElement("is_active")]
     public new bool Status { get; set; }
 
     [BsonElement("Time_Taken_Assemble_point")]

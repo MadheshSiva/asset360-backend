@@ -34,7 +34,7 @@ public sealed class ZoneRepository : MongoRepository<ZoneEntity>, IZoneRepositor
             new CreateIndexModel<ZoneEntity>(
                 Builders<ZoneEntity>.IndexKeys
                     .Ascending(zone => zone.ClientId)
-                    .Ascending(zone => zone.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_zone_client_status" })
         };
 

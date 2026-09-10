@@ -29,6 +29,6 @@ public sealed class Country : BaseEntity
     [BsonElement("longitude")]
     public string Longitude { get; set; } = string.Empty;
 
-    [BsonElement("status")]
+    [BsonElement("is_active")]
     public new bool Status { get; set; }
 }

@@ -34,7 +34,7 @@ public sealed class OuterZone : BaseEntity
     [BsonElement("longitude")]
     public string Longitude { get; set; } = string.Empty;
 
-    [BsonElement("status")]
+    [BsonElement("is_active")]
     public new bool Status { get; set; }
 
     [BsonElement("map_path")]

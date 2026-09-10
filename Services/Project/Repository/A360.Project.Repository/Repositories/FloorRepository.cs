@@ -33,7 +33,7 @@ public sealed class FloorRepository : MongoRepository<FloorEntity>, IFloorReposi
             new CreateIndexModel<FloorEntity>(
                 Builders<FloorEntity>.IndexKeys
                     .Ascending(floor => floor.ClientId)
-                    .Ascending(floor => floor.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_floor_client_status" })
         };
 

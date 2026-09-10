@@ -23,7 +23,7 @@ public sealed class ProjectRepository : MongoRepository<ProjectEntity>, IProject
             new CreateIndexModel<ProjectEntity>(
                 Builders<ProjectEntity>.IndexKeys
                     .Ascending(project => project.ClientId)
-                    .Ascending(project => project.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_projects_client_status" }),
             new CreateIndexModel<ProjectEntity>(
                 Builders<ProjectEntity>.IndexKeys

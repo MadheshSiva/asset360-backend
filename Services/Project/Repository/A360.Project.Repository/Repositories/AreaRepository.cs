@@ -30,7 +30,7 @@ public sealed class AreaRepository : MongoRepository<AreaEntity>, IAreaRepositor
             new CreateIndexModel<AreaEntity>(
                 Builders<AreaEntity>.IndexKeys
                     .Ascending(area => area.ClientId)
-                    .Ascending(area => area.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_area_client_status" })
         };
 

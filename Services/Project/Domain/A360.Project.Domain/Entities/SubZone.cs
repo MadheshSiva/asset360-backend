@@ -53,7 +53,7 @@ public sealed class SubZone : BaseEntity
     [BsonElement("exit")]
     public string Exit { get; set; } = string.Empty;
 
-    [BsonElement("status")]
+    [BsonElement("is_active")]
     public new bool Status { get; set; }
 
     [BsonElement("Time_Taken_Assemble_point")]

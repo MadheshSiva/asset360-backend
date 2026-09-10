@@ -31,7 +31,7 @@ public sealed class OuterZoneRepository : MongoRepository<OuterZoneEntity>, IOut
             new CreateIndexModel<OuterZoneEntity>(
                 Builders<OuterZoneEntity>.IndexKeys
                     .Ascending(outerZone => outerZone.ClientId)
-                    .Ascending(outerZone => outerZone.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_outerzone_client_status" })
         };
 

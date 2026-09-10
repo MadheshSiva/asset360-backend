@@ -28,7 +28,7 @@ public sealed class CountryRepository : MongoRepository<CountryEntity>, ICountry
             new CreateIndexModel<CountryEntity>(
                 Builders<CountryEntity>.IndexKeys
                     .Ascending(country => country.ClientId)
-                    .Ascending(country => country.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_countries_client_status" })
         };
 

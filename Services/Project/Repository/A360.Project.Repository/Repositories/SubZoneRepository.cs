@@ -35,7 +35,7 @@ public sealed class SubZoneRepository : MongoRepository<SubZoneEntity>, ISubZone
             new CreateIndexModel<SubZoneEntity>(
                 Builders<SubZoneEntity>.IndexKeys
                     .Ascending(subZone => subZone.ClientId)
-                    .Ascending(subZone => subZone.Status),
+                    .Ascending("is_active"),
                 new CreateIndexOptions { Name = "ix_subzone_client_status" })
         };
 
