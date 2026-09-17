@@ -12,7 +12,8 @@ public sealed record CreateAssetContractRequest(
     string? VendorContractDocuments,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetContractEntity ToEntity(string contractId)
     {
@@ -30,7 +31,8 @@ public sealed record CreateAssetContractRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -43,7 +45,8 @@ public sealed record UpdateAssetContractRequest(
     string? AmcDetails,
     string? SlaDetails,
     string? VendorContractDocuments,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetContractEntity contract)
     {
@@ -56,6 +59,7 @@ public sealed record UpdateAssetContractRequest(
         contract.VendorContractDocuments = VendorContractDocuments ?? string.Empty;
         contract.UpdatedBy = UpdatedBy;
         contract.UpdatedAt = DateTime.UtcNow;
+        contract.Status = Status;
     }
 }
 
@@ -75,7 +79,8 @@ public sealed record AssetContractResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetContractResponse FromEntity(AssetContractEntity contract)
     {
@@ -95,6 +100,7 @@ public sealed record AssetContractResponse(
             contract.UpdatedAt,
             contract.ClientId,
             contract.TenantId,
-            contract.IsDeleted);
+            contract.IsDeleted,
+            contract.Status);
     }
 }

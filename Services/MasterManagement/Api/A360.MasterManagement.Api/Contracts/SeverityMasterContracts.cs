@@ -8,7 +8,8 @@ public sealed record CreateSeverityMasterRequest(
     string? ColorCode,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public SeverityMasterEntity ToEntity(string severityId, string assetName)
     {
@@ -23,6 +24,7 @@ public sealed record CreateSeverityMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -32,7 +34,8 @@ public sealed record UpdateSeverityMasterRequest(
     string? AssetId,
     string? SeverityName,
     string? ColorCode,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(SeverityMasterEntity severityMaster, string assetName)
     {
@@ -41,6 +44,7 @@ public sealed record UpdateSeverityMasterRequest(
         severityMaster.SeverityName = SeverityName ?? string.Empty;
         severityMaster.ColorCode = ColorCode ?? string.Empty;
         severityMaster.UpdatedBy = UpdatedBy;
+        severityMaster.Status = Status;
         severityMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -58,7 +62,8 @@ public sealed record SeverityMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static SeverityMasterResponse FromEntity(SeverityMasterEntity severityMaster)
     {
@@ -75,6 +80,7 @@ public sealed record SeverityMasterResponse(
             severityMaster.UpdatedAt,
             severityMaster.ClientId,
             severityMaster.TenantId,
-            severityMaster.IsDeleted);
+            severityMaster.IsDeleted,
+            severityMaster.Status);
     }
 }

@@ -9,7 +9,8 @@ public sealed record CreateModuleAccessMasterRequest(
     string? Icon,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public ModuleAccessMasterEntity ToEntity(string moduleId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateModuleAccessMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateModuleAccessMasterRequest(
     string? ModuleName,
     string? RoutePath,
     string? Icon,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ModuleAccessMasterEntity moduleAccessMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateModuleAccessMasterRequest(
         moduleAccessMaster.RoutePath = RoutePath ?? string.Empty;
         moduleAccessMaster.Icon = Icon ?? string.Empty;
         moduleAccessMaster.UpdatedBy = UpdatedBy;
+        moduleAccessMaster.Status = Status;
         moduleAccessMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record ModuleAccessMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static ModuleAccessMasterResponse FromEntity(ModuleAccessMasterEntity moduleAccessMaster)
     {
@@ -81,6 +86,7 @@ public sealed record ModuleAccessMasterResponse(
             moduleAccessMaster.UpdatedAt,
             moduleAccessMaster.ClientId,
             moduleAccessMaster.TenantId,
-            moduleAccessMaster.IsDeleted);
+            moduleAccessMaster.IsDeleted,
+            moduleAccessMaster.Status);
     }
 }

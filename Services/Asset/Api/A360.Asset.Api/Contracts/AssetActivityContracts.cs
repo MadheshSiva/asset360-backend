@@ -11,7 +11,8 @@ public sealed record CreateAssetActivityRequest(
     string? AccessLogs,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetActivityEntity ToEntity(string activityId)
     {
@@ -28,7 +29,8 @@ public sealed record CreateAssetActivityRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -40,7 +42,8 @@ public sealed record UpdateAssetActivityRequest(
     string? ChangesMade,
     string? TimestampLogs,
     string? AccessLogs,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetActivityEntity activity)
     {
@@ -52,6 +55,7 @@ public sealed record UpdateAssetActivityRequest(
         activity.AccessLogs = AccessLogs ?? string.Empty;
         activity.UpdatedBy = UpdatedBy;
         activity.UpdatedAt = DateTime.UtcNow;
+        activity.Status = Status;
     }
 }
 
@@ -70,7 +74,8 @@ public sealed record AssetActivityResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetActivityResponse FromEntity(AssetActivityEntity activity)
     {
@@ -89,6 +94,7 @@ public sealed record AssetActivityResponse(
             activity.UpdatedAt,
             activity.ClientId,
             activity.TenantId,
-            activity.IsDeleted);
+            activity.IsDeleted,
+            activity.Status);
     }
 }

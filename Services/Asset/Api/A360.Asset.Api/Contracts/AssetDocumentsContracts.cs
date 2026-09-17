@@ -12,7 +12,8 @@ public sealed record CreateAssetDocumentsRequest(
     string? ComplianceCertificates,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetDocumentsEntity ToEntity(string documentId)
     {
@@ -30,7 +31,8 @@ public sealed record CreateAssetDocumentsRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -43,7 +45,8 @@ public sealed record UpdateAssetDocumentsRequest(
     string? Manuals,
     string? Images,
     string? ComplianceCertificates,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetDocumentsEntity documents)
     {
@@ -56,6 +59,7 @@ public sealed record UpdateAssetDocumentsRequest(
         documents.ComplianceCertificates = ComplianceCertificates ?? string.Empty;
         documents.UpdatedBy = UpdatedBy;
         documents.UpdatedAt = DateTime.UtcNow;
+        documents.Status = Status;
     }
 }
 
@@ -75,7 +79,8 @@ public sealed record AssetDocumentsResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetDocumentsResponse FromEntity(AssetDocumentsEntity documents)
     {
@@ -95,6 +100,7 @@ public sealed record AssetDocumentsResponse(
             documents.UpdatedAt,
             documents.ClientId,
             documents.TenantId,
-            documents.IsDeleted);
+            documents.IsDeleted,
+            documents.Status);
     }
 }

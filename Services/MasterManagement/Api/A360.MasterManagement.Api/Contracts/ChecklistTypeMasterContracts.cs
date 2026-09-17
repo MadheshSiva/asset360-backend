@@ -9,7 +9,8 @@ public sealed record CreateChecklistTypeMasterRequest(
     bool IsActive,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public ChecklistTypeMasterEntity ToEntity(string typeId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateChecklistTypeMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateChecklistTypeMasterRequest(
     string? TypeName,
     string? ApplicableModule,
     bool IsActive,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ChecklistTypeMasterEntity checklistTypeMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateChecklistTypeMasterRequest(
         checklistTypeMaster.ApplicableModule = ApplicableModule ?? string.Empty;
         checklistTypeMaster.IsActive = IsActive;
         checklistTypeMaster.UpdatedBy = UpdatedBy;
+        checklistTypeMaster.Status = Status;
         checklistTypeMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record ChecklistTypeMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static ChecklistTypeMasterResponse FromEntity(ChecklistTypeMasterEntity checklistTypeMaster)
     {
@@ -81,6 +86,7 @@ public sealed record ChecklistTypeMasterResponse(
             checklistTypeMaster.UpdatedAt,
             checklistTypeMaster.ClientId,
             checklistTypeMaster.TenantId,
-            checklistTypeMaster.IsDeleted);
+            checklistTypeMaster.IsDeleted,
+            checklistTypeMaster.Status);
     }
 }

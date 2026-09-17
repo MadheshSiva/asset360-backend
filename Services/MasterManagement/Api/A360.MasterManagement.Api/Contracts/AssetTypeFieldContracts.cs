@@ -10,7 +10,8 @@ public sealed record CreateAssetTypeFieldRequest(
     bool IsRequired,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetTypeFieldEntity ToEntity(string fieldId, string assetName)
     {
@@ -27,6 +28,7 @@ public sealed record CreateAssetTypeFieldRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -38,7 +40,8 @@ public sealed record UpdateAssetTypeFieldRequest(
     string? FieldName,
     string? FieldType,
     bool IsRequired,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetTypeFieldEntity assetTypeField, string assetName)
     {
@@ -49,6 +52,7 @@ public sealed record UpdateAssetTypeFieldRequest(
         assetTypeField.FieldType = FieldType ?? string.Empty;
         assetTypeField.IsRequired = IsRequired;
         assetTypeField.UpdatedBy = UpdatedBy;
+        assetTypeField.Status = Status;
         assetTypeField.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -68,7 +72,8 @@ public sealed record AssetTypeFieldResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetTypeFieldResponse FromEntity(AssetTypeFieldEntity assetTypeField)
     {
@@ -87,6 +92,7 @@ public sealed record AssetTypeFieldResponse(
             assetTypeField.UpdatedAt,
             assetTypeField.ClientId,
             assetTypeField.TenantId,
-            assetTypeField.IsDeleted);
+            assetTypeField.IsDeleted,
+            assetTypeField.Status);
     }
 }

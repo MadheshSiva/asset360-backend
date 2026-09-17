@@ -9,7 +9,8 @@ public sealed record CreateConditionMasterRequest(
     string? ColorCode,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public ConditionMasterEntity ToEntity(string conditionId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateConditionMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateConditionMasterRequest(
     string? ConditionName,
     double ThresholdValue,
     string? ColorCode,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ConditionMasterEntity conditionMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateConditionMasterRequest(
         conditionMaster.ThresholdValue = ThresholdValue;
         conditionMaster.ColorCode = ColorCode ?? string.Empty;
         conditionMaster.UpdatedBy = UpdatedBy;
+        conditionMaster.Status = Status;
         conditionMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record ConditionMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static ConditionMasterResponse FromEntity(ConditionMasterEntity conditionMaster)
     {
@@ -81,6 +86,7 @@ public sealed record ConditionMasterResponse(
             conditionMaster.UpdatedAt,
             conditionMaster.ClientId,
             conditionMaster.TenantId,
-            conditionMaster.IsDeleted);
+            conditionMaster.IsDeleted,
+            conditionMaster.Status);
     }
 }

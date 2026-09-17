@@ -7,7 +7,8 @@ public sealed record CreateCurrentLocationRequest(
     bool Active,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public CurrentLocationEntity ToEntity(string locationId)
     {
@@ -20,6 +21,7 @@ public sealed record CreateCurrentLocationRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -28,13 +30,15 @@ public sealed record CreateCurrentLocationRequest(
 public sealed record UpdateCurrentLocationRequest(
     string? CurrentLocationName,
     bool Active,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(CurrentLocationEntity currentLocation)
     {
         currentLocation.CurrentLocationName = CurrentLocationName ?? string.Empty;
         currentLocation.Active = Active;
         currentLocation.UpdatedBy = UpdatedBy;
+        currentLocation.Status = Status;
         currentLocation.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -50,7 +54,8 @@ public sealed record CurrentLocationResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static CurrentLocationResponse FromEntity(CurrentLocationEntity currentLocation)
     {
@@ -65,6 +70,7 @@ public sealed record CurrentLocationResponse(
             currentLocation.UpdatedAt,
             currentLocation.ClientId,
             currentLocation.TenantId,
-            currentLocation.IsDeleted);
+            currentLocation.IsDeleted,
+            currentLocation.Status);
     }
 }

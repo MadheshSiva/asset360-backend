@@ -8,7 +8,8 @@ public sealed record CreateUpdateSourceMasterRequest(
     string? Description,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public UpdateSourceMasterEntity ToEntity(string sourceId, string assetName)
     {
@@ -23,6 +24,7 @@ public sealed record CreateUpdateSourceMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -32,7 +34,8 @@ public sealed record UpdateUpdateSourceMasterRequest(
     string? AssetId,
     string? SourceName,
     string? Description,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(UpdateSourceMasterEntity updateSourceMaster, string assetName)
     {
@@ -41,6 +44,7 @@ public sealed record UpdateUpdateSourceMasterRequest(
         updateSourceMaster.SourceName = SourceName ?? string.Empty;
         updateSourceMaster.Description = Description ?? string.Empty;
         updateSourceMaster.UpdatedBy = UpdatedBy;
+        updateSourceMaster.Status = Status;
         updateSourceMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -58,7 +62,8 @@ public sealed record UpdateSourceMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static UpdateSourceMasterResponse FromEntity(UpdateSourceMasterEntity updateSourceMaster)
     {
@@ -75,6 +80,7 @@ public sealed record UpdateSourceMasterResponse(
             updateSourceMaster.UpdatedAt,
             updateSourceMaster.ClientId,
             updateSourceMaster.TenantId,
-            updateSourceMaster.IsDeleted);
+            updateSourceMaster.IsDeleted,
+            updateSourceMaster.Status);
     }
 }

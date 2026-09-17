@@ -18,7 +18,8 @@ public sealed record CreateAssetCheckoutRequest(
     string? SubCategory,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetCheckoutEntity ToEntity(string checkoutId)
     {
@@ -42,7 +43,8 @@ public sealed record CreateAssetCheckoutRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -61,7 +63,8 @@ public sealed record UpdateAssetCheckoutRequest(
     string? CustodianName,
     string? MainCategory,
     string? SubCategory,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetCheckoutEntity checkout)
     {
@@ -80,6 +83,7 @@ public sealed record UpdateAssetCheckoutRequest(
         checkout.SubCategory = SubCategory ?? string.Empty;
         checkout.UpdatedBy = UpdatedBy;
         checkout.UpdatedAt = DateTime.UtcNow;
+        checkout.Status = Status;
     }
 }
 
@@ -105,7 +109,8 @@ public sealed record AssetCheckoutResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetCheckoutResponse FromEntity(AssetCheckoutEntity checkout)
     {
@@ -131,6 +136,7 @@ public sealed record AssetCheckoutResponse(
             checkout.UpdatedAt,
             checkout.ClientId,
             checkout.TenantId,
-            checkout.IsDeleted);
+            checkout.IsDeleted,
+            checkout.Status);
     }
 }

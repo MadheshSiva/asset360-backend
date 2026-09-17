@@ -9,7 +9,8 @@ public sealed record CreateWorkTypeRequest(
     bool IsActive,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public WorkTypeEntity ToEntity(string workTypeId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateWorkTypeRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateWorkTypeRequest(
     string? WorkTypeName,
     string? Description,
     bool IsActive,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(WorkTypeEntity workType, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateWorkTypeRequest(
         workType.Description = Description ?? string.Empty;
         workType.IsActive = IsActive;
         workType.UpdatedBy = UpdatedBy;
+        workType.Status = Status;
         workType.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record WorkTypeResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static WorkTypeResponse FromEntity(WorkTypeEntity workType)
     {
@@ -81,6 +86,7 @@ public sealed record WorkTypeResponse(
             workType.UpdatedAt,
             workType.ClientId,
             workType.TenantId,
-            workType.IsDeleted);
+            workType.IsDeleted,
+            workType.Status);
     }
 }

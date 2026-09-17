@@ -13,7 +13,8 @@ public sealed record CreateAssetTrackingAndTelemetryRequest(
     string? SensorData,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetTrackingAndTelemetryEntity ToEntity(string trackingId)
     {
@@ -32,7 +33,8 @@ public sealed record CreateAssetTrackingAndTelemetryRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -46,7 +48,8 @@ public sealed record UpdateAssetTrackingAndTelemetryRequest(
     DateTime? LastSeenTimestamp,
     string? SpeedRoute,
     string? SensorData,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetTrackingAndTelemetryEntity telemetry)
     {
@@ -60,6 +63,7 @@ public sealed record UpdateAssetTrackingAndTelemetryRequest(
         telemetry.SensorData = SensorData ?? string.Empty;
         telemetry.UpdatedBy = UpdatedBy;
         telemetry.UpdatedAt = DateTime.UtcNow;
+        telemetry.Status = Status;
     }
 }
 
@@ -80,7 +84,8 @@ public sealed record AssetTrackingAndTelemetryResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetTrackingAndTelemetryResponse FromEntity(AssetTrackingAndTelemetryEntity telemetry)
     {
@@ -101,6 +106,7 @@ public sealed record AssetTrackingAndTelemetryResponse(
             telemetry.UpdatedAt,
             telemetry.ClientId,
             telemetry.TenantId,
-            telemetry.IsDeleted);
+            telemetry.IsDeleted,
+            telemetry.Status);
     }
 }

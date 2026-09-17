@@ -9,7 +9,8 @@ public sealed record CreatePermitTypeMasterRequest(
     bool IsApprovalRequired,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public PermitTypeMasterEntity ToEntity(string permitTypeId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreatePermitTypeMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdatePermitTypeMasterRequest(
     string? PermitName,
     int ValidityDays,
     bool IsApprovalRequired,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(PermitTypeMasterEntity permitTypeMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdatePermitTypeMasterRequest(
         permitTypeMaster.ValidityDays = ValidityDays;
         permitTypeMaster.IsApprovalRequired = IsApprovalRequired;
         permitTypeMaster.UpdatedBy = UpdatedBy;
+        permitTypeMaster.Status = Status;
         permitTypeMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record PermitTypeMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static PermitTypeMasterResponse FromEntity(PermitTypeMasterEntity permitTypeMaster)
     {
@@ -81,6 +86,7 @@ public sealed record PermitTypeMasterResponse(
             permitTypeMaster.UpdatedAt,
             permitTypeMaster.ClientId,
             permitTypeMaster.TenantId,
-            permitTypeMaster.IsDeleted);
+            permitTypeMaster.IsDeleted,
+            permitTypeMaster.Status);
     }
 }

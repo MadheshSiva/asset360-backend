@@ -15,7 +15,8 @@ public sealed record CreateAssetFinancialDetailsRequest(
     string? CostCenterAllocation,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetFinancialDetailsEntity ToEntity(string financialDetailsId)
     {
@@ -36,7 +37,8 @@ public sealed record CreateAssetFinancialDetailsRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -52,7 +54,8 @@ public sealed record UpdateAssetFinancialDetailsRequest(
     double CurrentBookValue,
     double ResidualValue,
     string? CostCenterAllocation,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetFinancialDetailsEntity financialDetails)
     {
@@ -68,6 +71,7 @@ public sealed record UpdateAssetFinancialDetailsRequest(
         financialDetails.CostCenterAllocation = CostCenterAllocation ?? string.Empty;
         financialDetails.UpdatedBy = UpdatedBy;
         financialDetails.UpdatedAt = DateTime.UtcNow;
+        financialDetails.Status = Status;
     }
 }
 
@@ -90,7 +94,8 @@ public sealed record AssetFinancialDetailsResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetFinancialDetailsResponse FromEntity(AssetFinancialDetailsEntity financialDetails)
     {
@@ -113,6 +118,7 @@ public sealed record AssetFinancialDetailsResponse(
             financialDetails.UpdatedAt,
             financialDetails.ClientId,
             financialDetails.TenantId,
-            financialDetails.IsDeleted);
+            financialDetails.IsDeleted,
+            financialDetails.Status);
     }
 }

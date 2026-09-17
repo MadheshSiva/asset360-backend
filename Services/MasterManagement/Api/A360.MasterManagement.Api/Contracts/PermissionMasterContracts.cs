@@ -8,7 +8,8 @@ public sealed record CreatePermissionMasterRequest(
     string? Module,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public PermissionMasterEntity ToEntity(string permissionId, string assetName)
     {
@@ -23,6 +24,7 @@ public sealed record CreatePermissionMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -32,7 +34,8 @@ public sealed record UpdatePermissionMasterRequest(
     string? AssetId,
     string? PermissionName,
     string? Module,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(PermissionMasterEntity permissionMaster, string assetName)
     {
@@ -41,6 +44,7 @@ public sealed record UpdatePermissionMasterRequest(
         permissionMaster.PermissionName = PermissionName ?? string.Empty;
         permissionMaster.Module = Module ?? string.Empty;
         permissionMaster.UpdatedBy = UpdatedBy;
+        permissionMaster.Status = Status;
         permissionMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -58,7 +62,8 @@ public sealed record PermissionMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static PermissionMasterResponse FromEntity(PermissionMasterEntity permissionMaster)
     {
@@ -75,6 +80,7 @@ public sealed record PermissionMasterResponse(
             permissionMaster.UpdatedAt,
             permissionMaster.ClientId,
             permissionMaster.TenantId,
-            permissionMaster.IsDeleted);
+            permissionMaster.IsDeleted,
+            permissionMaster.Status);
     }
 }

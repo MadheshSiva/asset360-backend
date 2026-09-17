@@ -12,7 +12,8 @@ public sealed record CreateAssetLocationRequest(
     string? LastSeenLocation,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetLocationEntity ToEntity()
     {
@@ -29,7 +30,8 @@ public sealed record CreateAssetLocationRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -41,7 +43,8 @@ public sealed record UpdateAssetLocationRequest(
     string? LocationHistory,
     string? ZoneTransitions,
     string? LastSeenLocation,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetLocationEntity location)
     {
@@ -53,6 +56,7 @@ public sealed record UpdateAssetLocationRequest(
         location.LastSeenLocation = LastSeenLocation;
         location.UpdatedBy = UpdatedBy;
         location.UpdatedAt = DateTime.UtcNow;
+        location.Status = Status;
     }
 }
 
@@ -71,7 +75,8 @@ public sealed record AssetLocationResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetLocationResponse FromEntity(AssetLocationEntity location)
     {
@@ -90,6 +95,7 @@ public sealed record AssetLocationResponse(
             location.UpdatedAt,
             location.ClientId,
             location.TenantId,
-            location.IsDeleted);
+            location.IsDeleted,
+            location.Status);
     }
 }

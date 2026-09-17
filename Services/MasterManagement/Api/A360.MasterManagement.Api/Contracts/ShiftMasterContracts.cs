@@ -9,7 +9,8 @@ public sealed record CreateShiftMasterRequest(
     string? EndTime,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public ShiftMasterEntity ToEntity(string shiftId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateShiftMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateShiftMasterRequest(
     string? ShiftName,
     string? StartTime,
     string? EndTime,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ShiftMasterEntity shiftMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateShiftMasterRequest(
         shiftMaster.StartTime = StartTime ?? string.Empty;
         shiftMaster.EndTime = EndTime ?? string.Empty;
         shiftMaster.UpdatedBy = UpdatedBy;
+        shiftMaster.Status = Status;
         shiftMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record ShiftMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static ShiftMasterResponse FromEntity(ShiftMasterEntity shiftMaster)
     {
@@ -81,6 +86,7 @@ public sealed record ShiftMasterResponse(
             shiftMaster.UpdatedAt,
             shiftMaster.ClientId,
             shiftMaster.TenantId,
-            shiftMaster.IsDeleted);
+            shiftMaster.IsDeleted,
+            shiftMaster.Status);
     }
 }

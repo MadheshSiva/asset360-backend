@@ -12,7 +12,8 @@ public sealed record CreateAssetAuditAndVerificationRequest(
     string? AuditHistoryLogs,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetAuditAndVerificationEntity ToEntity(string auditVerificationId)
     {
@@ -30,7 +31,8 @@ public sealed record CreateAssetAuditAndVerificationRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -43,7 +45,8 @@ public sealed record UpdateAssetAuditAndVerificationRequest(
     string? PhysicalVerificationResult,
     string? DiscrepanciesFound,
     string? AuditHistoryLogs,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetAuditAndVerificationEntity auditVerification)
     {
@@ -56,6 +59,7 @@ public sealed record UpdateAssetAuditAndVerificationRequest(
         auditVerification.AuditHistoryLogs = AuditHistoryLogs ?? string.Empty;
         auditVerification.UpdatedBy = UpdatedBy;
         auditVerification.UpdatedAt = DateTime.UtcNow;
+        auditVerification.Status = Status;
     }
 }
 
@@ -75,7 +79,8 @@ public sealed record AssetAuditAndVerificationResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetAuditAndVerificationResponse FromEntity(AssetAuditAndVerificationEntity auditVerification)
     {
@@ -95,6 +100,7 @@ public sealed record AssetAuditAndVerificationResponse(
             auditVerification.UpdatedAt,
             auditVerification.ClientId,
             auditVerification.TenantId,
-            auditVerification.IsDeleted);
+            auditVerification.IsDeleted,
+            auditVerification.Status);
     }
 }

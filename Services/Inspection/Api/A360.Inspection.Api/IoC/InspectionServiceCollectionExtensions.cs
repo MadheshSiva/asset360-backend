@@ -84,6 +84,10 @@ public static class InspectionServiceCollectionExtensions
         services.AddScoped<IHolidayAndWorkingCalendarRepository>(serviceProvider => serviceProvider.GetRequiredService<HolidayAndWorkingCalendarRepository>());
         services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<HolidayAndWorkingCalendarRepository>());
 
+        services.AddScoped<ChecklistRepository>();
+        services.AddScoped<IChecklistRepository>(serviceProvider => serviceProvider.GetRequiredService<ChecklistRepository>());
+        services.AddScoped<IMongoIndexConfigurator>(serviceProvider => serviceProvider.GetRequiredService<ChecklistRepository>());
+
         services.AddHostedService<MongoIndexHostedService>();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

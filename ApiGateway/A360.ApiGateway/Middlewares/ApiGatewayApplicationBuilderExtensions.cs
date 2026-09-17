@@ -51,6 +51,8 @@ public static class ApiGatewayApplicationBuilderExtensions
                 options.SwaggerEndpoint("/asset/swagger/v1/swagger.json", "Asset Service");
                 options.SwaggerEndpoint("/master-management/swagger/v1/swagger.json", "Master Management Service");
                 options.SwaggerEndpoint("/eventlog/swagger/v1/swagger.json", "Event Log Service");
+                options.SwaggerEndpoint("/maintenance/swagger/v1/swagger.json", "Maintenance Service");
+                options.SwaggerEndpoint("/wip/swagger/v1/swagger.json", "WIP Service");
 
                 options.RoutePrefix = "swagger";
             });
@@ -96,6 +98,20 @@ public static class ApiGatewayApplicationBuilderExtensions
                     gatewaySwaggerUrl = "/eventlog/swagger/v1/swagger.json",
                     serviceBaseUrl = "http://172.16.100.26:5420",
                     healthUrl = "/eventlog/health"
+               },
+                new
+               {
+                    service = "Maintenance",
+                    gatewaySwaggerUrl = "/maintenance/swagger/v1/swagger.json",
+                    serviceBaseUrl = "http://172.16.100.26:5430",
+                    healthUrl = "/maintenance/health"
+               },
+                new
+               {
+                    service = "Wip",
+                    gatewaySwaggerUrl = "/wip/swagger/v1/swagger.json",
+                    serviceBaseUrl = "http://172.16.100.26:5440",
+                    healthUrl = "/wip/health"
                }
             }))
             .WithName("GatewayDownstreamSwagger")

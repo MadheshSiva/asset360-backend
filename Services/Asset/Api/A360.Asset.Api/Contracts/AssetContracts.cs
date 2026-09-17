@@ -12,7 +12,8 @@ public sealed record CreateAssetRequest(
     string? ParentAsset,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetEntity ToEntity(string assetId)
     {
@@ -30,7 +31,8 @@ public sealed record CreateAssetRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -43,7 +45,8 @@ public sealed record UpdateAssetRequest(
     string? TagIds,
     string? AssetType,
     string? ParentAsset,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetEntity asset)
     {
@@ -56,6 +59,7 @@ public sealed record UpdateAssetRequest(
         asset.ParentAsset = ParentAsset;
         asset.UpdatedBy = UpdatedBy;
         asset.UpdatedAt = DateTime.UtcNow;
+        asset.Status = Status;
     }
 }
 
@@ -75,7 +79,8 @@ public sealed record AssetResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetResponse FromEntity(AssetEntity asset)
     {
@@ -95,6 +100,7 @@ public sealed record AssetResponse(
             asset.UpdatedAt,
             asset.ClientId,
             asset.TenantId,
-            asset.IsDeleted);
+            asset.IsDeleted,
+            asset.Status);
     }
 }

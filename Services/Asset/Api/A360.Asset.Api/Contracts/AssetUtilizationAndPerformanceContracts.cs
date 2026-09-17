@@ -12,7 +12,8 @@ public sealed record CreateAssetUtilizationAndPerformanceRequest(
     string? ProductivityMetrics,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetUtilizationAndPerformanceEntity ToEntity(string utilizationPerformanceId)
     {
@@ -30,7 +31,8 @@ public sealed record CreateAssetUtilizationAndPerformanceRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -43,7 +45,8 @@ public sealed record UpdateAssetUtilizationAndPerformanceRequest(
     string? MovementFrequency,
     double UtilizationPercentage,
     string? ProductivityMetrics,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetUtilizationAndPerformanceEntity utilizationPerformance)
     {
@@ -56,6 +59,7 @@ public sealed record UpdateAssetUtilizationAndPerformanceRequest(
         utilizationPerformance.ProductivityMetrics = ProductivityMetrics ?? string.Empty;
         utilizationPerformance.UpdatedBy = UpdatedBy;
         utilizationPerformance.UpdatedAt = DateTime.UtcNow;
+        utilizationPerformance.Status = Status;
     }
 }
 
@@ -75,7 +79,8 @@ public sealed record AssetUtilizationAndPerformanceResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetUtilizationAndPerformanceResponse FromEntity(AssetUtilizationAndPerformanceEntity utilizationPerformance)
     {
@@ -95,6 +100,7 @@ public sealed record AssetUtilizationAndPerformanceResponse(
             utilizationPerformance.UpdatedAt,
             utilizationPerformance.ClientId,
             utilizationPerformance.TenantId,
-            utilizationPerformance.IsDeleted);
+            utilizationPerformance.IsDeleted,
+            utilizationPerformance.Status);
     }
 }

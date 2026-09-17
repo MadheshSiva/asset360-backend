@@ -9,7 +9,8 @@ public sealed record CreateResponseTypeMasterRequest(
     bool IsActive,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public ResponseTypeMasterEntity ToEntity(string typeId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateResponseTypeMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateResponseTypeMasterRequest(
     string? TypeName,
     string? ValidationType,
     bool IsActive,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ResponseTypeMasterEntity responseTypeMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateResponseTypeMasterRequest(
         responseTypeMaster.ValidationType = ValidationType ?? string.Empty;
         responseTypeMaster.IsActive = IsActive;
         responseTypeMaster.UpdatedBy = UpdatedBy;
+        responseTypeMaster.Status = Status;
         responseTypeMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record ResponseTypeMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static ResponseTypeMasterResponse FromEntity(ResponseTypeMasterEntity responseTypeMaster)
     {
@@ -81,6 +86,7 @@ public sealed record ResponseTypeMasterResponse(
             responseTypeMaster.UpdatedAt,
             responseTypeMaster.ClientId,
             responseTypeMaster.TenantId,
-            responseTypeMaster.IsDeleted);
+            responseTypeMaster.IsDeleted,
+            responseTypeMaster.Status);
     }
 }

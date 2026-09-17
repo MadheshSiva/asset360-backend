@@ -14,7 +14,8 @@ public sealed record CreateAssetMaintenanceAndServiceRequest(
     string? VendorServiceProviderDetails,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetMaintenanceAndServiceEntity ToEntity(string maintenanceServiceId)
     {
@@ -34,7 +35,8 @@ public sealed record CreateAssetMaintenanceAndServiceRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -49,7 +51,8 @@ public sealed record UpdateAssetMaintenanceAndServiceRequest(
     string? DowntimeDuration,
     string? SparePartsUsed,
     string? VendorServiceProviderDetails,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetMaintenanceAndServiceEntity maintenanceService)
     {
@@ -64,6 +67,7 @@ public sealed record UpdateAssetMaintenanceAndServiceRequest(
         maintenanceService.VendorServiceProviderDetails = VendorServiceProviderDetails ?? string.Empty;
         maintenanceService.UpdatedBy = UpdatedBy;
         maintenanceService.UpdatedAt = DateTime.UtcNow;
+        maintenanceService.Status = Status;
     }
 }
 
@@ -85,7 +89,8 @@ public sealed record AssetMaintenanceAndServiceResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetMaintenanceAndServiceResponse FromEntity(AssetMaintenanceAndServiceEntity maintenanceService)
     {
@@ -107,6 +112,7 @@ public sealed record AssetMaintenanceAndServiceResponse(
             maintenanceService.UpdatedAt,
             maintenanceService.ClientId,
             maintenanceService.TenantId,
-            maintenanceService.IsDeleted);
+            maintenanceService.IsDeleted,
+            maintenanceService.Status);
     }
 }

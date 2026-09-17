@@ -10,7 +10,8 @@ public sealed record CreateAssetDomainRequest(
     string? FieldValue,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetDomainEntity ToEntity(string assetDomainId)
     {
@@ -26,7 +27,8 @@ public sealed record CreateAssetDomainRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -37,7 +39,8 @@ public sealed record UpdateAssetDomainRequest(
     string? AssetType,
     string? FieldName,
     string? FieldValue,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetDomainEntity assetDomain)
     {
@@ -48,6 +51,7 @@ public sealed record UpdateAssetDomainRequest(
         assetDomain.FieldValue = FieldValue ?? string.Empty;
         assetDomain.UpdatedBy = UpdatedBy;
         assetDomain.UpdatedAt = DateTime.UtcNow;
+        assetDomain.Status = Status;
     }
 }
 
@@ -65,7 +69,8 @@ public sealed record AssetDomainResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetDomainResponse FromEntity(AssetDomainEntity assetDomain)
     {
@@ -83,6 +88,7 @@ public sealed record AssetDomainResponse(
             assetDomain.UpdatedAt,
             assetDomain.ClientId,
             assetDomain.TenantId,
-            assetDomain.IsDeleted);
+            assetDomain.IsDeleted,
+            assetDomain.Status);
     }
 }

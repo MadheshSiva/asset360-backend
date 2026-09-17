@@ -28,6 +28,7 @@ public static class InspectionApplicationBuilderExtensions
         app.MapReportTemplateEndpoints();
         app.MapNumberingSequenceEndpoints();
         app.MapHolidayAndWorkingCalendarEndpoints();
+        app.MapChecklistEndpoints();
 
         return app;
     }

@@ -11,7 +11,8 @@ public sealed record CreateTagRequest(
     bool Active,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public TagEntity ToEntity(string tagId, string assetName)
     {
@@ -29,6 +30,7 @@ public sealed record CreateTagRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -41,7 +43,8 @@ public sealed record UpdateTagRequest(
     string? AssignedAssetCode,
     DateTime? IssueDate,
     bool Active,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(TagEntity tag, string assetName)
     {
@@ -53,6 +56,7 @@ public sealed record UpdateTagRequest(
         tag.IssueDate = IssueDate;
         tag.Active = Active;
         tag.UpdatedBy = UpdatedBy;
+        tag.Status = Status;
         tag.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -73,7 +77,8 @@ public sealed record TagResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static TagResponse FromEntity(TagEntity tag)
     {
@@ -93,6 +98,7 @@ public sealed record TagResponse(
             tag.UpdatedAt,
             tag.ClientId,
             tag.TenantId,
-            tag.IsDeleted);
+            tag.IsDeleted,
+            tag.Status);
     }
 }

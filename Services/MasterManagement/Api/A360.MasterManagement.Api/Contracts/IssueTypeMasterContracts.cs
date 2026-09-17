@@ -9,7 +9,8 @@ public sealed record CreateIssueTypeMasterRequest(
     bool IsActive,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public IssueTypeMasterEntity ToEntity(string issueTypeId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateIssueTypeMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateIssueTypeMasterRequest(
     string? IssueTypeName,
     string? Category,
     bool IsActive,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(IssueTypeMasterEntity issueTypeMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateIssueTypeMasterRequest(
         issueTypeMaster.Category = Category ?? string.Empty;
         issueTypeMaster.IsActive = IsActive;
         issueTypeMaster.UpdatedBy = UpdatedBy;
+        issueTypeMaster.Status = Status;
         issueTypeMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record IssueTypeMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static IssueTypeMasterResponse FromEntity(IssueTypeMasterEntity issueTypeMaster)
     {
@@ -81,6 +86,7 @@ public sealed record IssueTypeMasterResponse(
             issueTypeMaster.UpdatedAt,
             issueTypeMaster.ClientId,
             issueTypeMaster.TenantId,
-            issueTypeMaster.IsDeleted);
+            issueTypeMaster.IsDeleted,
+            issueTypeMaster.Status);
     }
 }

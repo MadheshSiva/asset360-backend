@@ -12,7 +12,8 @@ public sealed record CreateMasterMaintenanceRequest(
     bool Active,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public MasterMaintenanceEntity ToEntity(string masterMaintenanceId, string assetName)
     {
@@ -31,6 +32,7 @@ public sealed record CreateMasterMaintenanceRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -44,7 +46,8 @@ public sealed record UpdateMasterMaintenanceRequest(
     string? Frequency,
     double StandardDurationHrs,
     bool Active,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(MasterMaintenanceEntity masterMaintenance, string assetName)
     {
@@ -57,6 +60,7 @@ public sealed record UpdateMasterMaintenanceRequest(
         masterMaintenance.StandardDurationHrs = StandardDurationHrs;
         masterMaintenance.Active = Active;
         masterMaintenance.UpdatedBy = UpdatedBy;
+        masterMaintenance.Status = Status;
         masterMaintenance.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -78,7 +82,8 @@ public sealed record MasterMaintenanceResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static MasterMaintenanceResponse FromEntity(MasterMaintenanceEntity masterMaintenance)
     {
@@ -99,6 +104,7 @@ public sealed record MasterMaintenanceResponse(
             masterMaintenance.UpdatedAt,
             masterMaintenance.ClientId,
             masterMaintenance.TenantId,
-            masterMaintenance.IsDeleted);
+            masterMaintenance.IsDeleted,
+            masterMaintenance.Status);
     }
 }

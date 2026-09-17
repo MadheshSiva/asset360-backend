@@ -16,7 +16,8 @@ public sealed record CreateAssetCheckinRequest(
     string? CustodianName,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetCheckinEntity ToEntity(string checkinId)
     {
@@ -38,7 +39,8 @@ public sealed record CreateAssetCheckinRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -55,7 +57,8 @@ public sealed record UpdateAssetCheckinRequest(
     string? Room,
     string? DepartmentName,
     string? CustodianName,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetCheckinEntity checkin)
     {
@@ -72,6 +75,7 @@ public sealed record UpdateAssetCheckinRequest(
         checkin.CustodianName = CustodianName ?? string.Empty;
         checkin.UpdatedBy = UpdatedBy;
         checkin.UpdatedAt = DateTime.UtcNow;
+        checkin.Status = Status;
     }
 }
 
@@ -95,7 +99,8 @@ public sealed record AssetCheckinResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetCheckinResponse FromEntity(AssetCheckinEntity checkin)
     {
@@ -119,6 +124,7 @@ public sealed record AssetCheckinResponse(
             checkin.UpdatedAt,
             checkin.ClientId,
             checkin.TenantId,
-            checkin.IsDeleted);
+            checkin.IsDeleted,
+            checkin.Status);
     }
 }

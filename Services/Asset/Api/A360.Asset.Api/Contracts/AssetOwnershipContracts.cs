@@ -14,7 +14,8 @@ public sealed record CreateAssetOwnershipRequest(
     string? CheckInOutLogs,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetOwnershipEntity ToEntity(string ownershipId)
     {
@@ -34,7 +35,8 @@ public sealed record CreateAssetOwnershipRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -49,7 +51,8 @@ public sealed record UpdateAssetOwnershipRequest(
     string? TransferHistory,
     string? CustodianDetails,
     string? CheckInOutLogs,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetOwnershipEntity ownership)
     {
@@ -64,6 +67,7 @@ public sealed record UpdateAssetOwnershipRequest(
         ownership.CheckInOutLogs = CheckInOutLogs ?? string.Empty;
         ownership.UpdatedBy = UpdatedBy;
         ownership.UpdatedAt = DateTime.UtcNow;
+        ownership.Status = Status;
     }
 }
 
@@ -85,7 +89,8 @@ public sealed record AssetOwnershipResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetOwnershipResponse FromEntity(AssetOwnershipEntity ownership)
     {
@@ -107,6 +112,7 @@ public sealed record AssetOwnershipResponse(
             ownership.UpdatedAt,
             ownership.ClientId,
             ownership.TenantId,
-            ownership.IsDeleted);
+            ownership.IsDeleted,
+            ownership.Status);
     }
 }

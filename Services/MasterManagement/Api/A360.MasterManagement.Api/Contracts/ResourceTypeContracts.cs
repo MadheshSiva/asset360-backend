@@ -9,7 +9,8 @@ public sealed record CreateResourceTypeRequest(
     bool IsActive,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public ResourceTypeEntity ToEntity(string typeId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateResourceTypeRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateResourceTypeRequest(
     string? TypeName,
     string? Category,
     bool IsActive,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ResourceTypeEntity resourceType, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateResourceTypeRequest(
         resourceType.Category = Category ?? string.Empty;
         resourceType.IsActive = IsActive;
         resourceType.UpdatedBy = UpdatedBy;
+        resourceType.Status = Status;
         resourceType.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record ResourceTypeResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static ResourceTypeResponse FromEntity(ResourceTypeEntity resourceType)
     {
@@ -81,6 +86,7 @@ public sealed record ResourceTypeResponse(
             resourceType.UpdatedAt,
             resourceType.ClientId,
             resourceType.TenantId,
-            resourceType.IsDeleted);
+            resourceType.IsDeleted,
+            resourceType.Status);
     }
 }

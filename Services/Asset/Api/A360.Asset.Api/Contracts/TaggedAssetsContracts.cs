@@ -18,7 +18,8 @@ public sealed record CreateTaggedAssetsRequest(
     string? Brand,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public TaggedAssetsEntity ToEntity(string taggedAssetId)
     {
@@ -42,7 +43,8 @@ public sealed record CreateTaggedAssetsRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -61,7 +63,8 @@ public sealed record UpdateTaggedAssetsRequest(
     string? SubCategory,
     string? SubSubCategory,
     string? Brand,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(TaggedAssetsEntity taggedAsset)
     {
@@ -80,6 +83,7 @@ public sealed record UpdateTaggedAssetsRequest(
         taggedAsset.Brand = Brand ?? string.Empty;
         taggedAsset.UpdatedBy = UpdatedBy;
         taggedAsset.UpdatedAt = DateTime.UtcNow;
+        taggedAsset.Status = Status;
     }
 }
 
@@ -105,7 +109,8 @@ public sealed record TaggedAssetsResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static TaggedAssetsResponse FromEntity(TaggedAssetsEntity taggedAsset)
     {
@@ -131,6 +136,7 @@ public sealed record TaggedAssetsResponse(
             taggedAsset.UpdatedAt,
             taggedAsset.ClientId,
             taggedAsset.TenantId,
-            taggedAsset.IsDeleted);
+            taggedAsset.IsDeleted,
+            taggedAsset.Status);
     }
 }

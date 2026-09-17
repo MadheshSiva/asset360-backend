@@ -12,7 +12,8 @@ public sealed record CreateAssetAuditRequest(
     bool Active,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetAuditEntity ToEntity(string auditId)
     {
@@ -30,7 +31,8 @@ public sealed record CreateAssetAuditRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -43,7 +45,8 @@ public sealed record UpdateAssetAuditRequest(
     DateTime? AuditStartDate,
     DateTime? AuditEndDate,
     bool Active,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetAuditEntity audit)
     {
@@ -56,6 +59,7 @@ public sealed record UpdateAssetAuditRequest(
         audit.Active = Active;
         audit.UpdatedBy = UpdatedBy;
         audit.UpdatedAt = DateTime.UtcNow;
+        audit.Status = Status;
     }
 }
 
@@ -75,7 +79,8 @@ public sealed record AssetAuditResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetAuditResponse FromEntity(AssetAuditEntity audit)
     {
@@ -95,6 +100,7 @@ public sealed record AssetAuditResponse(
             audit.UpdatedAt,
             audit.ClientId,
             audit.TenantId,
-            audit.IsDeleted);
+            audit.IsDeleted,
+            audit.Status);
     }
 }

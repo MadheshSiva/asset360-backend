@@ -10,7 +10,8 @@ public sealed record CreatePriorityRequest(
     bool IsActive,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public PriorityEntity ToEntity(string priorityId, string assetName)
     {
@@ -27,6 +28,7 @@ public sealed record CreatePriorityRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -38,7 +40,8 @@ public sealed record UpdatePriorityRequest(
     string? ColorCode,
     string? SlaMapping,
     bool IsActive,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(PriorityEntity priority, string assetName)
     {
@@ -49,6 +52,7 @@ public sealed record UpdatePriorityRequest(
         priority.SlaMapping = SlaMapping ?? string.Empty;
         priority.IsActive = IsActive;
         priority.UpdatedBy = UpdatedBy;
+        priority.Status = Status;
         priority.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -68,7 +72,8 @@ public sealed record PriorityResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static PriorityResponse FromEntity(PriorityEntity priority)
     {
@@ -87,6 +92,7 @@ public sealed record PriorityResponse(
             priority.UpdatedAt,
             priority.ClientId,
             priority.TenantId,
-            priority.IsDeleted);
+            priority.IsDeleted,
+            priority.Status);
     }
 }

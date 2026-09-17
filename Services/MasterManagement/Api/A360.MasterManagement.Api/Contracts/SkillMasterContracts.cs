@@ -9,7 +9,8 @@ public sealed record CreateSkillMasterRequest(
     bool CertificationRequired,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public SkillMasterEntity ToEntity(string skillId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateSkillMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateSkillMasterRequest(
     string? SkillName,
     string? SkillLevel,
     bool CertificationRequired,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(SkillMasterEntity skillMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateSkillMasterRequest(
         skillMaster.SkillLevel = SkillLevel ?? string.Empty;
         skillMaster.CertificationRequired = CertificationRequired;
         skillMaster.UpdatedBy = UpdatedBy;
+        skillMaster.Status = Status;
         skillMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record SkillMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static SkillMasterResponse FromEntity(SkillMasterEntity skillMaster)
     {
@@ -81,6 +86,7 @@ public sealed record SkillMasterResponse(
             skillMaster.UpdatedAt,
             skillMaster.ClientId,
             skillMaster.TenantId,
-            skillMaster.IsDeleted);
+            skillMaster.IsDeleted,
+            skillMaster.Status);
     }
 }

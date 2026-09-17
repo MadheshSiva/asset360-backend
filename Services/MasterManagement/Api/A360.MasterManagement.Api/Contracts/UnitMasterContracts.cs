@@ -9,7 +9,8 @@ public sealed record CreateUnitMasterRequest(
     bool IsActive,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public UnitMasterEntity ToEntity(string unitId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateUnitMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateUnitMasterRequest(
     string? UnitName,
     string? Symbol,
     bool IsActive,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(UnitMasterEntity unitMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateUnitMasterRequest(
         unitMaster.Symbol = Symbol ?? string.Empty;
         unitMaster.IsActive = IsActive;
         unitMaster.UpdatedBy = UpdatedBy;
+        unitMaster.Status = Status;
         unitMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record UnitMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static UnitMasterResponse FromEntity(UnitMasterEntity unitMaster)
     {
@@ -81,6 +86,7 @@ public sealed record UnitMasterResponse(
             unitMaster.UpdatedAt,
             unitMaster.ClientId,
             unitMaster.TenantId,
-            unitMaster.IsDeleted);
+            unitMaster.IsDeleted,
+            unitMaster.Status);
     }
 }

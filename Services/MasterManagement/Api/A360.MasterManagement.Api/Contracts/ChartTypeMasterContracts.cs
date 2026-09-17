@@ -9,7 +9,8 @@ public sealed record CreateChartTypeMasterRequest(
     bool IsActive,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public ChartTypeMasterEntity ToEntity(string widgetId, string assetName)
     {
@@ -25,6 +26,7 @@ public sealed record CreateChartTypeMasterRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
+            Status = Status,
             IsDeleted = false
         };
     }
@@ -35,7 +37,8 @@ public sealed record UpdateChartTypeMasterRequest(
     string? WidgetName,
     string? ConfigJson,
     bool IsActive,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(ChartTypeMasterEntity chartTypeMaster, string assetName)
     {
@@ -45,6 +48,7 @@ public sealed record UpdateChartTypeMasterRequest(
         chartTypeMaster.ConfigJson = ConfigJson ?? string.Empty;
         chartTypeMaster.IsActive = IsActive;
         chartTypeMaster.UpdatedBy = UpdatedBy;
+        chartTypeMaster.Status = Status;
         chartTypeMaster.UpdatedAt = DateTime.UtcNow;
     }
 }
@@ -63,7 +67,8 @@ public sealed record ChartTypeMasterResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static ChartTypeMasterResponse FromEntity(ChartTypeMasterEntity chartTypeMaster)
     {
@@ -81,6 +86,7 @@ public sealed record ChartTypeMasterResponse(
             chartTypeMaster.UpdatedAt,
             chartTypeMaster.ClientId,
             chartTypeMaster.TenantId,
-            chartTypeMaster.IsDeleted);
+            chartTypeMaster.IsDeleted,
+            chartTypeMaster.Status);
     }
 }

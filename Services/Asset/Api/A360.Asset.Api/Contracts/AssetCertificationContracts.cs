@@ -11,7 +11,8 @@ public sealed record CreateAssetCertificationRequest(
     string? InspectionLogs,
     string? CreatedBy,
     string? ClientId,
-    string? TenantId)
+    string? TenantId,
+    string? Status)
 {
     public AssetCertificationEntity ToEntity(string certificationId)
     {
@@ -28,7 +29,8 @@ public sealed record CreateAssetCertificationRequest(
             CreatedAt = DateTime.UtcNow,
             ClientId = ClientId,
             TenantId = TenantId,
-            IsDeleted = false
+            IsDeleted = false,
+            Status = Status
         };
     }
 }
@@ -40,7 +42,8 @@ public sealed record UpdateAssetCertificationRequest(
     DateTime? IssuedDate,
     DateTime? ExpiryDate,
     string? InspectionLogs,
-    string? UpdatedBy)
+    string? UpdatedBy,
+    string? Status)
 {
     public void ApplyTo(AssetCertificationEntity certification)
     {
@@ -52,6 +55,7 @@ public sealed record UpdateAssetCertificationRequest(
         certification.InspectionLogs = InspectionLogs ?? string.Empty;
         certification.UpdatedBy = UpdatedBy;
         certification.UpdatedAt = DateTime.UtcNow;
+        certification.Status = Status;
     }
 }
 
@@ -70,7 +74,8 @@ public sealed record AssetCertificationResponse(
     DateTime? UpdatedAt,
     string? ClientId,
     string? TenantId,
-    bool IsDeleted)
+    bool IsDeleted,
+    string? Status)
 {
     public static AssetCertificationResponse FromEntity(AssetCertificationEntity certification)
     {
@@ -89,6 +94,7 @@ public sealed record AssetCertificationResponse(
             certification.UpdatedAt,
             certification.ClientId,
             certification.TenantId,
-            certification.IsDeleted);
+            certification.IsDeleted,
+            certification.Status);
     }
 }
