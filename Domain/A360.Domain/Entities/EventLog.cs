@@ -26,4 +26,6 @@ public static class EventAction
     public const string Updated = "Updated";
     public const string Deleted = "Deleted";
     public const string Viewed = "Viewed";
+    public const string LoggedIn = "LoggedIn";
+    public const string LoggedOut = "LoggedOut";
 }

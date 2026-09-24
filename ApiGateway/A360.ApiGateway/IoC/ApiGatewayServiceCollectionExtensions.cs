@@ -1,3 +1,4 @@
+using A360.Security;
 using Yarp.ReverseProxy;
 
 namespace A360.ApiGateway.IoC;
@@ -11,6 +12,8 @@ public static class ApiGatewayServiceCollectionExtensions
         services
             .AddReverseProxy()
             .LoadFromConfig(configuration.GetSection("ReverseProxy"));
+
+        services.AddA360JwtAuthentication(configuration);
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

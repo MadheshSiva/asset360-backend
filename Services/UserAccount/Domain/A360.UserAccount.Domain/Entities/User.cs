@@ -42,6 +42,9 @@ public sealed class User : BaseEntity
     [BsonElement("two_factor_expiration")]
     public DateTime? TwoFactorExpiration { get; set; }
 
+    [BsonElement("two_factor_attempts")]
+    public int TwoFactorAttempts { get; set; }
+
     [BsonElement("password_reset_token")]
     public string PasswordResetToken { get; set; } = string.Empty;
 

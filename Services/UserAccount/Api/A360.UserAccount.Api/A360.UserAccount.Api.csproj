@@ -15,6 +15,8 @@
     <ProjectReference Include="..\..\Domain\A360.UserAccount.Domain\A360.UserAccount.Domain.csproj" />
     <ProjectReference Include="..\..\Repository\A360.UserAccount.Repository\A360.UserAccount.Repository.csproj" />
     <ProjectReference Include="..\..\..\..\Repository\A360.Repository\A360.Repository.csproj" />
+    <ProjectReference Include="..\..\..\..\Email\A360.Email\A360.Email.csproj" />
+    <ProjectReference Include="..\..\..\..\Security\A360.Security\A360.Security.csproj" />
   </ItemGroup>
 
 </Project>

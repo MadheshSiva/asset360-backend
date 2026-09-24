@@ -46,10 +46,80 @@ public sealed class UserRepository : MongoRepository<UserEntity>, IUserRepositor
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyCollection<UserEntity>> GetByUserNameAsync(
+        string userName,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        return await Collection
+            .Find(user => user.UserName == userName && !user.IsDeleted, new FindOptions { Collation = CaseInsensitiveCollation })
+            .Limit(limit)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task SetTwoFactorCodeAsync(
+        string id,
+        string codeHash,
+        DateTime expiration,
+        CancellationToken cancellationToken = default)
+    {
+        await Collection.UpdateOneAsync(
+            user => user.Id == id,
+            Builders<UserEntity>.Update
+                .Set(user => user.TwoFactorCode, codeHash)
+                .Set(user => user.TwoFactorExpiration, expiration)
+                .Set(user => user.TwoFactorAttempts, 0),
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task<int> RegisterFailedTwoFactorAttemptAsync(string id, CancellationToken cancellationToken = default)
+    {
+        var user = await Collection.FindOneAndUpdateAsync(
+            user => user.Id == id,
+            Builders<UserEntity>.Update.Inc(user => user.TwoFactorAttempts, 1),
+            new FindOneAndUpdateOptions<UserEntity> { ReturnDocument = ReturnDocument.After },
+            cancellationToken);
+
+        return user?.TwoFactorAttempts ?? int.MaxValue;
+    }
+
+    public async Task ClearTwoFactorCodeAsync(string id, CancellationToken cancellationToken = default)
+    {
+        await Collection.UpdateOneAsync(
+            user => user.Id == id,
+            ClearTwoFactorUpdate(),
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task<bool> CompleteTwoFactorLoginAsync(
+        string id,
+        string codeHash,
+        CancellationToken cancellationToken = default)
+    {
+        // Matching on the code hash makes the OTP single-use even under concurrent requests.
+        var result = await Collection.UpdateOneAsync(
+            user => user.Id == id && user.TwoFactorCode == codeHash,
+            ClearTwoFactorUpdate().Set(user => user.LastLogin, DateTime.UtcNow),
+            cancellationToken: cancellationToken);
+
+        return result.IsAcknowledged && result.ModifiedCount > 0;
+    }
+
+    private static UpdateDefinition<UserEntity> ClearTwoFactorUpdate()
+    {
+        return Builders<UserEntity>.Update
+            .Set(user => user.TwoFactorCode, string.Empty)
+            .Set(user => user.TwoFactorExpiration, null)
+            .Set(user => user.TwoFactorAttempts, 0);
+    }
+
     public async Task CreateIndexesAsync(CancellationToken cancellationToken = default)
     {
         var indexes = new[]
         {
+            new CreateIndexModel<UserEntity>(
+                Builders<UserEntity>.IndexKeys.Ascending(user => user.UserName),
+                new CreateIndexOptions { Name = "ix_users_user_name", Collation = CaseInsensitiveCollation }),
             new CreateIndexModel<UserEntity>(
                 Builders<UserEntity>.IndexKeys.Ascending(user => user.UserId),
                 new CreateIndexOptions { Name = "ux_users_user_id", Unique = true }),

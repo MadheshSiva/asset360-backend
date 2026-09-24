@@ -12,7 +12,7 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader();
     });
 });
-builder.Services.AddUserAccountApiServices(builder.Configuration);
+builder.Services.AddUserAccountApiServices(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 app.UseCors("AllowAll");

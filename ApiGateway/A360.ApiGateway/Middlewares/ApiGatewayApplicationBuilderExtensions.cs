@@ -9,6 +9,9 @@ public static class ApiGatewayApplicationBuilderExtensions
 
     public static WebApplication UseApiGatewayMiddlewares(this WebApplication app)
     {
+        app.UseAuthentication();
+        app.UseMiddleware<GatewayAuthenticationMiddleware>();
+
         if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled"))
         {
             app.UseSwagger();

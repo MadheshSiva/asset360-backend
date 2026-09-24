@@ -9,7 +9,8 @@ public sealed record EventLogResponse(
     string EntityId,
     string EntityName,
     string Action,
-    DateTime? CreatedAt)
+    DateTime? CreatedAt,
+    string Message)
 {
     public static EventLogResponse FromEntity(EventLogEntity eventLog)
     {
@@ -20,7 +21,17 @@ public sealed record EventLogResponse(
             eventLog.EntityId,
             eventLog.EntityName,
             eventLog.Action,
-            eventLog.CreatedAt);
+            eventLog.CreatedAt,
+            BuildMessage(eventLog));
+    }
+
+    private static string BuildMessage(EventLogEntity eventLog)
+    {
+        var action = string.IsNullOrWhiteSpace(eventLog.Action)
+            ? eventLog.Action
+            : eventLog.Action.ToLowerInvariant();
+
+        return $"{eventLog.EntityName} is {action} with id {eventLog.EntityId}";
     }
 }
 

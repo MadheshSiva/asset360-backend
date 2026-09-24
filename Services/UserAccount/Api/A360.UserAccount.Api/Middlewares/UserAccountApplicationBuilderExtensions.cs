@@ -12,10 +12,14 @@ public static class UserAccountApplicationBuilderExtensions
             app.UseSwaggerUI();
         }
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "UserAccount" }))
             .WithName("UserAccountHealth")
             .WithTags("Health");
 
+        app.MapAuthEndpoints();
         app.MapUserEndpoints();
         app.MapRoleEndpoints();
 
